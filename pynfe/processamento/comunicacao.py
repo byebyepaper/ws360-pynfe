@@ -1334,8 +1334,8 @@ class ComunicacaoCTe(Comunicacao):
         url = self._get_url("EVENTOS")
 
         # Monta XML do corpo da requisição
-        #xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
-        return self._post(url, evento)
+        xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
+        return self._post(url, xml)
     
 
     def _construir_xml_soap(self, metodo, dados, cabecalho=False):
@@ -1343,7 +1343,7 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP},
+            nsmap={"soap": NAMESPACE_SOAP}, #"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, 
         )
 
         if self._header:
