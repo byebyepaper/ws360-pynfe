@@ -1260,7 +1260,7 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(self._header, xmlns=self._namespace_metodo + metodo)
         etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
-        etree.SubElement(raiz, "versaoDados").text = "4.0"
+        etree.SubElement(raiz, "versaoDados").text = "3.0"
         return raiz
 
     def _get_url(self, consulta):
