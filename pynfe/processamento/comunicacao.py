@@ -1395,6 +1395,9 @@ class ComunicacaoCTe(Comunicacao):
             )
             xml = xml_declaration + xml
 
+            xml_text = etree.tostring(xml, encoding="unicode", pretty_print=True)
+            print(f"xml_text:{xml_text}")
+
             # Faz o request com o servidor
             result = requests.post(
                 url,
