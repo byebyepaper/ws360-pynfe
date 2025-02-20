@@ -1334,8 +1334,8 @@ class ComunicacaoCTe(Comunicacao):
         url = self._get_url("EVENTOS")
 
         # Monta XML do corpo da requisição
-        xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
-        return self._post(url, xml)
+        #xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
+        return self._post(url, evento)
     
 
     def _construir_xml_soap(self, metodo, dados, cabecalho=False):
@@ -1394,7 +1394,6 @@ class ComunicacaoCTe(Comunicacao):
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml
-
             print(xml)
 
             # Faz o request com o servidor
