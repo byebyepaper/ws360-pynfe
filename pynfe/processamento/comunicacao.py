@@ -1344,7 +1344,7 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"soap": NAMESPACE_SOAP, "xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD},
+            # nsmap={"soap": NAMESPACE_SOAP, "xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD},
         )
         # if self._header:
         #     cabecalho = self._cabecalho_soap(metodo)
