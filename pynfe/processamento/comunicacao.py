@@ -1343,7 +1343,7 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"soap": NAMESPACE_SOAP}, #"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, 
+            nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP}, 
         )
 
         if self._header:
