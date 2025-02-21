@@ -2019,7 +2019,7 @@ class SerializacaoXML(Serializacao):
     def serializar_evento_cte(self, evento, tag_raiz="eventoCTe", retorna_string=False):
         tz = datetime.now().astimezone().strftime("%z")
         tz = "{}:{}".format(tz[:-2], tz[-2:])
-        raiz = etree.Element(tag_raiz, versao="4.0", xmlns=NAMESPACE_CTE)
+        raiz = etree.Element(tag_raiz, versao="4.0", xmlns=NAMESPACE_CTE, xmlns_ds=NAMESPACE_SIG)
         e = etree.SubElement(raiz, "infEvento", Id=evento.identificador)
         etree.SubElement(e, "cOrgao").text = CODIGOS_ESTADOS[evento.uf.upper()]
         etree.SubElement(e, "tpAmb").text = str(self._ambiente)

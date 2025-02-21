@@ -16,6 +16,7 @@ from pynfe.utils.flags import (
     NAMESPACE_MDFE_METODO,
     NAMESPACE_METODO,
     NAMESPACE_NFE,
+    NAMESPACE_SIG,
     NAMESPACE_SOAP,
     NAMESPACE_XSD,
     NAMESPACE_XSI,
@@ -1343,9 +1344,8 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP}, 
+            nsmap={"ds": NAMESPACE_SIG, "xs": NAMESPACE_XSD, "soap": NAMESPACE_SOAP}, #"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD
         )
-
         if self._header:
             cabecalho = self._cabecalho_soap(metodo)
             c = etree.SubElement(raiz, "{%s}Header" % self._namespace_soap)
