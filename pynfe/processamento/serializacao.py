@@ -2019,7 +2019,7 @@ class SerializacaoXML(Serializacao):
     def serializar_evento_cte(self, evento, tag_raiz="eventoCTe", retorna_string=False):
         tz = datetime.now().astimezone().strftime("%z")
         tz = "{}:{}".format(tz[:-2], tz[-2:])
-        raiz = etree.Element(tag_raiz, versao="4.00", nsmap={None: NAMESPACE_CTE, "ds": NAMESPACE_SIG})
+        raiz = etree.Element(tag_raiz, versao="4.00", nsmap={None: NAMESPACE_CTE})
         e = etree.SubElement(raiz, "infEvento", Id=evento.identificador)
         etree.SubElement(e, "cOrgao").text = CODIGOS_ESTADOS[evento.uf.upper()]
         etree.SubElement(e, "tpAmb").text = str(self._ambiente)
@@ -2033,7 +2033,7 @@ class SerializacaoXML(Serializacao):
         )
         etree.SubElement(e, "tpEvento").text = evento.tp_evento
         etree.SubElement(e, "nSeqEvento").text = str(evento.n_seq_evento)
-        det = etree.SubElement(e, "detEvento", versaoEvento="4.00", nsmap={None:NAMESPACE_CTE })
+        det = etree.SubElement(e, "detEvento", versaoEvento="4.00")
         # EVENTOS COMENTADOS NÂO TESTADOS
         # if evento.descricao == "Comprovante de Entrega do CT-e":
         #     etree.Subelement(det, "nProt").text = evento.protocolo
@@ -2081,7 +2081,7 @@ class SerializacaoXML(Serializacao):
             etree.SubElement(cancelamento, "nProt").text = evento.protocolo
             etree.SubElement(cancelamento, "nProtIE").text = evento.protocolo_evento
         elif evento.descricao == "Prestação do Serviço em Desacordo":
-            desacordo = etree.SubElement(det, "evPrestDesacordo", nsmap={None:NAMESPACE_CTE})
+            desacordo = etree.SubElement(det, "evPrestDesacordo")
             etree.SubElement(desacordo, "descEvento").text = evento.descricao
             etree.SubElement(desacordo, "indDesacordoOper").text = "1" #Indicador de operação em desacordo
             etree.SubElement(desacordo, "xObs").text = evento.observacao

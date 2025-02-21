@@ -1344,7 +1344,7 @@ class ComunicacaoCTe(Comunicacao):
 
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP},
+            nsmap={"soap": NAMESPACE_SOAP, "xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD},
         )
         # if self._header:
         #     cabecalho = self._cabecalho_soap(metodo)
@@ -1352,17 +1352,8 @@ class ComunicacaoCTe(Comunicacao):
         #     c.append(cabecalho)
 
         body = etree.SubElement(raiz, "{%s}Body" % NAMESPACE_SOAP)
-        # distribuição tem um corpo de xml diferente
-        if metodo == "CTeDistribuicaoDFe":
-            x = etree.SubElement(
-                body, "cteDistDFeInteresse", xmlns=NAMESPACE_CTE_METODO + metodo
-            )
-            a = etree.SubElement(x, "cteDadosMsg")
-        else:
-            a = etree.SubElement(
-                body, "cteDadosMsg", xmlns=NAMESPACE_CTE_METODO + metodo
-            )
-        a.append(dados)
+        cte_dados_msg = etree.SubElement(body, "cteDadosMsg", xmlns=NAMESPACE_CTE_METODO + metodo)
+        cte_dados_msg.append(dados)
         return raiz
 
     def _post_header(self):
