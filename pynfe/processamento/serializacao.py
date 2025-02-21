@@ -2020,7 +2020,7 @@ class SerializacaoXML(Serializacao):
         tz = datetime.now().astimezone().strftime("%z")
         tz = "{}:{}".format(tz[:-2], tz[-2:])
         raiz = etree.Element(tag_raiz, versao="4.00", nsmap={None: NAMESPACE_CTE})
-        e = etree.SubElement(raiz, "infEvento", Id=evento.identificador)
+        e = etree.SubElement(raiz, "infEvento", Id=evento.identificador_cte)
         etree.SubElement(e, "cOrgao").text = CODIGOS_ESTADOS[evento.uf.upper()]
         etree.SubElement(e, "tpAmb").text = str(self._ambiente)
         if len(so_numeros(evento.cnpj)) == 11:

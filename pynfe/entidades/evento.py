@@ -44,6 +44,19 @@ class Evento(Entidade):
             "n_seq_evento": str(self.n_seq_evento).zfill(2),
         }
         return self.id
+    
+    def identificador_cte(self):
+        """
+        Gera o valor para o campo id
+        A regra de formação do Id é: “ID” + tpEvento + chave da NF-e + nSeqEvento
+        O n_seq_evento pra eventos de cte tem 3 digitos
+        """
+        self.id = "ID%(tp_evento)s%(chave)s%(n_seq_evento)s" % {
+            "tp_evento": self.tp_evento,
+            "chave": self.chave,
+            "n_seq_evento": str(self.n_seq_evento).zfill(3),
+        }
+        return self.id
 
 
 class EventoCancelarNota(Evento):
