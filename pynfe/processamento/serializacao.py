@@ -2033,7 +2033,7 @@ class SerializacaoXML(Serializacao):
         )
         etree.SubElement(e, "tpEvento").text = evento.tp_evento
         etree.SubElement(e, "nSeqEvento").text = str(evento.n_seq_evento)
-        det = etree.SubElement(e, "detEvento", versaoEvento="4.00")
+        det = etree.SubElement(e, "detEvento", versaoEvento="4.00", nsmap={None:NAMESPACE_CTE })
         # EVENTOS COMENTADOS NÂO TESTADOS
         # if evento.descricao == "Comprovante de Entrega do CT-e":
         #     etree.Subelement(det, "nProt").text = evento.protocolo
@@ -2049,7 +2049,7 @@ class SerializacaoXML(Serializacao):
         #         inf_entrega = etree.SubElement(det, "infEntrega") #apenas para CT-e com tipo de serviço Normal
         #         etree.SubElement(inf_entrega, "chNFe").text = evento.chave_acesso #chave de acesso da NF-e entregue
         if evento.descricao == "Cancelamento do Comprovante de Entrega do CT-e":
-            cancelamento = etree.SubElement(det, "evCancCECTe", nsmap={None: NAMESPACE_CTE})
+            cancelamento = etree.SubElement(det, "evCancCECTe")
             etree.SubElement(cancelamento, "descEvento").text = evento.descricao
             etree.SubElement(cancelamento, "nProt").text = evento.protocolo #Número do Protocolo de autorização do CT-e
             etree.SubElement(cancelamento, "nProtCE").text = evento.protocolo_evento #Número do Protocolo de autorização do evento a ser cancelado
@@ -2076,17 +2076,17 @@ class SerializacaoXML(Serializacao):
             #     inf_entrega = etree.SubElement(det, "infEntrega") #apenas para CT-e com tipo de serviço Normal
             #     etree.SubElement(inf_entrega, "chNFe").text = evento.chave_acesso #chave de acesso da NF-e com insucesso na entrega
         elif evento.descricao == "Cancelamento do Insucesso de Entrega do CT-e":
-            cancelamento = etree.SubElement(det, "evCancIECTe", nsmap={None: NAMESPACE_CTE})
+            cancelamento = etree.SubElement(det, "evCancIECTe")
             etree.SubElement(cancelamento, "descEvento").text = evento.descricao
             etree.SubElement(cancelamento, "nProt").text = evento.protocolo
             etree.SubElement(cancelamento, "nProtIE").text = evento.protocolo_evento
         elif evento.descricao == "Prestação do Serviço em Desacordo":
-            desacordo = etree.SubElement(det, "evPrestDesacordo", nsmap={None: NAMESPACE_CTE})
+            desacordo = etree.SubElement(det, "evPrestDesacordo", nsmap={None:NAMESPACE_CTE})
             etree.SubElement(desacordo, "descEvento").text = evento.descricao
             etree.SubElement(desacordo, "indDesacordoOper").text = "1" #Indicador de operação em desacordo
             etree.SubElement(desacordo, "xObs").text = evento.observacao
         elif evento.descricao == "Cancelamento Prestação do Serviço em Desacordo":
-            cancelamento = etree.SubElement(det, "evCancPrestDesacordo", nsmap={None: NAMESPACE_CTE})
+            cancelamento = etree.SubElement(det, "evCancPrestDesacordo")
             etree.SubElement(cancelamento, "descEvento").text = evento.descricao
             etree.SubElement(cancelamento, "nProtEvPrestDes").text = evento.protocolo_evento
 
