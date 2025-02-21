@@ -551,26 +551,31 @@ CTE = {
         "HOMOLOGACAO": "https://hom1",
     },
     "MT": {
+        "EVENTOS": "sefaz.mt.gov.br/ctews2/services/CTeRecepcaoEventoV4?wsdl"
         "STATUS": "sefaz.mt.gov.br/ctews/services/CteStatusServico",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://homologacao.",
     },
     "MS": {
+        "EVENTOS": "cte.ms.gov.br/ws/CTeRecepcaoEventoV4",
         "STATUS": "cte.ms.gov.br/ws/CteStatusServico",
         "HTTPS": "https://producao.",
         "HOMOLOGACAO": "https://homologacao.",
     },
     "MG": {
+        "EVENTOS": "fazenda.mg.gov.br/cte/services/CTeRecepcaoEventoV4",
         "STATUS": "fazenda.mg.gov.br/cte/services/CteStatusServico",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://hcte.",
     },
     "PR": {
+        "EVENTOS": "fazenda.pr.gov.br/cte4/CTeRecepcaoEventoV4?wsdl",
         "STATUS": "fazenda.pr.gov.br/cte/CteStatusServico?wsdl",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://homologacao.",
     },
     "RS": {
+        "EVENTOS": "svrs.rs.gov.br/ws/CTeRecepcaoEventoV4/CTeRecepcaoEventoV4.asmx",
         "STATUS": "svrs.rs.gov.br/ws/ctestatusservico/CteStatusServico.asmx",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://cte-homologacao.",
@@ -582,11 +587,13 @@ CTE = {
         "HOMOLOGACAO": "https://homologacao.nfe.",
     },
     "SVRS": {
+        "EVENTOS": "svrs.rs.gov.br/ws/CTeRecepcaoEventoV4/CTeRecepcaoEventoV4.asmx",
         "STATUS": "svrs.rs.gov.br/ws/ctestatusservico/CteStatusServico.asmx",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://cte-homologacao.",
     },
     "SVSP": {
+        "EVENTOS": "fazenda.sp.gov.br/CTeWS/WS/CTeRecepcaoEventoV4.asmx",
         "STATUS": "fazenda.sp.gov.br/cteWEB/services/CteStatusServico.asmx",
         "HTTPS": "https://nfe.",
         "HOMOLOGACAO": "https://homologacao.nfe.",
