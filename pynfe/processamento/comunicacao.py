@@ -1346,10 +1346,10 @@ class ComunicacaoCTe(Comunicacao):
             "{%s}Envelope" % NAMESPACE_SOAP,
             nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP},
         )
-        if self._header:
-            cabecalho = self._cabecalho_soap(metodo)
-            c = etree.SubElement(raiz, "{%s}Header" % self._namespace_soap)
-            c.append(cabecalho)
+        # if self._header:
+        #     cabecalho = self._cabecalho_soap(metodo)
+        #     c = etree.SubElement(raiz, "{%s}Header" % self._namespace_soap)
+        #     c.append(cabecalho)
 
         body = etree.SubElement(raiz, "{%s}Body" % NAMESPACE_SOAP)
         # distribuição tem um corpo de xml diferente
