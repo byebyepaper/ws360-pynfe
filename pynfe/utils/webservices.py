@@ -551,7 +551,7 @@ CTE = {
         "HOMOLOGACAO": "https://hom1",
     },
     "MT": {
-        "EVENTOS": "sefaz.mt.gov.br/ctews2/services/CTeRecepcaoEventoV4?wsdl"
+        "EVENTOS": "sefaz.mt.gov.br/ctews2/services/CTeRecepcaoEventoV4?wsdl",
         "STATUS": "sefaz.mt.gov.br/ctews/services/CteStatusServico",
         "HTTPS": "https://cte.",
         "HOMOLOGACAO": "https://homologacao.",
