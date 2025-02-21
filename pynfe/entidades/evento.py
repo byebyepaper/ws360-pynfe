@@ -45,6 +45,7 @@ class Evento(Entidade):
         }
         return self.id
     
+    @property
     def identificador_cte(self):
         """
         Gera o valor para o campo id
