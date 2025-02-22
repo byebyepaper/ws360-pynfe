@@ -1269,7 +1269,6 @@ class ComunicacaoCTe(Comunicacao):
 
         # Estados que implementam webservices proprios
         lista = ["MT", "MS", "MG", "PR", "RS", "SP"]
-        print(self.uf.upper())
         if self.uf.upper() in lista:
             if self._ambiente == 1:
                 ambiente = "HTTPS"
@@ -1334,7 +1333,6 @@ class ComunicacaoCTe(Comunicacao):
 
         # url do serviço
         url = self._get_url("EVENTOS")
-        print(url)
 
         # Monta XML do corpo da requisição
         xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
@@ -1387,7 +1385,6 @@ class ComunicacaoCTe(Comunicacao):
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml
-            print(xml)
 
             # Faz o request com o servidor
             result = requests.post(
