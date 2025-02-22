@@ -1269,6 +1269,7 @@ class ComunicacaoCTe(Comunicacao):
 
         # Estados que implementam webservices proprios
         lista = ["MT", "MS", "MG", "PR", "RS", "SP"]
+        print(self.uf.upper())
         if self.uf.upper() in lista:
             if self._ambiente == 1:
                 ambiente = "HTTPS"
