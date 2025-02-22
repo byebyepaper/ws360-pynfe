@@ -1333,6 +1333,7 @@ class ComunicacaoCTe(Comunicacao):
 
         # url do serviço
         url = self._get_url("EVENTOS")
+        print(url)
 
         # Monta XML do corpo da requisição
         xml = self._construir_xml_soap("CTeRecepcaoEventoV4", evento)
