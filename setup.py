@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyNFe",
-    version="0.5.3",
+    version="0.5.4",
     author="TadaSoftware",
     author_email="tadasoftware@gmail.com",
     description="Interface library with the Brazilian Electronic Invoice web services",
@@ -27,7 +27,7 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(exclude=["tests"]),
     package_data={
-        "pynfe": ["data/**/*.txt"],
+        "pynfe": ["data/**/*.txt", "data/**/*.json", "data/**/*.xsd", "data/**/*.csv"],
     },
     install_requires=[
         "pyopenssl>=23.0.0",
