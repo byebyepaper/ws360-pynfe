@@ -774,6 +774,7 @@
                     },
                     "valor": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gIBSMun/vIBSMun"
                 },
+                "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/vIBS",
                 "cbs": {
                     "aliquota": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCBS/pCBS",
                     "diferimento": {
@@ -825,6 +826,7 @@
                     "aliquotaAdRemCbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/adRemCBS",
                     "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/vIBSMono",
                     "valorCbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/vCBSMono",
+                    
                     "quantidadeRetencao": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/qBCMonoReten",
                     "aliquotaAdRemIbsRetencao": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/adRemIBSReten",
                     "valorIbsRetencao": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/vIBSMonoReten",
