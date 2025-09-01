@@ -628,6 +628,8 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "BETHA":
             self._namespace = NAMESPACE_BETHA
             self._versao = "2.02"
+        elif self.autorizador == "SAO_PAULO":
+            self._namespace = "http://www.prefeitura.sp.gov.br/nfe"
         else:
             raise Exception("Autorizador não encontrado!")
 
@@ -770,6 +772,8 @@ class ComunicacaoNfse(Comunicacao):
         """Retorna a url para comunicação com o webservice"""
         if self._ambiente == 1:
             ambiente = "HTTPS"
+        elif self._ambiente != 1 and self.autorizador == "SAO_PAULO":
+            raise Exception("São Paulo só opera em produção.")
         else:
             ambiente = "HOMOLOGACAO"
         if self.autorizador in NFSE:
@@ -841,6 +845,40 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
+    def enviar_sp(self, xml, operation):
+        url = self._get_url()
+        if self.autorizador == "SAO_PAULO":
+            return self._post_sp_https(url, xml, operation)
+        else:
+            raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+
+    def _post_sp_https(self, url, xml, metodo):
+        """Comunicação wsdl (https) utilizando certificado do usuário"""
+        # comunicacao wsdl
+        try:
+            from pynfe.utils.https_nfse import HttpAuthenticated
+            from suds.client import Client
+
+            certificadoA1 = CertificadoA1(self.certificado)
+            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+
+            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+
+            # gerar nfse
+            if metodo == "enviar_rps":
+                return cliente.service.EnviarRPS(VersaoSchema=1, MensagemXML=xml)
+            if metodo == "consultar_rps":
+                return cliente.service.ConsultaNFe(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "cancelar":
+                return cliente.service.CancelamentoNFe(VersaoSchema=1, MensagemXML=xml)
+            # TODO outros metodos
+            else:
+                raise Exception(f"Método {metodo} não implementado no autorizador São Paulo.")
+        except Exception as e:
+            raise e
+        finally:
+            certificadoA1.excluir()
 
 
 class ComunicacaoMDFe(Comunicacao):

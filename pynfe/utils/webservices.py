@@ -500,6 +500,12 @@ NFE = {
 # Nfs-e
 NFSE = {
     #
+    "SAO_PAULO": {
+        "ENVIAR_RPS": "EnviarRps",
+        "CONSULTA_RPS": "ConsultaNFe",
+        "CANCELAR_NFSE": "CancelamentoNFe",
+        "HTTPS": "https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx?wsdl"
+    },
     "BETHA": {
         "AUTORIZACAO": "GerarNfse",
         "CANCELAR": "CancelarNfse",
