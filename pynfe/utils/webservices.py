@@ -506,6 +506,13 @@ NFSE = {
         "CANCELAR_NFSE": "CancelamentoNFe",
         "HTTPS": "https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx?wsdl"
     },
+    "BARUERI": {
+        "ENVIAR_RPS": "EnviarRPS",
+        "CONSULTA_RPS": "ConsultaNFe",
+        "CANCELAR_NFSE": "CancelamentoNFe",
+        "HTTPS": "https://www.barueri.sp.gov.br/nfeservice/wsrps.asmx?WSDL",
+        "HOMOLOGACAO": "https://testeeiss.barueri.sp.gov.br/nfeservice/wsrps.asmx?WSDL"
+    },
     "BETHA": {
         "AUTORIZACAO": "GerarNfse",
         "CANCELAR": "CancelarNfse",

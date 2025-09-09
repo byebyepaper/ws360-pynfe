@@ -630,6 +630,10 @@ class ComunicacaoNfse(Comunicacao):
             self._versao = "2.02"
         elif self.autorizador == "SAO_PAULO":
             self._namespace = "http://www.prefeitura.sp.gov.br/nfe"
+            self._versao = "2"
+        elif self.autorizador == "BARUERI":
+            self._namespace = "http://www.barueri.sp.gov.br/nfeservice"
+            self._versao = "1"
         else:
             raise Exception("Autorizador não encontrado!")
 
@@ -845,6 +849,45 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
+    def enviar_barueri(self, xml, operation):
+        url = self._get_url()
+        if self.autorizador == "BARUERI":
+            return self._post_barueri_https(url, xml, operation)
+        else:
+            raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+        
+    def _post_barueri_https(self, url, xml, metodo):
+        """Comunicação wsdl (https) utilizando certificado do usuário"""
+        # comunicacao wsdl
+        try:
+            from pynfe.utils.https_nfse import HttpAuthenticated
+            from suds.client import Client
+
+            certificadoA1 = CertificadoA1(self.certificado)
+            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+
+            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+
+            # gerar nfse
+
+            if metodo == "enviar_rps":
+                return cliente.service.NFeLoteEnviarArquivo(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "consultar_rps":
+                return cliente.service.ConsultaNFe(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "listar_rps":
+                return cliente.service.NFeLoteListarArquivos(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "baixar_nfse":
+                return cliente.service.NFeLoteBaixarArquivo(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "cancelar":
+                return cliente.service.CancelamentoNFe(VersaoSchema=1, MensagemXML=xml)
+            # TODO outros metodos
+            else:
+                raise Exception(f"Método {metodo} não implementado no autorizador Barueri.")
+        except Exception as e:
+            raise e
+        finally:
+            certificadoA1.excluir()
 
     def enviar_sp(self, xml, operation):
         url = self._get_url()
