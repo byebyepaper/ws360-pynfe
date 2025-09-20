@@ -875,7 +875,7 @@ class ComunicacaoNfse(Comunicacao):
             if metodo == "enviar_rps":
                 return cliente.service.NFeLoteEnviarArquivo(VersaoSchema=1, MensagemXML=xml)
             elif metodo == "consultar_rps":
-                return cliente.service.ConsultaNFe(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.NFeLoteStatusArquivo(VersaoSchema=1, MensagemXML=xml)
             elif metodo == "listar_rps":
                 return cliente.service.NFeLoteListarArquivos(VersaoSchema=1, MensagemXML=xml)
             elif metodo == "baixar_nfse":
