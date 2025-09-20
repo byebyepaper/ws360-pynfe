@@ -34,10 +34,10 @@ setuptools.setup(
         "requests",
         "lxml",
         "signxml",
+        "suds-jurko",
     ],
     extras_require={
         "nfse": [
-            "suds-jurko",
             "pyxb==1.2.4",
         ],
     },

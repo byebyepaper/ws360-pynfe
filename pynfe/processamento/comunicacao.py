@@ -900,11 +900,11 @@ class ComunicacaoNfse(Comunicacao):
     def _post_sp_https(self, url, xml, metodo):
         """Comunicação wsdl (https) utilizando certificado do usuário"""
         # comunicacao wsdl
+        certificadoA1 = CertificadoA1(self.certificado)
         try:
             from pynfe.utils.https_nfse import HttpAuthenticated
             from suds.client import Client
 
-            certificadoA1 = CertificadoA1(self.certificado)
             chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
 
             cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
