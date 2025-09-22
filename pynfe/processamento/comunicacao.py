@@ -853,12 +853,58 @@ class ComunicacaoNfse(Comunicacao):
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
         if self.autorizador == "BARUERI":
-            return self._post_barueri_https(url, xml, operation)
+            return self._post_barueri_requests(url, xml, operation)
         else:
             raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+
+    def _post_barueri_requests(self, url, xml, operation):
+        """
+        Comunicação SOAP usando requests diretamente (como NFe)
+        Recebe o envelope SOAP completo já montado
+        """
+        import requests
+        
+        certificado_a1 = CertificadoA1(self.certificado)
+        try:
+            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave_cert = (cert, chave)
+
+            if operation == "enviar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteEnviarArquivo"
+            elif operation == "consultar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteStatusArquivo"
+            elif operation == "listar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteListarArquivos"
+            elif operation == "baixar_nfse":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteBaixarArquivo"
+            else:
+                raise Exception(f"Operação {operation} não implementada para Barueri.")
+            
+            headers = {
+                'Content-Type': 'text/xml; charset=utf-8',
+                'SOAPAction': f'"{soap_action}"'
+            }
+            
+            return requests.post(
+                url,
+                data=xml.encode('utf-8'),
+                headers=headers,
+                cert=chave_cert,
+                verify=False,
+                timeout=30
+            )
+            
+        except requests.exceptions.RequestException as e:
+            raise e
+        finally:
+            certificado_a1.excluir()
         
     def _post_barueri_https(self, url, xml, metodo):
-        """Comunicação wsdl (https) utilizando certificado do usuário"""
+        """
+        LEGACY: Comunicação wsdl (https) utilizando certificado do usuário
+        Este método usa SUDS e não é mais usado pelo Barueri.
+        Usar _post_barueri_requests() para Barueri.
+        """
         # comunicacao wsdl
 
         certificadoA1 = CertificadoA1(self.certificado)
