@@ -852,10 +852,27 @@ class ComunicacaoNfse(Comunicacao):
 
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
-        if self.autorizador == "BARUERI":
-            return self._post_barueri_requests(url, xml, operation)
-        else:
+
+        if not self.autorizador == "BARUERI":
             raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
+
+    def consultar_rps_barueri(self, xml, operation):
+        url = self._get_url()
+
+        if not self.autorizador == "BARUERI":
+            raise Exception(f"Consultar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
+
+    def baixar_rps_barueri(self, xml, operation):
+        url = self._get_url()
+
+        if not self.autorizador == "BARUERI":
+            raise Exception(f"Baixar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
 
     def _post_barueri_requests(self, url, xml, operation):
         """
