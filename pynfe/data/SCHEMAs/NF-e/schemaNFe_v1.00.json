@@ -34,7 +34,7 @@
         "tipoOperacao": "NFe/infNFe/ide/gCompraGov/tpOperGov"
     },
     "pagAntecipado": [{
-        "chave": "NFe/infNFe/ide/gPagAntecipado/refNFe"
+        "chave": "NFe/infNFe/ide/gPagAntecipado/refNFe[]"
     }],
     "emitente": {
         "cpfCnpj": "NFe/infNFe/emit/CNPJ",
@@ -236,19 +236,19 @@
         "reboque": [{
             "vagao": "NFe/infNFe/transp/vagao",
             "balsa": "NFe/infNFe/transp/balsa",
-            "placa": "NFe/infNFe/transp/reboque/placa",
-            "uf": "NFe/infNFe/transp/reboque/UF",
-            "rntc": "NFe/infNFe/transp/reboque/RNTC"
+            "placa": "NFe/infNFe/transp/reboque[]/placa",
+            "uf": "NFe/infNFe/transp/reboque[]/UF",
+            "rntc": "NFe/infNFe/transp/reboque[]/RNTC"
         }],
         "volumes": [{
-            "quantidade": "NFe/infNFe/transp/vol/qVol",
-            "especie": "NFe/infNFe/transp/vol/esp",
-            "marca": "NFe/infNFe/transp/vol/marca",
-            "numeracao": "NFe/infNFe/transp/vol/nVol",
-            "pesoLiquido": "NFe/infNFe/transp/vol/pesoL",
-            "pesoBruto": "NFe/infNFe/transp/vol/pesoB",
+            "quantidade": "NFe/infNFe/transp/vol[]/qVol",
+            "especie": "NFe/infNFe/transp/vol[]/esp",
+            "marca": "NFe/infNFe/transp/vol[]/marca",
+            "numeracao": "NFe/infNFe/transp/vol[]/nVol",
+            "pesoLiquido": "NFe/infNFe/transp/vol[]/pesoL",
+            "pesoBruto": "NFe/infNFe/transp/vol[]/pesoB",
             "lacres": [{
-                "numero": "NFe/infNFe/transp/vol/lacres/nLacre"
+                "numero": "NFe/infNFe/transp/vol[]/lacres[]/nLacre"
             }]
         }]
     },
@@ -258,9 +258,9 @@
         "valorDesconto": "NFe/infNFe/cobr/fat/vDesc",
         "valorLiquido": "NFe/infNFe/cobr/fat/vLiq",
         "parcelas": [{
-            "numero": "NFe/infNFe/cobr/dup/nDup",
-            "dataVencimento": "NFe/infNFe/cobr/dup/dVenc",
-            "valor": "NFe/infNFe/cobr/dup/vDup"
+            "numero": "NFe/infNFe/cobr/dup[]/nDup",
+            "dataVencimento": "NFe/infNFe/cobr/dup[]/dVenc",
+            "valor": "NFe/infNFe/cobr/dup[]/vDup"
         }]
     },
     "valorTroco": "NFe/infNFe/pag/vTroco",
@@ -279,51 +279,51 @@
     "cana": {
         "safra": "NFe/infNFe/cana/safra",
         "dataReferencia": "NFe/infNFe/cana/ref",
+        "quantidadeMes": "NFe/infNFe/cana/qTotMes",
+        "quantidadeAnterior": "NFe/infNFe/cana/qTotAnt",
+        "quantidadeGeral": "NFe/infNFe/cana/qTotGer",
+        "valorFornecimentos": "NFe/infNFe/cana/vFor",
+        "valorTotal": "NFe/infNFe/cana/vTotDed",
+        "valorLiquidoFornecimento": "NFe/infNFe/cana/vLiqFor",
         "fornecimentoDiario": [{
-            "dia": "NFe/infNFe/cana/forDia/@dia",
-            "quantidadeKg": "NFe/infNFe/cana/forDia/qtde",
-            "quantidadeMes": "NFe/infNFe/cana/qTotMes",
-            "quantidadeAnterior": "NFe/infNFe/cana/qTotAnt",
-            "quantidadeGeral": "NFe/infNFe/cana/qTotGer"
+            "dia": "NFe/infNFe/cana/forDia[]/@dia",
+            "quantidadeKg": "NFe/infNFe/cana/forDia[]/qtde"
         }]
     },
     "canaDeducoes": [{
-        "descricao": "NFe/infNFe/cana/deduc/xDed",
-        "valor": "NFe/infNFe/cana/deduc/vDed",
-        "valorFornecimentos": "NFe/infNFe/cana/vFor",
-        "valorTotal": "NFe/infNFe/cana/vTotDed",
-        "valorLiquidoFornecimento": "NFe/infNFe/cana/vLiqFor"
+        "descricao": "NFe/infNFe/cana/deduc[]/xDed",
+        "valor": "NFe/infNFe/cana/deduc[]/vDed"
     }],
     "nfeReferenciada": [{
-        "chave": "NFe/infNFe/ide/NFref/refNFe",
-        "chaveSigilo": "NFe/infNFe/ide/NFref/refNFeSig",
+        "chave": "NFe/infNFe/ide/NFref[]/refNFe",
+        "chaveSigilo": "NFe/infNFe/ide/NFref[]/refNFeSig",
         "nfePapel": {
-            "estado": "NFe/infNFe/ide/NFref/refNF/cUF",
-            "dataEmissao": "NFe/infNFe/ide/NFref/refNF/AAMM",
-            "cpfCnpj": "NFe/infNFe/ide/NFref/refNF/CNPJ",
-            "modelo": "NFe/infNFe/ide/NFref/refNF/mod",
-            "serie": "NFe/infNFe/ide/NFref/refNF/serie",
-            "numero": "NFe/infNFe/ide/NFref/refNF/nNF"
+            "estado": "NFe/infNFe/ide/NFref[]/refNF/cUF",
+            "dataEmissao": "NFe/infNFe/ide/NFref[]/refNF/AAMM",
+            "cpfCnpj": "NFe/infNFe/ide/NFref[]/refNF/CNPJ",
+            "modelo": "NFe/infNFe/ide/NFref[]/refNF/mod",
+            "serie": "NFe/infNFe/ide/NFref[]/refNF/serie",
+            "numero": "NFe/infNFe/ide/NFref[]/refNF/nNF"
         },
         "produtorRural": {
-            "estado": "NFe/infNFe/ide/NFref/refNFP/cUF",
-            "dataEmissao": "NFe/infNFe/ide/NFref/refNFP/AAMM",
-            "cnpj": "NFe/infNFe/ide/NFref/refNFP/CNPJ",
-            "cpf": "NFe/infNFe/ide/NFref/refNFP/CPF",
-            "inscricaoEstadual": "NFe/infNFe/ide/NFref/refNFP/IE",
-            "modelo": "NFe/infNFe/ide/NFref/refNFP/mod",
-            "serie": "NFe/infNFe/ide/NFref/refNFP/serie",
-            "numero": "NFe/infNFe/ide/NFref/refNFP/nNF"
+            "estado": "NFe/infNFe/ide/NFref[]/refNFP/cUF",
+            "dataEmissao": "NFe/infNFe/ide/NFref[]/refNFP/AAMM",
+            "cnpj": "NFe/infNFe/ide/NFref[]/refNFP/CNPJ",
+            "cpf": "NFe/infNFe/ide/NFref[]/refNFP/CPF",
+            "inscricaoEstadual": "NFe/infNFe/ide/NFref[]/refNFP/IE",
+            "modelo": "NFe/infNFe/ide/NFref[]/refNFP/mod",
+            "serie": "NFe/infNFe/ide/NFref[]/refNFP/serie",
+            "numero": "NFe/infNFe/ide/NFref[]/refNFP/nNF"
         },
-        "chaveCte": "NFe/infNFe/ide/NFref/refCTe",
+        "chaveCte": "NFe/infNFe/ide/NFref[]/refCTe",
         "cupomFiscal": {
-            "modelo": "NFe/infNFe/ide/NFref/refECF/mod",
-            "numeroOrdemSequencia": "NFe/infNFe/ide/NFref/refECF/nECF",
-            "numeroContador": "NFe/infNFe/ide/NFref/refECF/nCOO"
+            "modelo": "NFe/infNFe/ide/NFref[]/refECF/mod",
+            "numeroOrdemSequencia": "NFe/infNFe/ide/NFref[]/refECF/nECF",
+            "numeroContador": "NFe/infNFe/ide/NFref[]/refECF/nCOO"
         }
     }],
     "responsavelAutorizado": [{
-        "cpfCnpj": "NFe/infNFe/autXML/CNPJ"
+        "cpfCnpj": "NFe/infNFe/autXML[]/CNPJ"
     }],
     "itens": [{
         "codigo": "NFe/infNFe/det/prod/cProd",
@@ -336,9 +336,9 @@
         "cnpjFabricante": "NFe/infNFe/det/prod/CNPJFab",
         "codigoBeneficioFiscal": "NFe/infNFe/det/prod/cBenef",
         "creditoPresumido": [{
-            "codigo": "NFe/infNFe/det/prod/gCred/cCredPresumido",
-            "percentual": "NFe/infNFe/det/prod/gCred/pCredPresumido",
-            "valor": "NFe/infNFe/det/prod/gCred/vCredPresumido"
+            "codigo": "NFe/infNFe/det/prod/gCred[]/cCredPresumido",
+            "percentual": "NFe/infNFe/det/prod/gCred[]/pCredPresumido",
+            "valor": "NFe/infNFe/det/prod/gCred[]/vCredPresumido"
         }],
         "exTipi": "NFe/infNFe/det/prod/EXTIPI",
         "cfop": "NFe/infNFe/det/prod/CFOP",
@@ -394,9 +394,9 @@
             "restricao": "NFe/infNFe/det/prod/veicProd/tpRest"
         },
         "medicamentos": [{
-            "codigoAnvisa": "NFe/infNFe/det/prod/med/cProdANVISA",
-            "motivoInsencaoAnvisa": "NFe/infNFe/det/prod/med/xMotivoIsencao",
-            "valorMaximo": "NFe/infNFe/det/prod/med/vPMC"
+            "codigoAnvisa": "NFe/infNFe/det/prod/med[]/cProdANVISA",
+            "motivoInsencaoAnvisa": "NFe/infNFe/det/prod/med[]/xMotivoIsencao",
+            "valorMaximo": "NFe/infNFe/det/prod/med[]/vPMC"
         }],
         "combustivel": {
             "codigoAnp": "NFe/infNFe/det/prod/comb/cProdANP",
@@ -422,9 +422,9 @@
                 "valorFinal": "NFe/infNFe/det/prod/comb/encerrante/vEncFin"
             },
             "origemCombustivel": [{
-                "indicadorImportacao": "NFe/infNFe/det/prod/comb/origComb/indImport",
-                "codigoUf": "NFe/infNFe/det/prod/comb/origComb/cUFOrig",
-                "percentualOrigUf": "NFe/infNFe/det/prod/comb/origComb/pOrig"
+                "indicadorImportacao": "NFe/infNFe/det/prod/comb/origComb[]/indImport",
+                "codigoUf": "NFe/infNFe/det/prod/comb/origComb[]/cUFOrig",
+                "percentualOrigUf": "NFe/infNFe/det/prod/comb/origComb[]/pOrig"
             }]
         },
         "papelImune": {
@@ -987,61 +987,61 @@
         },
         "informacoesComplementares": "NFe/infNFe/det/infAdProd",
         "numero": "NFe/infNFe/det/@nItem",
-        "nve": [{"numero": "NFe/infNFe/det/prod/NVE"}],
+        "nve": [{"numero": "NFe/infNFe/det/prod/NVE[]"}],
         "importacao": [{
-            "numero": "NFe/infNFe/det/prod/DI/nDI",
-            "dataEmissao": "NFe/infNFe/det/prod/DI/dDI",
+            "numero": "NFe/infNFe/det/prod/DI[]/nDI",
+            "dataEmissao": "NFe/infNFe/det/prod/DI[]/dDI",
             "desembaraco": {
-                "local": "NFe/infNFe/det/prod/DI/xLocDesemb",
-                "estado": "NFe/infNFe/det/prod/DI/UFDesemb",
-                "data": "NFe/infNFe/det/prod/DI/dDesemb"
+                "local": "NFe/infNFe/det/prod/DI[]/xLocDesemb",
+                "estado": "NFe/infNFe/det/prod/DI[]/UFDesemb",
+                "data": "NFe/infNFe/det/prod/DI[]/dDesemb"
             },
-            "viaTransporte": "NFe/infNFe/det/prod/DI/tpViaTransp",
-            "valorAfrmm": "NFe/infNFe/det/prod/DI/vAFRMM",
-            "formaImportacao": "NFe/infNFe/det/prod/DI/tpIntermedio",
+            "viaTransporte": "NFe/infNFe/det/prod/DI[]/tpViaTransp",
+            "valorAfrmm": "NFe/infNFe/det/prod/DI[]/vAFRMM",
+            "formaImportacao": "NFe/infNFe/det/prod/DI[]/tpIntermedio",
             "adquirente": {
-                "cnpj": "NFe/infNFe/det/prod/DI/CNPJ",
-                "cpf": "NFe/infNFe/det/prod/DI/CPF",
-                "estado": "NFe/infNFe/det/prod/DI/UFTerceiro"
+                "cnpj": "NFe/infNFe/det/prod/DI[]/CNPJ",
+                "cpf": "NFe/infNFe/det/prod/DI[]/CPF",
+                "estado": "NFe/infNFe/det/prod/DI[]/UFTerceiro"
             },
-            "codigoExportador": "NFe/infNFe/det/prod/DI/cExportador",
+            "codigoExportador": "NFe/infNFe/det/prod/DI[]/cExportador",
             "adicoes": [{
-                "numero": "NFe/infNFe/det/prod/DI/adi/nAdicao",
-                "numeroSequencia": "NFe/infNFe/det/prod/DI/adi/nSeqAdic",
-                "codigoFabricante": "NFe/infNFe/det/prod/DI/adi/cFabricante",
-                "valorDesconto": "NFe/infNFe/det/prod/DI/adi/vDescDI",
-                "numeroDrawback": "NFe/infNFe/det/prod/DI/adi/nDraw"
+                "numero": "NFe/infNFe/det/prod/DI[]/adi[]/nAdicao",
+                "numeroSequencia": "NFe/infNFe/det/prod/DI[]/adi[]/nSeqAdic",
+                "codigoFabricante": "NFe/infNFe/det/prod/DI[]/adi[]/cFabricante",
+                "valorDesconto": "NFe/infNFe/det/prod/DI[]/adi[]/vDescDI",
+                "numeroDrawback": "NFe/infNFe/det/prod/DI[]/adi[]/nDraw"
             }]
         }],
         "exportacao": [{
-            "numeroDrawback": "NFe/infNFe/det/prod/detExport/nDraw",
+            "numeroDrawback": "NFe/infNFe/det/prod/detExport[]/nDraw",
             "exportacaoIndireta": {
-                "numero": "NFe/infNFe/det/prod/detExport/exportInd/nRE",
-                "chave": "NFe/infNFe/det/prod/detExport/exportInd/chNFe",
-                "quantidade": "NFe/infNFe/det/prod/detExport/exportInd/qExport"
+                "numero": "NFe/infNFe/det/prod/detExport[]/exportInd/nRE",
+                "chave": "NFe/infNFe/det/prod/detExport[]/exportInd/chNFe",
+                "quantidade": "NFe/infNFe/det/prod/detExport[]/exportInd/qExport"
             }
         }],
         "rastreavel": [{
-            "lote": "NFe/infNFe/det/prod/rastro/nLote",
-            "quantidade": "NFe/infNFe/det/prod/rastro/qLote",
-            "dataFabricacao": "NFe/infNFe/det/prod/rastro/dFab",
-            "dataValidade": "NFe/infNFe/det/prod/rastro/dVal",
-            "codigoAgregacao": "NFe/infNFe/det/prod/rastro/cAgreg"
+            "lote": "NFe/infNFe/det/prod/rastro[]/nLote",
+            "quantidade": "NFe/infNFe/det/prod/rastro[]/qLote",
+            "dataFabricacao": "NFe/infNFe/det/prod/rastro[]/dFab",
+            "dataValidade": "NFe/infNFe/det/prod/rastro[]/dVal",
+            "codigoAgregacao": "NFe/infNFe/det/prod/rastro[]/cAgreg"
         }],
         "armamentos": [{
-            "tipo": "NFe/infNFe/det/prod/arma/tpArma",
-            "numeroSerie": "NFe/infNFe/det/prod/arma/nSerie",
-            "numeroSerieCano": "NFe/infNFe/det/prod/arma/nCano",
-            "descricao": "NFe/infNFe/det/prod/arma/descr"
+            "tipo": "NFe/infNFe/det/prod/arma[]/tpArma",
+            "numeroSerie": "NFe/infNFe/det/prod/arma[]/nSerie",
+            "numeroSerieCano": "NFe/infNFe/det/prod/arma[]/nCano",
+            "descricao": "NFe/infNFe/det/prod/arma[]/descr"
         }],
         "observacoes": {
             "contribuinte": [{
-                "campo": "NFe/infNFe/det/obsItem/obsCont/@xCampo",
-                "texto": "NFe/infNFe/det/obsItem/obsCont/xTexto"
+                "campo": "NFe/infNFe/det/obsItem/obsCont[]/@xCampo",
+                "texto": "NFe/infNFe/det/obsItem/obsCont[]/xTexto"
             }],
             "fisco": [{
-                "texto": "NFe/infNFe/det/obsItem/obsFisco/@xCampo",
-                "campo": "NFe/infNFe/det/obsItem/obsFisco/xTexto"
+                "texto": "NFe/infNFe/det/obsItem/obsFisco[]/@xCampo",
+                "campo": "NFe/infNFe/det/obsItem/obsFisco[]/xTexto"
             }]
         },
         "valorTotal": "NFe/infNFe/det/vItem",
@@ -1051,24 +1051,24 @@
         }
     }],
     "pagamentos": [{
-        "aVista": "NFe/infNFe/pag/detPag/indPag",
-        "meio": "NFe/infNFe/pag/detPag/tPag",
-        "descricaoMeio": "NFe/infNFe/pag/detPag/xPag",
-        "valor": "NFe/infNFe/pag/detPag/vPag",
+        "aVista": "NFe/infNFe/pag/detPag[]/indPag",
+        "meio": "NFe/infNFe/pag/detPag[]/tPag",
+        "descricaoMeio": "NFe/infNFe/pag/detPag[]/xPag",
+        "valor": "NFe/infNFe/pag/detPag[]/vPag",
         "cartao": {
-            "tipoIntegracao": "NFe/infNFe/pag/detPag/card/tpIntegra",
-            "cnpjCredenciadora": "NFe/infNFe/pag/detPag/card/CNPJ",
-            "bandeiraOperadora": "NFe/infNFe/pag/detPag/card/tBand",
-            "numeroAutorizacao": "NFe/infNFe/pag/detPag/card/cAut"
+            "tipoIntegracao": "NFe/infNFe/pag/detPag[]/card/tpIntegra",
+            "cnpjCredenciadora": "NFe/infNFe/pag/detPag[]/card/CNPJ",
+            "bandeiraOperadora": "NFe/infNFe/pag/detPag[]/card/tBand",
+            "numeroAutorizacao": "NFe/infNFe/pag/detPag[]/card/cAut"
         }
     }],
     "pagamento": {
-        "data": "NFe/infNFe/pag/detPag/dPag",
-        "cnpjTransacional": "NFe/infNFe/pag/detPag/CNPJPag",
-        "ufTransacional": "NFe/infNFe/pag/detPag/UFPag",
+        "data": "NFe/infNFe/pag/detPag[]/dPag",
+        "cnpjTransacional": "NFe/infNFe/pag/detPag[]/CNPJPag",
+        "ufTransacional": "NFe/infNFe/pag/detPag[]/UFPag",
         "cartao": {
-            "cnpjBeneficiario": "NFe/infNFe/pag/detPag/card/CNPJReceb",
-            "idTerminal": "NFe/infNFe/pag/detPag/card/idTermPag"
+            "cnpjBeneficiario": "NFe/infNFe/pag/detPag[]/card/CNPJReceb",
+            "idTerminal": "NFe/infNFe/pag/detPag[]/card/idTermPag"
         }
     },
     "intermediadorTransacao": {
@@ -1077,18 +1077,18 @@
     },
     "observacoes": {
         "contribuinte": [{
-            "campo": "NFe/infNFe/infAdic/obsCont/@xCampo",
-            "texto": "NFe/infNFe/infAdic/obsCont/xTexto"
+            "campo": "NFe/infNFe/infAdic/obsCont[]/@xCampo",
+            "texto": "NFe/infNFe/infAdic/obsCont[]/xTexto"
         }],
         "fisco": [{
-            "texto": "NFe/infNFe/infAdic/obsFisco/xTexto",
-            "campo": "NFe/infNFe/infAdic/obsFisco/@xCampo"
+            "texto": "NFe/infNFe/infAdic/obsFisco[]/xTexto",
+            "campo": "NFe/infNFe/infAdic/obsFisco[]/@xCampo"
         }]
     },
     "processoReferenciado": [{
-        "identificador": "NFe/infNFe/infAdic/procRef/nProc",
-        "origem": "NFe/infNFe/infAdic/procRef/indProc",
-        "tipo": "NFe/infNFe/infAdic/procRef/tpAto"
+        "identificador": "NFe/infNFe/infAdic/procRef[]/nProc",
+        "origem": "NFe/infNFe/infAdic/procRef[]/indProc",
+        "tipo": "NFe/infNFe/infAdic/procRef[]/tpAto"
     }],
     "responsavelTecnico": {
         "cpfCnpj": "NFe/infNFe/infRespTec/CNPJ",
@@ -1100,8 +1100,8 @@
     },
     "agropecuario": {
         "defensivo": [{
-            "numeroReceituario": "NFe/infNFe/agropecuario/defensivo/nReceituario",
-            "cpfResponsavelTecnico": "NFe/infNFe/agropecuario/defensivo/CPFRespTec"
+            "numeroReceituario": "NFe/infNFe/agropecuario/defensivo[]/nReceituario",
+            "cpfResponsavelTecnico": "NFe/infNFe/agropecuario/defensivo[]/CPFRespTec"
         }],
         "guiaTransito": {
             "tipoGuia": "NFe/infNFe/agropecuario/guiaTransito/tpGuia",
