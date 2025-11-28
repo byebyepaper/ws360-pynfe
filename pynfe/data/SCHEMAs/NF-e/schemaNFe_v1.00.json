@@ -362,7 +362,7 @@
         "valorDesconto": "NFe/infNFe/det/prod/vDesc",
         "valorOutros": "NFe/infNFe/det/prod/vOutro",
         "compoeTotal": "NFe/infNFe/det/prod/indTot",
-        "tipoCreditoPresumindoIbsZFM": "NFe/infNFe/det/prod/tpCredPresIBSZFM",
+        "tipoCreditoPresumidoIbsZFM": "NFe/infNFe/det/prod/tpCredPresIBSZFM",
         "indicadorBemMovelUsado": "NFe/infNFe/det/prod/indBemMovelUsado",
         "numeroCompra": "NFe/infNFe/det/prod/xPed",
         "pedidoCompra": "NFe/infNFe/det/prod/nItemPed",
