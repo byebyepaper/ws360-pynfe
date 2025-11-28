@@ -191,7 +191,7 @@
         "valorDevolucaoIbsMunicipio": "NFe/infNFe/total/IBSCBSTot/gIBS/gIBSMun/vDevTrib",
         "valorIbsMunicipio": "NFe/infNFe/total/IBSCBSTot/gIBS/gIBSMun/vIBSMun",
         "valorIbs": "NFe/infNFe/total/IBSCBSTot/gIBS/vIBS",
-        "valorIbsCreditoPresumindo": "NFe/infNFe/total/IBSCBSTot/gIBS/vCredPres",
+        "valorIbsCreditoPresumido": "NFe/infNFe/total/IBSCBSTot/gIBS/vCredPres",
         "valorIbsCreditoPresumidoSupensao": "NFe/infNFe/total/IBSCBSTot/gIBS/vCredPresCondSus",
         "valorCbsDiferimento": "NFe/infNFe/total/IBSCBSTot/gCBS/vDif",
         "valorCbsDevolucao": "NFe/infNFe/total/IBSCBSTot/gCBS/vDevTrib",
