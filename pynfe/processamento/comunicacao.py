@@ -974,7 +974,9 @@ class ComunicacaoNfse(Comunicacao):
 
             # gerar nfse
             if metodo == "enviar_rps":
-                return cliente.service.EnviarRPS(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.EnvioRPS(VersaoSchema=1, MensagemXML=xml)
+            if metodo == "teste_envio_lote_rps":
+                return cliente.service.TesteEnvioLoteRPS(VersaoSchema=1, MensagemXML=xml)
             if metodo == "consultar_rps":
                 return cliente.service.ConsultaNFe(VersaoSchema=1, MensagemXML=xml)
             elif metodo == "cancelar":
