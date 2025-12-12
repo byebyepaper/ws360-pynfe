@@ -953,16 +953,37 @@ class ComunicacaoNfse(Comunicacao):
         finally:
             certificadoA1.excluir()
 
-    def enviar_sp(self, xml, operation):
+    def enviar_sp(self, xml, operation, versao_schema=2):
+        """
+        Send XML to São Paulo NFS-e webservice.
+        
+        Args:
+            xml: XML string to send
+            operation: Operation name (enviar_rps, teste_envio_lote_rps, envio_lote_rps, consultar_rps, cancelar)
+            versao_schema: Schema version (1 for v1, 2 for v2 - Reforma Tributária 2026)
+        
+        Returns:
+            WebService response
+        """
         url = self._get_url()
         if self.autorizador == "SAO_PAULO":
-            return self._post_sp_https(url, xml, operation)
+            return self._post_sp_https(url, xml, operation, versao_schema)
         else:
             raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
 
-    def _post_sp_https(self, url, xml, metodo):
-        """Comunicação wsdl (https) utilizando certificado do usuário"""
-        # comunicacao wsdl
+    def _post_sp_https(self, url, xml, metodo, versao_schema=2):
+        """
+        Comunicação wsdl (https) utilizando certificado do usuário.
+        
+        According to São Paulo NFS-e manual v3.3.4:
+        - VersaoSchema=2: Schema version 2 (Reforma Tributária 2026)
+        
+        Args:
+            url: WebService URL
+            xml: XML message string
+            metodo: Method name
+            versao_schema: Schema version (1 or 2)
+        """
         certificadoA1 = CertificadoA1(self.certificado)
         try:
             from pynfe.utils.https_nfse import HttpAuthenticated
@@ -972,16 +993,18 @@ class ComunicacaoNfse(Comunicacao):
 
             cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
 
-            # gerar nfse
+            # São Paulo NFS-e WebService methods
+            # Manual v3.3.4 section 4.3.1: All methods receive VersaoSchema and MensagemXML
             if metodo == "enviar_rps":
-                return cliente.service.EnvioRPS(VersaoSchema=1, MensagemXML=xml)
-            if metodo == "teste_envio_lote_rps":
-                return cliente.service.TesteEnvioLoteRPS(VersaoSchema=1, MensagemXML=xml)
-            if metodo == "consultar_rps":
-                return cliente.service.ConsultaNFe(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.EnvioRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "teste_envio_lote_rps":
+                return cliente.service.TesteEnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "envio_lote_rps":
+                return cliente.service.EnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "consultar_rps":
+                return cliente.service.ConsultaNFe(VersaoSchema=versao_schema, MensagemXML=xml)
             elif metodo == "cancelar":
-                return cliente.service.CancelamentoNFe(VersaoSchema=1, MensagemXML=xml)
-            # TODO outros metodos
+                return cliente.service.CancelamentoNFe(VersaoSchema=versao_schema, MensagemXML=xml)
             else:
                 raise Exception(f"Método {metodo} não implementado no autorizador São Paulo.")
         except Exception as e:

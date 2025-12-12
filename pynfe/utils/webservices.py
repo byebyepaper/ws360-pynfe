@@ -502,9 +502,13 @@ NFSE = {
     #
     "SAO_PAULO": {
         "ENVIAR_RPS": "EnviarRps",
+        "ENVIO_LOTE_RPS": "EnvioLoteRPS",
+        "TESTE_ENVIO_LOTE_RPS": "TesteEnvioLoteRPS",
         "CONSULTA_RPS": "ConsultaNFe",
         "CANCELAR_NFSE": "CancelamentoNFe",
-        "HTTPS": "https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx?wsdl"
+        # New URL supports both v1 and v2 (Reforma Tributária 2026)
+        # Old URL (v1 only): https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx?wsdl
+        "HTTPS": "https://nfews.prefeitura.sp.gov.br/lotenfe.asmx?WSDL"
     },
     "BARUERI": {
         "ENVIAR_RPS": "EnviarRPS",
