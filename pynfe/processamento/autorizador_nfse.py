@@ -10,6 +10,33 @@ class InterfaceAutorizador:
     def cancelar(self):
         pass
 
+class SerializacaoOsasco:
+    def __init__(self, chave_autenticacao):
+        self.chave_autenticacao = chave_autenticacao
+        
+    def _consultar(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None, numero_rps_unico=None):
+        return {
+        "ChaveAutenticacao": self.chave_autenticacao,
+        "CNPJTomador": cnpj_tomador,
+        "CPFTomador": cpf_tomador,
+        "DataInicial": data_inicial,
+        "DataFinal": data_final,
+        "NumeroNotaInicial": numero_nota_inicial,
+        "NumeroNotaFinal": numero_nota_final,
+        "NumeroReciboInicial": numero_rps_inicial,
+        "NumeroReciboFinal": numero_rps_final,
+        "NumeroReciboUnico": numero_rps_unico,
+    }
+
+    def consultar_periodo(self, data_inicial, data_final, cnpj_tomador=None, cpf_tomador=None):
+        return self._consultar(data_inicial=data_inicial, data_final=data_final, cnpj_tomador=cnpj_tomador, cpf_tomador=cpf_tomador)
+    
+    def consultar_faixa(self,numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None, cnpj_tomador=None, cpf_tomador=None):
+        return self._consultar(numero_nota_inicial=numero_nota_inicial, numero_nota_final=numero_nota_final, numero_rps_inicial=numero_rps_inicial, numero_rps_final=numero_rps_final, cnpj_tomador=cnpj_tomador, cpf_tomador=cpf_tomador)
+    
+    def consultar_nota(self, numero_nota, cnpj_tomador=None, cpf_tomador=None):
+        return self._consultar(numero_nota_inicial=numero_nota, numero_nota_final=numero_nota, cnpj_tomador=cnpj_tomador, cpf_tomador=cpf_tomador)
+
 
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):

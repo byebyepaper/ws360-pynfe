@@ -610,14 +610,14 @@ class ComunicacaoSefaz(Comunicacao):
         finally:
             certificado_a1.excluir()
 
-
 class ComunicacaoNfse(Comunicacao):
     """Classe de comunicação que segue o padrão definido para as SEFAZ dos Municípios."""
 
     _versao = ""
     _namespace = ""
+    
 
-    def __init__(self, certificado, certificado_senha, autorizador, homologacao=False):
+    def __init__(self, autorizador, certificado=None, certificado_senha=None, homologacao=False):
         self.certificado = certificado
         self.certificado_senha = certificado_senha
         self._ambiente = 2 if homologacao else 1
@@ -628,6 +628,9 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "BETHA":
             self._namespace = NAMESPACE_BETHA
             self._versao = "2.02"
+        elif self.autorizador == "OSASCO":
+            self._namespace = ""
+            self._versao = "1"
         else:
             raise Exception("Autorizador não encontrado!")
 
@@ -653,16 +656,19 @@ class ComunicacaoNfse(Comunicacao):
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
 
-    def consultar(self, xml):
+    def consultar(self, payload):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "GINFES":
             # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
+            payload = '<?xml version="1.0" encoding="UTF-8"?>' + payload
             # comunica via wsdl
-            return self._post_https(url, xml, "consulta")
+            return self._post_https(url, payload, "consulta")
+        elif self.autorizador == "OSASCO":
+            # comunica via wsdl
+            return self._zeep_client(url, payload, "ConsultarNotaCompleta")
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def consultar_rps(self, xml):
         # url do serviço
@@ -672,9 +678,11 @@ class ComunicacaoNfse(Comunicacao):
             return self._post(url, xml, "consultaRps")
         elif self.autorizador == "GINFES":
             return self._post_https(url, xml, "consultaRps")
-        # TODO outros autorizadres
+        elif self.autorizador == "OSASCO":
+            # comunica via wsdl
+            return self._zeep_client(url, xml, "Consultar")
         else:
-            raise Exception("Autorizador não encontrado!")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def consultar_faixa(self, xml):
         # url do serviço
@@ -682,8 +690,11 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "BETHA":
             # comunica via wsdl
             return self._post(url, xml, "consultaFaixa")
+        elif self.autorizador == "OSASCO":
+            # comunica via wsdl
+            return self._zeep_client(url, xml, "Consultar")
         else:
-            raise Exception("Este método só esta implementado no autorizador betha.")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def consultar_lote(self, xml):
         # url do serviço
@@ -694,7 +705,7 @@ class ComunicacaoNfse(Comunicacao):
             # comunica via wsdl
             return self._post_https(url, xml, "consulta_lote")
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def consultar_situacao_lote(self, xml):
         # url do serviço
@@ -703,7 +714,7 @@ class ComunicacaoNfse(Comunicacao):
             # comunica via wsdl
             return self._post_https(url, xml, "consulta_situacao_lote")
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def cancelar(self, xml):
         # url do serviço
@@ -716,9 +727,9 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "GINFES":
             # comunica via wsdl com certificado
             return self._post_https(url, xml, "cancelar")
-        # TODO outros autorizadres
+        # TODO outros autorizadores
         else:
-            raise Exception("Autorizador não encontrado!")
+            raise Exception("Este método não esta implementado para o autorizador.")
 
     def _cabecalho(self, retorna_string=True):
         """Monta o XML do cabeçalho da requisição wsdl
@@ -841,7 +852,39 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+    
+    def _zeep_client(self, wsdl, payload, metodo, wcf_compatibility=True):
+        """Comunicação wsdl utilizando a biblioteca zeep"""
+        
+         # comunicacao wsdl
+        try:
+            from zeep import Client 
+            from zeep.transports import Transport
+            from zeep.settings import Settings
+            session = requests.Session()
 
+            transport = Transport(
+                session=session,
+                timeout=60
+            )
+
+            settings = Settings(
+                strict=not wcf_compatibility,        # IMPORTANTÍSSIMO p/ WCF
+                xml_huge_tree=True
+            )
+
+            client = Client(
+                wsdl=wsdl,
+                transport=transport,
+                settings=settings
+            )
+            if hasattr(client.service, metodo):
+                service = getattr(client.service, metodo)
+                return service(payload)
+            else:
+                raise Exception("Método não implementado no autorizador.")
+        except Exception as e:
+            raise e
 
 class ComunicacaoMDFe(Comunicacao):
     MDFE_SITUACAO_JA_ENVIADO = ("100", "101", "132")

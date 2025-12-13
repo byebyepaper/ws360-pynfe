@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyNFe",
-    version="0.5.7",
+    version="0.6.0",
     author="TadaSoftware",
     author_email="tadasoftware@gmail.com",
     description="Interface library with the Brazilian Electronic Invoice web services",
@@ -34,6 +34,7 @@ setuptools.setup(
         "requests",
         "lxml",
         "signxml",
+        "zeep>=4.3.2",
     ],
     extras_require={
         "nfse": [

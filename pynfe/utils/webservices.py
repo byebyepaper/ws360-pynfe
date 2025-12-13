@@ -525,6 +525,15 @@ NFSE = {
         "HTTPS": "https://producao.ginfes.com.br/ServiceGinfesImpl?wsdl",
         "HOMOLOGACAO": "https://homologacao.ginfes.com.br/ServiceGinfesImpl?wsdl",
     },
+    "OSASCO": {
+        "AUTORIZACAO": "Emitir",
+        "AUTORIZACAO_LOTE": "EmitirEmLote",
+        "CANCELAR": "Cancelar",
+        "CANCELAR_LOTE": "CancelarNotaLote",
+        "CONSULTA": "Consultar",
+        "HTTPS": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
+        "HOMOLOGACAO": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
+    },
 }
 
 # MDF-e
