@@ -2206,9 +2206,10 @@ class SerializacaoQrcode(object):
 
 
 class SerializacaoNfse(object):
-    def __init__(self, autorizador):
+    def __init__(self, autorizador, chave_autenticacao=None):
         "Recebe uma string com o nome do autorizador."
         self.autorizador = autorizador
+        self.chave_autenticacao = chave_autenticacao
 
     def gerar(self, nfse):
         if self.autorizador.lower() == "betha":
@@ -2233,6 +2234,14 @@ class SerializacaoNfse(object):
             return SerializacaoGinfes().consultar_nfse(emitente, numero, inicio, fim)
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
+    
+    def consultar_nota_emitida(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None):
+        if self.autorizador.lower() == "osasco":
+            from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
+        
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=cnpj_tomador, cpf_tomador=cpf_tomador, data_inicial=data_inicial, data_final=data_final, numero_nota_inicial=numero_nota_inicial, numero_nota_final=numero_nota_final, numero_rps_inicial=numero_rps_inicial, numero_rps_final=numero_rps_final)
+        else:
+            raise Exception("Este método só esta implementado no autorizador Osasco.")
 
     def consultar_lote(self, emitente, numero):
         if self.autorizador.lower() == "ginfes":
