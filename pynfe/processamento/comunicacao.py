@@ -610,12 +610,12 @@ class ComunicacaoSefaz(Comunicacao):
         finally:
             certificado_a1.excluir()
 
+
 class ComunicacaoNfse(Comunicacao):
     """Classe de comunicação que segue o padrão definido para as SEFAZ dos Municípios."""
 
     _versao = ""
     _namespace = ""
-    
 
     def __init__(self, autorizador, certificado=None, certificado_senha=None, homologacao=False):
         self.certificado = certificado
@@ -852,39 +852,34 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
-    
+
     def _zeep_client(self, wsdl, payload, metodo, wcf_compatibility=True):
         """Comunicação wsdl utilizando a biblioteca zeep"""
-        
-         # comunicacao wsdl
+
+        # comunicacao wsdl
         try:
-            from zeep import Client 
-            from zeep.transports import Transport
+            from zeep import Client
+            from zeep.helpers import serialize_object
             from zeep.settings import Settings
+            from zeep.transports import Transport
+
             session = requests.Session()
 
-            transport = Transport(
-                session=session,
-                timeout=60
-            )
+            transport = Transport(session=session, timeout=60)
 
             settings = Settings(
-                strict=not wcf_compatibility,        # IMPORTANTÍSSIMO p/ WCF
-                xml_huge_tree=True
+                strict=not wcf_compatibility, xml_huge_tree=True  # IMPORTANTÍSSIMO p/ WCF
             )
 
-            client = Client(
-                wsdl=wsdl,
-                transport=transport,
-                settings=settings
-            )
+            client = Client(wsdl=wsdl, transport=transport, settings=settings)
             if hasattr(client.service, metodo):
                 service = getattr(client.service, metodo)
-                return service(payload)
+                return serialize_object(service(payload))
             else:
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
 
 class ComunicacaoMDFe(Comunicacao):
     MDFE_SITUACAO_JA_ENVIADO = ("100", "101", "132")
