@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
-import time
-import re
 import html
+import re
+
 import requests
 from pynfe.entidades.certificado import CertificadoA1
 from pynfe.utils import etree, so_numeros
@@ -183,7 +183,7 @@ class ComunicacaoSefaz(Comunicacao):
             # Monta XML para envio da requisição
             xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
         return self._post(url, xml)
-    
+
     def download_nota(self, modelo, chave, contingencia=False):
         """
         Download da NFCom via Portal SVRS (HTML + extração do XML via JS).
@@ -202,8 +202,7 @@ class ComunicacaoSefaz(Comunicacao):
 
         try:
             key_path, cert_path = certificado_a1.separar_arquivo(
-                self.certificado_senha,
-                caminho=True
+                self.certificado_senha, caminho=True
             )
             cert = (cert_path, key_path)
 
@@ -229,10 +228,7 @@ class ComunicacaoSefaz(Comunicacao):
             html_body = response.text
 
             # 🚫 BLOQUEIO POR IP (rate limit)
-            if (
-                'textoErro' in html_body and
-                'IP não autorizado' in html_body
-            ):
+            if "textoErro" in html_body and "IP não autorizado" in html_body:
                 raise PermissionError(
                     "SVRS bloqueou o IP por múltiplas consultas simultâneas. "
                     "Aguarde liberação ou utilize outro IP."
@@ -260,8 +256,6 @@ class ComunicacaoSefaz(Comunicacao):
 
         finally:
             certificado_a1.excluir()
-
-
 
     def consulta_distribuicao(
         self, cnpj=None, cpf=None, chave=None, nsu=0, consulta_nsu_especifico=False
@@ -591,7 +585,9 @@ class ComunicacaoSefaz(Comunicacao):
                     self.url = NFCOM["SVRS"][consulta]
                 else:
                     if self.uf.upper() in ["MG", "MT", "MS"]:
-                        self.url = NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                        self.url = (
+                            NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                        )
                     else:
                         self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
 
@@ -717,6 +713,8 @@ class ComunicacaoSefaz(Comunicacao):
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml
+            print(xml)
+            print("URL:", url)
             # Faz o request com o servidor
             result = requests.post(
                 url,
