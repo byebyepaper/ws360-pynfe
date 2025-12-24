@@ -167,6 +167,7 @@ class ComunicacaoSefaz(Comunicacao):
         """
         # url do serviço
         url = self._get_url(modelo=modelo, consulta="CHAVE", contingencia=contingencia)
+        soap_action = None
         if modelo == "nfcom":
             raiz = etree.Element("consSitNfcom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM)
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
@@ -174,6 +175,7 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "chNfcom").text = chave
 
             xml = self._construir_xml_soap("NFComConsulta", raiz)
+            soap_action = "nfcomConsultaNF"
         else:
             # Monta XML do corpo da requisição
             raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
@@ -182,7 +184,7 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "chNFe").text = chave
             # Monta XML para envio da requisição
             xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
-        return self._post(url, xml)
+        return self._post(url, xml, soap_action=soap_action)
 
     def consulta_distribuicao(
         self, cnpj=None, cpf=None, chave=None, nsu=0, consulta_nsu_especifico=False
@@ -608,7 +610,7 @@ class ComunicacaoSefaz(Comunicacao):
         a.append(dados)
         return raiz
 
-    def _post_header(self):
+    def _post_header(self, soap_action=None):
         """Retorna um dicionário com os atributos para o cabeçalho da requisição HTTP"""
         # PE é a única UF que exige SOAPAction no header
         response = {
@@ -617,9 +619,12 @@ class ComunicacaoSefaz(Comunicacao):
         }
         if self.uf.upper() == "PE":
             response["SOAPAction"] = ""
+
+        if soap_action:
+            response["SOAPAction"] = soap_action
         return response
 
-    def _post(self, url, xml, timeout=None):
+    def _post(self, url, xml, timeout=None, soap_action=None):
         certificado_a1 = CertificadoA1(self.certificado)
         chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
         chave_cert = (cert, chave)
@@ -638,7 +643,7 @@ class ComunicacaoSefaz(Comunicacao):
             result = requests.post(
                 url,
                 xml,
-                headers=self._post_header(),
+                headers=self._post_header(soap_action=soap_action),
                 cert=chave_cert,
                 verify=False,
                 timeout=timeout,
