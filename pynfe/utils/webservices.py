@@ -611,7 +611,6 @@ CTE = {
 
 NFCOM = {
     "MG": {
-        "DOWNLOAD": "https://dfe-portal.svrs.rs.gov.br/NfcomSSL/DownloadXmlDfe",
         "AUTORIZACAO": "fazenda.mg.gov.br/nfcom/services/NFComRecepcao?wsdl",
         "CHAVE": "fazenda.mg.gov.br/nfcom/services/NFComConsulta?wsdl",
         "EVENTOS": "fazenda.mg.gov.br/nfcom/services/NFComRecepcaoEvento?wsdl",
@@ -620,7 +619,6 @@ NFCOM = {
         "HOMOLOGACAO": "https://hnfcom.",
     },
     "MS": {
-        "DOWNLOAD": "https://dfe-portal.svrs.rs.gov.br/NfcomSSL/DownloadXmlDfe",
         "AUTORIZACAO": "sefaz.ms.gov.br/ws/NFComRecepcao?wsdl",
         "CHAVE": "sefaz.ms.gov.br/ws/NFComConsulta?wsdl",
         "EVENTOS": "sefaz.ms.gov.br/ws/NFComRecepcaoEvento?wsdl",
@@ -629,7 +627,6 @@ NFCOM = {
         "HOMOLOGACAO": "https://hom.nfcom.",
     },
     "MT": {
-        "DOWNLOAD": "https://dfe-portal.svrs.rs.gov.br/NfcomSSL/DownloadXmlDfe",
         "AUTORIZACAO": "sefaz.mt.gov.br/nfcom/services/NFComRecepcao?wsdl",
         "CHAVE": "sefaz.mt.gov.br/nfcom/services/NFComConsulta?wsdl",
         "EVENTOS": "sefaz.mt.gov.br/nfcom/services/NFComRecepcaoEvento?wsdl",

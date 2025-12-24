@@ -566,10 +566,13 @@ class ComunicacaoSefaz(Comunicacao):
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE[self.uf.upper()][ambiente] + NFCE[self.uf.upper()][consulta]
             elif modelo == "nfcom":
-                if self.uf.upper() in ["MG", "MT", "MS"]:
-                    self.url = NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                if consulta == "DOWNLOAD":
+                    self.url = NFCOM["SVRS"][consulta]
                 else:
-                    self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
+                    if self.uf.upper() in ["MG", "MT", "MS"]:
+                        self.url = NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                    else:
+                        self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
 
             else:
                 raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"')
