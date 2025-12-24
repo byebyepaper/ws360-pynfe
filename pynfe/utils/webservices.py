@@ -608,3 +608,39 @@ CTE = {
         "HOMOLOGACAO": "https://homologacao.nfe.",
     },
 }
+
+# NFCOM
+NFCOM = {
+    "MG": {
+        "AUTORIZACAO": "fazenda.mg.gov.br/nfcom/services/NFComRecepcao?wsdl",
+        "CHAVE": "fazenda.mg.gov.br/nfcom/services/NFComConsulta?wsdl",
+        "EVENTOS": "fazenda.mg.gov.br/nfcom/services/NFComRecepcaoEvento?wsdl",
+        "STATUS": "fazenda.mg.gov.br/nfcom/services/NFComStatusServico?wsdl",
+        "HTTPS": "https://nfcom.",
+        "HOMOLOGACAO": "https://hnfcom.",
+    },
+    "MS": {
+        "AUTORIZACAO": "sefaz.ms.gov.br/ws/NFComRecepcao?wsdl",
+        "CHAVE": "sefaz.ms.gov.br/ws/NFComConsulta?wsdl",
+        "EVENTOS": "sefaz.ms.gov.br/ws/NFComRecepcaoEvento?wsdl",
+        "STATUS": "sefaz.ms.gov.br/ws/NFComStatusServico?wsdl",
+        "HTTPS": "https://nfcom.",
+        "HOMOLOGACAO": "https://hom.nfcom.",
+    },
+    "MT": {
+        "AUTORIZACAO": "sefaz.mt.gov.br/nfcom/services/NFComRecepcao?wsdl",
+        "CHAVE": "sefaz.mt.gov.br/nfcom/services/NFComConsulta?wsdl",
+        "EVENTOS": "sefaz.mt.gov.br/nfcom/services/NFComRecepcaoEvento?wsdl",
+        "STATUS": "sefaz.mt.gov.br/nfcom/services/NFComStatusServico?wsdl",
+        "HTTPS": "https://www.",
+        "HOMOLOGACAO": "https://homologacao.",
+    },
+    "SVRS": {
+        "AUTORIZACAO": "svrs.rs.gov.br/WS/NFComConsulta/NFComConsulta.asmx",
+        "CHAVE": "svrs.rs.gov.br/WS/NFComRecepcao/NFComRecepcao.asmx",
+        "EVENTOS": "svrs.rs.gov.br/WS/NFComRecepcaoEvento/NFComRecepcaoEvento.asmx",
+        "STATUS": "svrs.rs.gov.br/WS/NFComStatusServico/NFComStatusServico.asmx",
+        "HTTPS": "https://nfcom.",
+        "HOMOLOGACAO": "https://nfcom-homologacao.",
+    }
+}

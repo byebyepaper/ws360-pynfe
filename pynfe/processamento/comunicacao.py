@@ -14,15 +14,18 @@ from pynfe.utils.flags import (
     NAMESPACE_MDFE,
     NAMESPACE_MDFE_METODO,
     NAMESPACE_METODO,
+    NAMESPACE_NFCOM,
+    NAMESPACE_NFCOM_METODO,
     NAMESPACE_NFE,
     NAMESPACE_SOAP,
     NAMESPACE_XSD,
     NAMESPACE_XSI,
     VERSAO_CTE,
     VERSAO_MDFE,
+    VERSAO_NFCOM,
     VERSAO_PADRAO,
 )
-from pynfe.utils.webservices import CTE, MDFE, NFCE, NFE, NFSE
+from pynfe.utils.webservices import CTE, MDFE, NFCE, NFCOM, NFE, NFSE
 
 from .assinatura import AssinaturaA1
 
@@ -164,13 +167,21 @@ class ComunicacaoSefaz(Comunicacao):
         """
         # url do serviço
         url = self._get_url(modelo=modelo, consulta="CHAVE", contingencia=contingencia)
-        # Monta XML do corpo da requisição
-        raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
-        etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
-        etree.SubElement(raiz, "xServ").text = "CONSULTAR"
-        etree.SubElement(raiz, "chNFe").text = chave
-        # Monta XML para envio da requisição
-        xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
+        if modelo == "nfcom":
+            raiz = etree.Element("consSitNfcom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM)
+            etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
+            etree.SubElement(raiz, "xServ").text = "CONSULTAR"
+            etree.SubElement(raiz, "chNfcom").text = chave
+
+            xml = self._construir_xml_soap("NFComConsulta", raiz)
+        else:
+            # Monta XML do corpo da requisição
+            raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
+            etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
+            etree.SubElement(raiz, "xServ").text = "CONSULTAR"
+            etree.SubElement(raiz, "chNFe").text = chave
+            # Monta XML para envio da requisição
+            xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
         return self._post(url, xml)
 
     def consulta_distribuicao(
@@ -496,8 +507,14 @@ class ComunicacaoSefaz(Comunicacao):
                 else:
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE[self.uf.upper()][ambiente] + NFCE[self.uf.upper()][consulta]
+            elif modelo == "nfcom":
+                if self.uf.upper() in ["MG", "MT", "MS"]:
+                    self.url = NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                else:
+                    self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
+
             else:
-                raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+                raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"')
         # Estados que utilizam outros ambientes
         else:
             lista_svrs = [
@@ -528,8 +545,12 @@ class ComunicacaoSefaz(Comunicacao):
                 elif modelo == "nfce":
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
+                elif modelo == "nfcom":
+                    self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
                 else:
-                    raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+                    raise Exception(
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"'
+                    )
             # unico UF que utiliza SVAN ainda para NF-e
             # SVRS para NFC-e
             elif self.uf.upper() == "MA":
@@ -543,28 +564,47 @@ class ComunicacaoSefaz(Comunicacao):
                 elif modelo == "nfce":
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
+                elif modelo == "nfcom":
+                    self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
                 else:
-                    raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+                    raise Exception(
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"'
+                    )
             else:
                 raise Exception(f"Url não encontrada para {modelo} e {consulta} {self.uf.upper()}")
         return self.url
 
     def _construir_xml_soap(self, metodo, dados, cabecalho=False):
-        """Mota o XML para o envio via SOAP"""
+        """Monta o XML para o envio via SOAP"""
         raiz = etree.Element(
             "{%s}Envelope" % NAMESPACE_SOAP,
-            nsmap={"xsi": NAMESPACE_XSI, "xsd": NAMESPACE_XSD, "soap": NAMESPACE_SOAP},
+            nsmap={
+                "xsi": NAMESPACE_XSI,
+                "xsd": NAMESPACE_XSD,
+                "soap": NAMESPACE_SOAP,
+            },
         )
+
         body = etree.SubElement(raiz, "{%s}Body" % NAMESPACE_SOAP)
-        # distribuição tem um corpo de xml diferente
+
+        # === NFe Distribuição ===
         if metodo == "NFeDistribuicaoDFe":
             x = etree.SubElement(body, "nfeDistDFeInteresse", xmlns=NAMESPACE_METODO + metodo)
             a = etree.SubElement(x, "nfeDadosMsg")
+
+        # === Cadastro MT ===
         elif metodo == "CadConsultaCadastro4" and self.uf.upper() == "MT":
             x = etree.SubElement(body, "consultaCadastro", xmlns=NAMESPACE_METODO + metodo)
             a = etree.SubElement(x, "nfeDadosMsg")
+
+        # === NFCOM Consulta ===
+        elif metodo == "NFComConsulta":
+            a = etree.SubElement(body, "nfcomDadosMsg", xmlns=NAMESPACE_NFCOM_METODO + metodo)
+
+        # === Default (NFe / NFCe / CTe etc) ===
         else:
             a = etree.SubElement(body, "nfeDadosMsg", xmlns=NAMESPACE_METODO + metodo)
+
         a.append(dados)
         return raiz
 
