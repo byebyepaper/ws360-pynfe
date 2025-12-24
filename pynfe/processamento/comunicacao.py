@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import time
 import re
 import html
 import requests
@@ -201,26 +202,32 @@ class ComunicacaoSefaz(Comunicacao):
             chave_cert = (cert, chave)
             # Abre a conexão HTTPS
             try:
-                response = requests.post(
-                    url,
-                    data={
-                        "sistema": "Nfcom",
-                        "OrigemSite": "0",
-                        "Ambiente": self._ambiente,  # 1=Produção, 2=Homologação
-                        "ChaveAcessoDfe": chave
-                    },
-                    headers={
-                        "User-Agent": "Mozilla/5.0",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "Referer": "https://dfe-portal.svrs.rs.gov.br/Nfcom",
-                    },
-                    cert=chave_cert,
-                    verify=False,
-                    timeout=30,
-                )
-            
-                pattern = r'"xml"\s*:\s*"(.+?)"\s*\}'
-                match = re.search(pattern, response.text, re.DOTALL)
+                session = requests.Session()
+                for _ in range(3):
+                    response = session.post(
+                        url,
+                        data={
+                            "sistema": "Nfcom",
+                            "OrigemSite": "0",
+                            "Ambiente": self._ambiente,  # 1=Produção, 2=Homologação
+                            "ChaveAcessoDfe": chave
+                        },
+                        headers={
+                            "User-Agent": "Mozilla/5.0",
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Referer": "https://dfe-portal.svrs.rs.gov.br/Nfcom",
+                        },
+                        cert=chave_cert,
+                        verify=False,
+                        timeout=30,
+                    )
+                
+                    pattern = r'"xml"\s*:\s*"(.+?)"\s*\}'
+                    match = re.search(pattern, response.text, re.DOTALL)
+                    if not match:
+                        print(response.text)  # DEBUG
+                        print("Retrying download...")  # DEBUG
+                        time.sleep(2)  # Wait before retrying
 
                 if not match:
                     print(response.text)  # DEBUG
