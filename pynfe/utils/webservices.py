@@ -1,5 +1,5 @@
 """
-    @author: Junior Tada, Leonardo Tada
+@author: Junior Tada, Leonardo Tada
 """
 
 # http://nfce.encat.org/desenvolvedor/qrcode/
@@ -299,9 +299,7 @@ NFCE = {
 NFE = {
     # Alguns serviços são disponibilizados apenas pelo ambiente nacional
     "AN": {
-        "EVENTOS": (
-            "nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx"
-        ),  # versao: 4.00
+        "EVENTOS": "nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",  # versao: 4.00
         "DISTRIBUICAO": "nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx",
         "HTTPS": "https://www",
         "HOMOLOGACAO": "https://hom1",
@@ -317,11 +315,7 @@ NFE = {
         "HTTPS": "https://",
         "HOMOLOGACAO": "https://hom",
     },
-    "MA": {
-        "CADASTRO": (
-            "https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl"
-        )
-    },
+    "MA": {"CADASTRO": "https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl"},
     "PE": {
         "STATUS": "sefaz.pe.gov.br/nfe-service/services/NFeStatusServico4",
         "AUTORIZACAO": "sefaz.pe.gov.br/nfe-service/services/NFeAutorizacao4",
@@ -334,24 +328,12 @@ NFE = {
         "HOMOLOGACAO": "https://nfehomolog.",
     },
     "BA": {
-        "STATUS": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeStatusServico4/NFeStatusServico4.asmx"
-        ),
-        "AUTORIZACAO": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeAutorizacao4/NFeAutorizacao4.asmx"
-        ),
-        "RECIBO": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx"
-        ),
-        "CHAVE": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx"
-        ),
-        "INUTILIZACAO": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeInutilizacao4/NFeInutilizacao4.asmx"
-        ),
-        "EVENTOS": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx"
-        ),
+        "STATUS": "nfe.sefaz.ba.gov.br/webservices/NFeStatusServico4/NFeStatusServico4.asmx",
+        "AUTORIZACAO": "nfe.sefaz.ba.gov.br/webservices/NFeAutorizacao4/NFeAutorizacao4.asmx",
+        "RECIBO": "nfe.sefaz.ba.gov.br/webservices/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx",
+        "CHAVE": "nfe.sefaz.ba.gov.br/webservices/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
+        "INUTILIZACAO": "nfe.sefaz.ba.gov.br/webservices/NFeInutilizacao4/NFeInutilizacao4.asmx",
+        "EVENTOS": "nfe.sefaz.ba.gov.br/webservices/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
         "CADASTRO": (
             "nfe.sefaz.ba.gov.br/webservices/CadConsultaCadastro4/CadConsultaCadastro4.asmx"
         ),
@@ -381,14 +363,10 @@ NFE = {
         "HOMOLOGACAO": "https://homologacao.",
     },
     "PR": {
-        "STATUS": (
-            "nfe.sefa.pr.gov.br/nfe/NFeStatusServico4"
-        ),  # CONSULTA STATUS DO SERVICO
+        "STATUS": "nfe.sefa.pr.gov.br/nfe/NFeStatusServico4",  # CONSULTA STATUS DO SERVICO
         "AUTORIZACAO": "nfe.sefa.pr.gov.br/nfe/NFeAutorizacao4",  # AUTORIZACAO
         "RECIBO": "nfe.sefa.pr.gov.br/nfe/NFeRetAutorizacao4",  # CONSULTA RECIBO
-        "CHAVE": (
-            "nfe.sefa.pr.gov.br/nfe/NFeConsultaProtocolo4"
-        ),  # CONSULTA CHAVE DE ACESSO
+        "CHAVE": "nfe.sefa.pr.gov.br/nfe/NFeConsultaProtocolo4",  # CONSULTA CHAVE DE ACESSO
         "INUTILIZACAO": "nfe.sefa.pr.gov.br/nfe/NFeInutilizacao4",  # INUTILIZAÇAO
         "EVENTOS": "nfe.sefa.pr.gov.br/nfe/NFeRecepcaoEvento4",  # REGISTRO DE EVENTOS
         "CADASTRO": "nfe.sefa.pr.gov.br/nfe/CadConsultaCadastro4",  # CONSULTA CADASTRO
@@ -445,22 +423,12 @@ NFE = {
         "HOMOLOGACAO": "https://homolog.",
     },
     "SVAN": {
-        "STATUS": (
-            "sefazvirtual.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx"
-        ),
-        "AUTORIZACAO": (
-            "sefazvirtual.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx"
-        ),
-        "RECIBO": (
-            "sefazvirtual.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx"
-        ),
+        "STATUS": "sefazvirtual.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx",
+        "AUTORIZACAO": "sefazvirtual.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx",
+        "RECIBO": "sefazvirtual.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx",
         "CHAVE": "sefazvirtual.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
-        "INUTILIZACAO": (
-            "sefazvirtual.fazenda.gov.br/NFeInutilizacao4/NFeInutilizacao4.asmx"
-        ),
-        "EVENTOS": (
-            "sefazvirtual.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx"
-        ),
+        "INUTILIZACAO": "sefazvirtual.fazenda.gov.br/NFeInutilizacao4/NFeInutilizacao4.asmx",
+        "EVENTOS": "sefazvirtual.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
         "DOWNLOAD": "sefazvirtual.fazenda.gov.br/NfeDownloadNF/NfeDownloadNF.asmx",
         "HTTPS": "https://www.",
         "HOMOLOGACAO": "https://hom.",
@@ -509,9 +477,7 @@ NFSE = {
         "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
         "SUBSTITUIR": "SubstituirNfse",
         "HTTPS": "http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl",
-        "HOMOLOGACAO": (
-            "http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl"
-        ),
+        "HOMOLOGACAO": "http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl",
     },
     #
     "GINFES": {
@@ -532,7 +498,9 @@ NFSE = {
         "CANCELAR_LOTE": "CancelarNotaLote",
         "CONSULTA": "Consultar",
         "HTTPS": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
-        "HOMOLOGACAO": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
+        "HOMOLOGACAO": (
+            "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl"
+        ),
     },
 }
 
@@ -636,11 +604,11 @@ NFCOM = {
     },
     "SVRS": {
         "DOWNLOAD": "https://dfe-portal.svrs.rs.gov.br/NfcomSSL/DownloadXmlDfe",
-        "AUTORIZACAO": "svrs.rs.gov.br/WS/NFComConsulta/NFComConsulta.asmx",
-        "CHAVE": "svrs.rs.gov.br/WS/NFComRecepcao/NFComRecepcao.asmx",
+        "AUTORIZACAO": "svrs.rs.gov.br/WS/NFComRecepcao/NFComRecepcao.asmx",
+        "CHAVE": "svrs.rs.gov.br/WS/NFComConsulta/NFComConsulta.asmx",
         "EVENTOS": "svrs.rs.gov.br/WS/NFComRecepcaoEvento/NFComRecepcaoEvento.asmx",
         "STATUS": "svrs.rs.gov.br/WS/NFComStatusServico/NFComStatusServico.asmx",
         "HTTPS": "https://nfcom.",
         "HOMOLOGACAO": "https://nfcom-homologacao.",
-    }
+    },
 }
