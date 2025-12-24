@@ -223,6 +223,7 @@ class ComunicacaoSefaz(Comunicacao):
                 match = re.search(pattern, response.text, re.DOTALL)
 
                 if not match:
+                    print(response.text)  # DEBUG
                     raise ValueError("XML não encontrado no HTML")
 
                 xml_escaped = match.group(1)
@@ -697,8 +698,6 @@ class ComunicacaoSefaz(Comunicacao):
             )
             xml = xml_declaration + xml
             # Faz o request com o servidor
-            print(xml)
-            print(url)
             result = requests.post(
                 url,
                 xml,
