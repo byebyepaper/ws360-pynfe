@@ -167,15 +167,13 @@ class ComunicacaoSefaz(Comunicacao):
         """
         # url do serviço
         url = self._get_url(modelo=modelo, consulta="CHAVE", contingencia=contingencia)
-        soap_action = None
         if modelo == "nfcom":
-            raiz = etree.Element("consSitNfcom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM)
+            raiz = etree.Element("consSitNFCom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM)
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
-            etree.SubElement(raiz, "chNfcom").text = chave
+            etree.SubElement(raiz, "chNFCom").text = chave
 
             xml = self._construir_xml_soap("NFComConsulta", raiz)
-            soap_action = "nfcomConsultaNF"
         else:
             # Monta XML do corpo da requisição
             raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
@@ -184,7 +182,7 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "chNFe").text = chave
             # Monta XML para envio da requisição
             xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
-        return self._post(url, xml, soap_action=soap_action)
+        return self._post(url, xml)
 
     def consulta_distribuicao(
         self, cnpj=None, cpf=None, chave=None, nsu=0, consulta_nsu_especifico=False
@@ -610,7 +608,7 @@ class ComunicacaoSefaz(Comunicacao):
         a.append(dados)
         return raiz
 
-    def _post_header(self, soap_action=None):
+    def _post_header(self):
         """Retorna um dicionário com os atributos para o cabeçalho da requisição HTTP"""
         # PE é a única UF que exige SOAPAction no header
         response = {
@@ -620,8 +618,6 @@ class ComunicacaoSefaz(Comunicacao):
         if self.uf.upper() == "PE":
             response["SOAPAction"] = ""
 
-        if soap_action:
-            response["content-type"] = f"application/soap+xml; charset=utf-8; action={soap_action}"
         return response
 
     def _post(self, url, xml, timeout=None, soap_action=None):
@@ -642,11 +638,10 @@ class ComunicacaoSefaz(Comunicacao):
             # Faz o request com o servidor
             print(xml)
             print(url)
-            print(self._post_header(soap_action=soap_action))
             result = requests.post(
                 url,
                 xml,
-                headers=self._post_header(soap_action=soap_action),
+                headers=self._post_header(),
                 cert=chave_cert,
                 verify=False,
                 timeout=timeout,
