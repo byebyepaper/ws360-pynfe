@@ -640,6 +640,9 @@ class ComunicacaoSefaz(Comunicacao):
             )
             xml = xml_declaration + xml
             # Faz o request com o servidor
+            print(xml)
+            print(url)
+            print(self._post_header(soap_action=soap_action))
             result = requests.post(
                 url,
                 xml,
