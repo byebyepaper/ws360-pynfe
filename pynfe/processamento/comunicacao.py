@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import re
-
+import html
 import requests
 from pynfe.entidades.certificado import CertificadoA1
 from pynfe.utils import etree, so_numeros
@@ -172,7 +172,6 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
             etree.SubElement(raiz, "chNFCom").text = chave
-
             xml = self._construir_xml_soap("NFComConsulta", raiz)
         else:
             # Monta XML do corpo da requisição
@@ -183,6 +182,65 @@ class ComunicacaoSefaz(Comunicacao):
             # Monta XML para envio da requisição
             xml = self._construir_xml_soap("NFeConsultaProtocolo4", raiz)
         return self._post(url, xml)
+    
+    def download_nota(self, modelo, chave, contingencia=False):
+        """
+            Este método oferece o download da NF-e/NFC-e na Base de Dados do Portal
+            da Secretaria de Fazenda Estadual.
+        :param modelo: Modelo da nota
+        :param chave: Chave da nota
+        :param contingencia: Indica se o envio é em contingência ou não
+        :return:
+        """
+        # url do serviço
+        url = self._get_url(modelo=modelo, consulta="DOWNLOAD", contingencia=contingencia)
+        
+        if modelo == "nfcom":
+            certificado_a1 = CertificadoA1(self.certificado)
+            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave_cert = (cert, chave)
+            # Abre a conexão HTTPS
+            try:
+                response = requests.post(
+                    url,
+                    data={
+                        "sistema": "Nfcom",
+                        "OrigemSite": "0",
+                        "Ambiente": self._ambiente,  # 1=Produção, 2=Homologação
+                        "ChaveAcessoDfe": chave
+                    },
+                    headers={
+                        "User-Agent": "Mozilla/5.0",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Referer": "https://dfe-portal.svrs.rs.gov.br/Nfcom",
+                    },
+                    cert=chave_cert,
+                    verify=False,
+                    timeout=30,
+                )
+            
+                pattern = r'"xml"\s*:\s*"(.+?)"\s*\}'
+                match = re.search(pattern, response.text, re.DOTALL)
+
+                if not match:
+                    raise ValueError("XML não encontrado no HTML")
+
+                xml_escaped = match.group(1)
+
+                # Remove escapes JavaScript
+                xml = xml_escaped.encode("utf-8").decode("unicode_escape")
+
+                # Converte entidades HTML (&amp; etc)
+                xml = html.unescape(xml)
+                return xml.strip()
+            except requests.exceptions.RequestException as e:
+                raise e
+            finally:
+                certificado_a1.excluir()
+            
+        else:
+            raise NotImplementedError("Download not implemented for this model yet.")
+
 
     def consulta_distribuicao(
         self, cnpj=None, cpf=None, chave=None, nsu=0, consulta_nsu_especifico=False
@@ -620,7 +678,7 @@ class ComunicacaoSefaz(Comunicacao):
 
         return response
 
-    def _post(self, url, xml, timeout=None, soap_action=None):
+    def _post(self, url, xml, timeout=None):
         certificado_a1 = CertificadoA1(self.certificado)
         chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
         chave_cert = (cert, chave)
