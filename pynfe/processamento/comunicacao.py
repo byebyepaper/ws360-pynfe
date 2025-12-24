@@ -186,68 +186,81 @@ class ComunicacaoSefaz(Comunicacao):
     
     def download_nota(self, modelo, chave, contingencia=False):
         """
-            Este método oferece o download da NF-e/NFC-e na Base de Dados do Portal
-            da Secretaria de Fazenda Estadual.
-        :param modelo: Modelo da nota
-        :param chave: Chave da nota
-        :param contingencia: Indica se o envio é em contingência ou não
-        :return:
+        Download da NFCom via Portal SVRS (HTML + extração do XML via JS).
         """
-        # url do serviço
+
         url = self._get_url(modelo=modelo, consulta="DOWNLOAD", contingencia=contingencia)
-        
-        if modelo == "nfcom":
-            certificado_a1 = CertificadoA1(self.certificado)
-            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
-            chave_cert = (cert, chave)
-            # Abre a conexão HTTPS
-            try:
-                session = requests.Session()
-                for _ in range(3):
-                    response = session.post(
-                        url,
-                        data={
-                            "sistema": "Nfcom",
-                            "OrigemSite": "0",
-                            "Ambiente": self._ambiente,  # 1=Produção, 2=Homologação
-                            "ChaveAcessoDfe": chave
-                        },
-                        headers={
-                            "User-Agent": "Mozilla/5.0",
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            "Referer": "https://dfe-portal.svrs.rs.gov.br/Nfcom",
-                        },
-                        cert=chave_cert,
-                        verify=False,
-                        timeout=30,
-                    )
-                
-                    pattern = r'"xml"\s*:\s*"(.+?)"\s*\}'
-                    match = re.search(pattern, response.text, re.DOTALL)
-                    if not match:
-                        print(response.text)  # DEBUG
-                        print("Retrying download...")  # DEBUG
-                        time.sleep(2)  # Wait before retrying
 
-                if not match:
-                    print(response.text)  # DEBUG
-                    raise ValueError("XML não encontrado no HTML")
-
-                xml_escaped = match.group(1)
-
-                # Remove escapes JavaScript
-                xml = xml_escaped.encode("utf-8").decode("unicode_escape")
-
-                # Converte entidades HTML (&amp; etc)
-                xml = html.unescape(xml)
-                return xml.strip()
-            except requests.exceptions.RequestException as e:
-                raise e
-            finally:
-                certificado_a1.excluir()
-            
-        else:
+        if modelo != "nfcom":
             raise NotImplementedError("Download not implemented for this model yet.")
+
+        # validação da chave
+        if not chave or not chave.isdigit() or len(chave) != 44:
+            raise ValueError("Chave NFCom inválida (esperado 44 dígitos numéricos)")
+
+        certificado_a1 = CertificadoA1(self.certificado)
+
+        try:
+            key_path, cert_path = certificado_a1.separar_arquivo(
+                self.certificado_senha,
+                caminho=True
+            )
+            cert = (cert_path, key_path)
+
+            session = requests.Session()
+
+            response = session.post(
+                url,
+                files={
+                    "sistema": (None, "Nfcom"),
+                    "OrigemSite": (None, "0"),
+                    "Ambiente": (None, str(self._ambiente)),
+                    "ChaveAcessoDfe": (None, chave),
+                },
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                    "Referer": "https://dfe-portal.svrs.rs.gov.br/Nfcom",
+                },
+                cert=cert,
+                verify=False,
+                timeout=30,
+            )
+
+            html_body = response.text
+
+            # 🚫 BLOQUEIO POR IP (rate limit)
+            if (
+                'textoErro' in html_body and
+                'IP não autorizado' in html_body
+            ):
+                raise PermissionError(
+                    "SVRS bloqueou o IP por múltiplas consultas simultâneas. "
+                    "Aguarde liberação ou utilize outro IP."
+                )
+
+            # 🔍 extrai o XML do JS
+            pattern = r'var\s+stringJson\s*=\s*\{\s*"xml"\s*:\s*"(.+?)"\s*\};'
+            match = re.search(pattern, html_body, re.DOTALL)
+
+            if not match:
+                raise ValueError(
+                    "XML não encontrado no HTML retornado pelo portal SVRS. "
+                    "Pode ser chave inexistente, ambiente incorreto ou NFCom sem permissão."
+                )
+
+            xml_js = match.group(1)
+
+            # remove escapes JavaScript
+            xml = bytes(xml_js, "utf-8").decode("unicode_escape")
+
+            # converte entidades HTML (&amp; etc)
+            xml = html.unescape(xml)
+
+            return xml.strip()
+
+        finally:
+            certificado_a1.excluir()
+
 
 
     def consulta_distribuicao(
