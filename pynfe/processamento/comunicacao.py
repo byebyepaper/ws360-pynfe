@@ -621,7 +621,7 @@ class ComunicacaoSefaz(Comunicacao):
             response["SOAPAction"] = ""
 
         if soap_action:
-            response["SOAPAction"] = soap_action
+            response["content-type"] = f"application/soap+xml; charset=utf-8; action={soap_action}"
         return response
 
     def _post(self, url, xml, timeout=None, soap_action=None):
