@@ -953,7 +953,20 @@ class ComunicacaoNfse(Comunicacao):
             certificadoA1 = CertificadoA1(self.certificado)
             chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
 
-            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+            wsdl = url                       # ?wsdl
+            endpoint = url.replace("?wsdl", "")  # REMOVE ?wsdl
+
+            print("WSDL:", wsdl)
+            print("ENDPOINT:", endpoint)
+
+            cliente = Client(
+                wsdl,
+                transport=HttpAuthenticated(
+                    key=chave,
+                    cert=cert,
+                    endereco=endpoint  # ✅ endpoint correto
+                )
+            )
 
             # gerar nfse
             if metodo == "gerar":
