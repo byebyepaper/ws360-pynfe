@@ -102,7 +102,7 @@ class SerializacaoBetha(InterfaceAutorizador):
         gnfse.Rps = declaracao_servico
 
         gnfse = (
-            gnfse.toxml(element_name="GerarNfseEnvio")
+            gnfse.toxml(encoding="utf-8", element_name="GerarNfseEnvio")
             .replace("ns1:", "")
             .replace(":ns1", "")
             .replace('<?xml version="1.0" ?>', "")
@@ -130,7 +130,7 @@ class SerializacaoBetha(InterfaceAutorizador):
         consulta.Prestador = id_prestador
 
         consulta = (
-            consulta.toxml(element_name="ConsultarNfseRpsEnvio")
+            consulta.toxml(encoding="utf-8", element_name="ConsultarNfseRpsEnvio")
             .replace("ns1:", "")
             .replace(":ns1", "")
             .replace('<?xml version="1.0" ?>', "")
@@ -156,7 +156,7 @@ class SerializacaoBetha(InterfaceAutorizador):
         consulta.Faixa.NumeroNfseFinal = fim
 
         consulta = (
-            consulta.toxml(element_name="ConsultarNfseFaixaEnvio")
+            consulta.toxml(encoding="utf-8", element_name="ConsultarNfseFaixaEnvio")
             .replace("ns1:", "")
             .replace(":ns1", "")
             .replace('<?xml version="1.0" ?>', "")
@@ -189,7 +189,7 @@ class SerializacaoBetha(InterfaceAutorizador):
         cancelar = nfse_schema.CancelarNfseEnvio()
         cancelar.Pedido = pedido
 
-        return cancelar.toxml(element_name="CancelarNfseEnvio")
+        return cancelar.toxml(encoding="utf-8", element_name="CancelarNfseEnvio")
 
     def serializar_lote_sincrono(self, nfse):
         """Retorna string de um XML gerado a partir do
@@ -268,7 +268,7 @@ class SerializacaoBetha(InterfaceAutorizador):
         gnfse = nfse_schema.EnviarLoteRpsSincronoEnvio()
         gnfse.LoteRps = lote
 
-        return gnfse.toxml(element_name="EnviarLoteRpsSincronoEnvio")
+        return gnfse.toxml(encoding="utf-8", element_name="EnviarLoteRpsSincronoEnvio")
 
 
 class SerializacaoGinfes(InterfaceAutorizador):
@@ -321,7 +321,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
         consulta.IdentificacaoRps = id_rps
         consulta.Prestador = id_prestador
 
-        return consulta.toxml(element_name="ns1:ConsultarNfseRpsEnvio")
+        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseRpsEnvio")
 
     def consultar_nfse(self, emitente, numero=None, inicio=None, fim=None):
         # Prestador
@@ -340,7 +340,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
 
-        return consulta.toxml(element_name="ns1:ConsultarNfseEnvio")
+        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio" )
 
     def consultar_lote(self, emitente, numero):
         # Prestador
@@ -352,7 +352,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
         consulta.Prestador = id_prestador
         consulta.Protocolo = str(numero)
 
-        return consulta.toxml(element_name="ns1:ConsultarLoteRpsEnvio")
+        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarLoteRpsEnvio")
 
     def consultar_situacao_lote(self, emitente, numero):
         "Serializa lote de envio, baseado no servico_consultar_situacao_lote_rps_envio_v03.xsd"
@@ -365,7 +365,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
         consulta.Prestador = id_prestador
         consulta.Protocolo = str(numero)
 
-        return consulta.toxml(element_name="ns1:ConsultarSituacaoLoteRpsEnvio")
+        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarSituacaoLoteRpsEnvio")
 
     def serializar_lote_assincrono(self, nfse):
         "Serializa lote de envio, baseado no servico_enviar_lote_rps_envio_v03.xsd"
@@ -504,7 +504,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
 
         enviarLote = servico_enviar_lote_rps_envio_v03.EnviarLoteRpsEnvio()
         enviarLote.LoteRps = lote
-        return enviarLote.toxml(element_name="ns1:EnviarLoteRpsEnvio")
+        return enviarLote.toxml(encoding="utf-8", element_name="ns1:EnviarLoteRpsEnvio")
 
     def cancelar(self, nfse, codigo):
         """Retorna string de um XML gerado a partir do
@@ -530,7 +530,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
         cancelar = servico_cancelar_nfse_envio_v03.CancelarNfseEnvio()
         cancelar.Pedido = pedido
 
-        return cancelar.toxml(element_name="ns1:CancelarNfseEnvio")
+        return cancelar.toxml(encoding="utf-8", element_name="ns1:CancelarNfseEnvio")
 
     def cancelar_v2(self, nfse):
         # serialização utilizando lxml
@@ -552,4 +552,4 @@ class SerializacaoGinfes(InterfaceAutorizador):
         cabecalho = cabecalho_v03.cabecalho()
         cabecalho.versao = "3"
         cabecalho.versaoDados = "3"
-        return cabecalho.toxml(element_name="ns2:cabecalho")
+        return cabecalho.toxml(encoding="utf-8", element_name="ns2:cabecalho")
