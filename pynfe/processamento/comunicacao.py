@@ -1194,10 +1194,14 @@ class ComunicacaoNfse(Comunicacao):
 
             # DEBUG ÚTIL
             print("SOAP endpoint:", client.service._binding_options["address"])
-
+            
+    
             if not hasattr(client.service, metodo):
                 raise Exception(f"Método {metodo} não existe no WSDL")
-
+            
+            print("Chamando método:", metodo)
+            print("Parâmetros:", args)
+    
             service = getattr(client.service, metodo)
 
             # chama com N parâmetros (GINFES usa 2)
