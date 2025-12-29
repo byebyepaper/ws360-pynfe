@@ -803,7 +803,7 @@ class ComunicacaoNfse(Comunicacao):
             # comunica via wsdl
             return self._post(url, xml, "consultaRps")
         elif self.autorizador == "GINFES":
-            return self._post_https(url, xml, "consultaRps")
+            return self._zeep_client(url, xml, "consultaRps")
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._zeep_client(url, xml, "Consultar")
@@ -961,6 +961,9 @@ class ComunicacaoNfse(Comunicacao):
             elif metodo == "enviar_lote":
                 return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
             elif metodo == "consulta":
+                print("URL:", url)
+                print("Cabecalho:", cabecalho)
+                print("XML:", xml)
                 return cliente.service.ConsultarNfseV3(cabecalho, xml)
             elif metodo == "consulta_lote":
                 return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
@@ -1011,7 +1014,7 @@ class ComunicacaoNfse(Comunicacao):
         Recebe o envelope SOAP completo já montado
         """
         import requests
-        
+
         certificado_a1 = CertificadoA1(self.certificado)
         try:
             chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
@@ -1027,26 +1030,23 @@ class ComunicacaoNfse(Comunicacao):
                 soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteBaixarArquivo"
             else:
                 raise Exception(f"Operação {operation} não implementada para Barueri.")
-            
-            headers = {
-                'Content-Type': 'text/xml; charset=utf-8',
-                'SOAPAction': f'"{soap_action}"'
-            }
-            
+
+            headers = {"Content-Type": "text/xml; charset=utf-8", "SOAPAction": f'"{soap_action}"'}
+
             return requests.post(
                 url,
-                data=xml.encode('utf-8'),
+                data=xml.encode("utf-8"),
                 headers=headers,
                 cert=chave_cert,
                 verify=False,
-                timeout=30
+                timeout=30,
             )
-            
+
         except requests.exceptions.RequestException as e:
             raise e
         finally:
             certificado_a1.excluir()
-        
+
     def _post_barueri_https(self, url, xml, metodo):
         """
         LEGACY: Comunicação wsdl (https) utilizando certificado do usuário
@@ -1087,12 +1087,12 @@ class ComunicacaoNfse(Comunicacao):
     def enviar_sp(self, xml, operation, versao_schema=2):
         """
         Send XML to São Paulo NFS-e webservice.
-        
+
         Args:
             xml: XML string to send
             operation: Operation name (enviar_rps, teste_envio_lote_rps, envio_lote_rps, consultar_rps, cancelar)
             versao_schema: Schema version (1 for v1, 2 for v2 - Reforma Tributária 2026)
-        
+
         Returns:
             WebService response
         """
@@ -1105,10 +1105,10 @@ class ComunicacaoNfse(Comunicacao):
     def _post_sp_https(self, url, xml, metodo, versao_schema=2):
         """
         Comunicação wsdl (https) utilizando certificado do usuário.
-        
+
         According to São Paulo NFS-e manual v3.3.4:
         - VersaoSchema=2: Schema version 2 (Reforma Tributária 2026)
-        
+
         Args:
             url: WebService URL
             xml: XML message string
@@ -1129,7 +1129,9 @@ class ComunicacaoNfse(Comunicacao):
             if metodo == "enviar_rps":
                 return cliente.service.EnvioRPS(VersaoSchema=versao_schema, MensagemXML=xml)
             elif metodo == "teste_envio_lote_rps":
-                return cliente.service.TesteEnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+                return cliente.service.TesteEnvioLoteRPS(
+                    VersaoSchema=versao_schema, MensagemXML=xml
+                )
             elif metodo == "envio_lote_rps":
                 return cliente.service.EnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
             elif metodo == "consultar_rps":
@@ -1142,6 +1144,7 @@ class ComunicacaoNfse(Comunicacao):
             raise e
         finally:
             certificadoA1.excluir()
+
     def _zeep_client(self, wsdl, payload, metodo, wcf_compatibility=True):
         """Comunicação wsdl utilizando a biblioteca zeep"""
 

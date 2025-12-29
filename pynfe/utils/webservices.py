@@ -502,8 +502,8 @@ NFSE = {
     "GINFES": {
         "CONSULTA": "ConsultarNfseV3",
         "CONSULTA_RPS": "ConsultarNfsePorRpsV3",
-        "HTTPS": "https://producao.ginfes.com.br/ServiceGinfesImpl",
-        "HOMOLOGACAO": "https://homologacao.ginfes.com.br/ServiceGinfesImpl",
+        "HTTPS": "https://producao.ginfes.com.br/ServiceGinfesImpl?wsdl",
+        "HOMOLOGACAO": "https://homologacao.ginfes.com.br/ServiceGinfesImpl?wsdl",
     },
     "OSASCO": {
         "AUTORIZACAO": "Emitir",
