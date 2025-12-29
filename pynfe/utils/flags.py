@@ -54,15 +54,12 @@ ICMS_TIPOS_TRIBUTACAO = (
     ("10", "ICMS 10 - Tributada com cobranca do ICMS por substituicao tributaria"),
     (
         "15",
-        (
-            "ICMS 15 - Tributação monofásica própria e com responsabilidade pela retenção sobre"
-            " combustíveis"
-        ),
+        "ICMS 15 - Tributação monofásica própria e com responsabilidade pela retenção sobre combustíveis",
     ),
     ("20", "ICMS 20 - Com reducao da base de calculo"),
     (
         "30",
-        "ICMS 30 - Isenta ou nao tributada e com cobranca do ICMS por substituicao tributaria",
+        ("ICMS 30 - Isenta ou nao tributada e com cobranca do ICMS por substituicao tributaria"),
     ),
     ("40", "ICMS 40 - Isenta"),
     ("41", "ICMS 41 - Nao tributada"),
@@ -73,7 +70,7 @@ ICMS_TIPOS_TRIBUTACAO = (
     ("61", "ICMS 61 - Tributação monofásica sobre combustíveis cobrada anteriormente"),
     (
         "70",
-        "ICMS 70 - Com reducao da base de calculo e cobranca do ICMS por substituicao tributaria",
+        ("ICMS 70 - Com reducao da base de calculo e cobranca do ICMS por substituicao tributaria"),
     ),
     ("90", "ICMS 90 - Outras"),
     ("101", "ICMS 101 - Tributação ICMS pelo Simples Nacional, CSOSN=101"),
@@ -115,7 +112,7 @@ ICMS_ORIGENS = (
     ),
     (
         5,
-        "Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40%. ",
+        ("Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40%. "),
     ),
     (
         6,
