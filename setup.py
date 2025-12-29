@@ -34,11 +34,11 @@ setuptools.setup(
         "requests",
         "lxml",
         "signxml",
-        "zeep>=4.3.2",
+        "suds-py3",
+        "zeep>=4.3.2"
     ],
     extras_require={
         "nfse": [
-            "suds-jurko",
             "pyxb==1.2.4",
         ],
     },

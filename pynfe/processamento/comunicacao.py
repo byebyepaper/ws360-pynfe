@@ -749,6 +749,11 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "BETHA":
             self._namespace = NAMESPACE_BETHA
             self._versao = "2.02"
+        elif self.autorizador == "SAO_PAULO":
+            self._namespace = "http://www.prefeitura.sp.gov.br/nfe"
+            self._versao = "2"
+        elif self.autorizador == "BARUERI":
+            self._namespace = "http://www.barueri.sp.gov.br/nfeservice"
         elif self.autorizador == "OSASCO":
             self._namespace = ""
             self._versao = "1"
@@ -902,6 +907,8 @@ class ComunicacaoNfse(Comunicacao):
         """Retorna a url para comunicação com o webservice"""
         if self._ambiente == 1:
             ambiente = "HTTPS"
+        elif self._ambiente != 1 and self.autorizador == "SAO_PAULO":
+            raise Exception("São Paulo só opera em produção.")
         else:
             ambiente = "HOMOLOGACAO"
         if self.autorizador in NFSE:
@@ -974,6 +981,167 @@ class ComunicacaoNfse(Comunicacao):
         except Exception as e:
             raise e
 
+    def enviar_barueri(self, xml, operation):
+        url = self._get_url()
+
+        if not self.autorizador == "BARUERI":
+            raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
+
+    def consultar_rps_barueri(self, xml, operation):
+        url = self._get_url()
+
+        if not self.autorizador == "BARUERI":
+            raise Exception(f"Consultar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
+
+    def baixar_rps_barueri(self, xml, operation):
+        url = self._get_url()
+
+        if not self.autorizador == "BARUERI":
+            raise Exception(f"Baixar RPS não implementado para {self.autorizador}")
+
+        return self._post_barueri_requests(url, xml, operation)
+
+    def _post_barueri_requests(self, url, xml, operation):
+        """
+        Comunicação SOAP usando requests diretamente (como NFe)
+        Recebe o envelope SOAP completo já montado
+        """
+        import requests
+        
+        certificado_a1 = CertificadoA1(self.certificado)
+        try:
+            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave_cert = (cert, chave)
+
+            if operation == "enviar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteEnviarArquivo"
+            elif operation == "consultar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteStatusArquivo"
+            elif operation == "listar_rps":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteListarArquivos"
+            elif operation == "baixar_nfse":
+                soap_action = "http://www.barueri.sp.gov.br/nfe/NFeLoteBaixarArquivo"
+            else:
+                raise Exception(f"Operação {operation} não implementada para Barueri.")
+            
+            headers = {
+                'Content-Type': 'text/xml; charset=utf-8',
+                'SOAPAction': f'"{soap_action}"'
+            }
+            
+            return requests.post(
+                url,
+                data=xml.encode('utf-8'),
+                headers=headers,
+                cert=chave_cert,
+                verify=False,
+                timeout=30
+            )
+            
+        except requests.exceptions.RequestException as e:
+            raise e
+        finally:
+            certificado_a1.excluir()
+        
+    def _post_barueri_https(self, url, xml, metodo):
+        """
+        LEGACY: Comunicação wsdl (https) utilizando certificado do usuário
+        Este método usa SUDS e não é mais usado pelo Barueri.
+        Usar _post_barueri_requests() para Barueri.
+        """
+        # comunicacao wsdl
+
+        certificadoA1 = CertificadoA1(self.certificado)
+        try:
+            from pynfe.utils.https_nfse import HttpAuthenticated
+            from suds.client import Client
+
+            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+
+            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+
+            # gerar nfse
+
+            if metodo == "enviar_rps":
+                return cliente.service.NFeLoteEnviarArquivo(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "consultar_rps":
+                return cliente.service.NFeLoteStatusArquivo(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "listar_rps":
+                return cliente.service.NFeLoteListarArquivos(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "baixar_nfse":
+                return cliente.service.NFeLoteBaixarArquivo(VersaoSchema=1, MensagemXML=xml)
+            elif metodo == "cancelar":
+                return cliente.service.CancelamentoNFe(VersaoSchema=1, MensagemXML=xml)
+            # TODO outros metodos
+            else:
+                raise Exception(f"Método {metodo} não implementado no autorizador Barueri.")
+        except Exception as e:
+            raise e
+        finally:
+            certificadoA1.excluir()
+
+    def enviar_sp(self, xml, operation, versao_schema=2):
+        """
+        Send XML to São Paulo NFS-e webservice.
+        
+        Args:
+            xml: XML string to send
+            operation: Operation name (enviar_rps, teste_envio_lote_rps, envio_lote_rps, consultar_rps, cancelar)
+            versao_schema: Schema version (1 for v1, 2 for v2 - Reforma Tributária 2026)
+        
+        Returns:
+            WebService response
+        """
+        url = self._get_url()
+        if self.autorizador == "SAO_PAULO":
+            return self._post_sp_https(url, xml, operation, versao_schema)
+        else:
+            raise Exception(f"Enviar RPS não implementado para {self.autorizador}")
+
+    def _post_sp_https(self, url, xml, metodo, versao_schema=2):
+        """
+        Comunicação wsdl (https) utilizando certificado do usuário.
+        
+        According to São Paulo NFS-e manual v3.3.4:
+        - VersaoSchema=2: Schema version 2 (Reforma Tributária 2026)
+        
+        Args:
+            url: WebService URL
+            xml: XML message string
+            metodo: Method name
+            versao_schema: Schema version (1 or 2)
+        """
+        certificadoA1 = CertificadoA1(self.certificado)
+        try:
+            from pynfe.utils.https_nfse import HttpAuthenticated
+            from suds.client import Client
+
+            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+
+            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+
+            # São Paulo NFS-e WebService methods
+            # Manual v3.3.4 section 4.3.1: All methods receive VersaoSchema and MensagemXML
+            if metodo == "enviar_rps":
+                return cliente.service.EnvioRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "teste_envio_lote_rps":
+                return cliente.service.TesteEnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "envio_lote_rps":
+                return cliente.service.EnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "consultar_rps":
+                return cliente.service.ConsultaNFe(VersaoSchema=versao_schema, MensagemXML=xml)
+            elif metodo == "cancelar":
+                return cliente.service.CancelamentoNFe(VersaoSchema=versao_schema, MensagemXML=xml)
+            else:
+                raise Exception(f"Método {metodo} não implementado no autorizador São Paulo.")
+        except Exception as e:
+            raise e
+        finally:
+            certificadoA1.excluir()
     def _zeep_client(self, wsdl, payload, metodo, wcf_compatibility=True):
         """Comunicação wsdl utilizando a biblioteca zeep"""
 
