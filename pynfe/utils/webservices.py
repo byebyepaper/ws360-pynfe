@@ -500,13 +500,8 @@ NFSE = {
     },
     #
     "GINFES": {
-        "AUTORIZACAO": "GerarNfse",
-        "CANCELAR": "CancelarNfse",
-        "CONSULTA_RPS": "ConsultarNfsePorRps",
-        "CONSULTA_FAIXA": "ConsultarNfseFaixa",
-        "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
-        "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
-        "SUBSTITUIR": "SubstituirNfse",
+        "CONSULTA": "ConsultarNfseV3",
+        "CONSULTA_RPS": "ConsultarNfsePorRpsV3",
         "HTTPS": "https://producao.ginfes.com.br/ServiceGinfesImpl?wsdl",
         "HOMOLOGACAO": "https://homologacao.ginfes.com.br/ServiceGinfesImpl?wsdl",
     },

@@ -959,24 +959,28 @@ class ComunicacaoNfse(Comunicacao):
             if metodo == "gerar":
                 return cliente.service.GerarNfse(cabecalho, xml)
             elif metodo == "enviar_lote":
-                return cliente.service.RecepcionarLoteRps(cabecalho, xml)
+                return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
             elif metodo == "consulta":
-                return cliente.service.ConsultarNfse(cabecalho, xml)
+                return cliente.service.ConsultarNfseV3(cabecalho, xml)
             elif metodo == "consulta_lote":
-                return cliente.service.ConsultarLoteRps(cabecalho, xml)
+                return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
             elif metodo == "consulta_situacao_lote":
-                return cliente.service.ConsultarSituacaoLoteRps(cabecalho, xml)
+                return cliente.service.ConsultarSituacaoLoteRpsV3(cabecalho, xml)
             elif metodo == "consultaRps":
-                return cliente.service.ConsultarNfsePorRps(cabecalho, xml)
+                return cliente.service.ConsultarNfsePorRpsV3(cabecalho, xml)
             elif metodo == "consultaFaixa":
                 return cliente.service.ConsultarNfseFaixa(cabecalho, xml)
             elif metodo == "cancelar":
+                # versão 2
                 return cliente.service.CancelarNfse(xml)
+                # versão 3
+                # return cliente.service.CancelarNfseV3(cabecalho, xml)
             # TODO outros metodos
             else:
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
 
@@ -1518,17 +1522,6 @@ class ComunicacaoCTe(Comunicacao):
 
         # Monta XML para envio da requisição
         xml = self._construir_xml_soap("CTeDistribuicaoDFe", raiz)
-        return self._post(url, xml)
-
-    def consulta(self, chave):
-        url = self._get_url("CONSULTA")
-        # Monta XML do corpo da requisição
-        raiz = etree.Element("consSitCTe", versao=self._versao, xmlns=NAMESPACE_CTE)
-        etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
-        etree.SubElement(raiz, "xServ").text = "CONSULTAR"
-        etree.SubElement(raiz, "chCTe").text = chave
-        # Monta XML para envio da requisição
-        xml = self._construir_xml_soap("cteConsultaCT", raiz)
         return self._post(url, xml)
 
     def _get_url_an(self, consulta):
