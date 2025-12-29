@@ -10,6 +10,23 @@ class InterfaceAutorizador:
     def cancelar(self):
         pass
 
+class SerializacaoOsasco:
+    def __init__(self, chave_autenticacao):
+        self.chave_autenticacao = chave_autenticacao
+        
+    def consultar(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None, numero_rps_unico=None):
+        return {
+        "ChaveAutenticacao": self.chave_autenticacao,
+        "CNPJTomador": cnpj_tomador,
+        "CPFTomador": cpf_tomador,
+        "DataInicial": data_inicial,
+        "DataFinal": data_final,
+        "NumeroNotaInicial": numero_nota_inicial,
+        "NumeroNotaFinal": numero_nota_final,
+        "NumeroReciboInicial": numero_rps_inicial,
+        "NumeroReciboFinal": numero_rps_final,
+        "NumeroReciboUnico": numero_rps_unico,
+    }
 
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):

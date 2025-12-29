@@ -21,6 +21,9 @@ NAMESPACE_CTE = "http://www.portalfiscal.inf.br/cte"
 NAMESPACE_CTE_METODO = "http://www.portalfiscal.inf.br/cte/wsdl/"
 VERSAO_CTE = "3.00"
 
+NAMESPACE_NFCOM = "http://www.portalfiscal.inf.br/nfcom"
+NAMESPACE_NFCOM_METODO = "http://www.portalfiscal.inf.br/nfcom/wsdl/"
+VERSAO_NFCOM = "1.00"
 VERSAO_QRCODE = "2"
 
 TIPOS_DOCUMENTO = (

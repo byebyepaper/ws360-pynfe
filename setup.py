@@ -35,6 +35,7 @@ setuptools.setup(
         "lxml",
         "signxml",
         "suds-py3",
+        "zeep>=4.3.2"
     ],
     extras_require={
         "nfse": [
