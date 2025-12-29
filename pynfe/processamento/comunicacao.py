@@ -959,28 +959,24 @@ class ComunicacaoNfse(Comunicacao):
             if metodo == "gerar":
                 return cliente.service.GerarNfse(cabecalho, xml)
             elif metodo == "enviar_lote":
-                return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
+                return cliente.service.RecepcionarLoteRps(cabecalho, xml)
             elif metodo == "consulta":
-                return cliente.service.ConsultarNfseV3(cabecalho, xml)
+                return cliente.service.ConsultarNfse(cabecalho, xml)
             elif metodo == "consulta_lote":
-                return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
+                return cliente.service.ConsultarLoteRps(cabecalho, xml)
             elif metodo == "consulta_situacao_lote":
-                return cliente.service.ConsultarSituacaoLoteRpsV3(cabecalho, xml)
+                return cliente.service.ConsultarSituacaoLoteRps(cabecalho, xml)
             elif metodo == "consultaRps":
-                return cliente.service.ConsultarNfsePorRpsV3(cabecalho, xml)
+                return cliente.service.ConsultarNfsePorRps(cabecalho, xml)
             elif metodo == "consultaFaixa":
                 return cliente.service.ConsultarNfseFaixa(cabecalho, xml)
             elif metodo == "cancelar":
-                # versão 2
                 return cliente.service.CancelarNfse(xml)
-                # versão 3
-                # return cliente.service.CancelarNfseV3(cabecalho, xml)
             # TODO outros metodos
             else:
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
-
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
 
