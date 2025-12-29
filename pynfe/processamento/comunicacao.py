@@ -776,7 +776,6 @@ class ComunicacaoNfse(Comunicacao):
 
         if self.autorizador == "GINFES":
             cabecalho = self._cabecalho_ginfes()
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],cabecalho, xml)
             
@@ -794,7 +793,6 @@ class ComunicacaoNfse(Comunicacao):
             return self._post(url, xml, "consultaRps")
         elif self.autorizador == "GINFES":
             cabecalho = self._cabecalho_ginfes()
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"],cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -948,8 +946,6 @@ class ComunicacaoNfse(Comunicacao):
             wsdl = url  # ?wsdl
             endpoint = url.replace("?wsdl", "")  # REMOVE ?wsdl
 
-            print("WSDL:", wsdl)
-            print("ENDPOINT:", endpoint)
 
             cliente = Client(
                 wsdl,
@@ -964,9 +960,6 @@ class ComunicacaoNfse(Comunicacao):
             elif metodo == "enviar_lote":
                 return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
             elif metodo == "consulta":
-                print("URL:", url)
-                print("Cabecalho:", cabecalho)
-                print("XML:", xml)
                 return cliente.service.ConsultarNfseV3(cabecalho, xml)
             elif metodo == "consulta_lote":
                 return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
