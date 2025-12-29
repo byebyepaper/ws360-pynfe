@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyNFe",
-    version="0.7.1",
+    version="0.6.0",
     author="TadaSoftware",
     author_email="tadasoftware@gmail.com",
     description="Interface library with the Brazilian Electronic Invoice web services",
@@ -35,12 +35,14 @@ setuptools.setup(
         "lxml",
         "signxml",
         "suds-py3",
-        "zeep>=4.3.2"
+        "zeep>=4.3.2",
     ],
     extras_require={
         "nfse": [
-            "pyxb==1.2.4",
+            "suds-community",
+            "PyXB-X==1.2.6.3",
         ],
+        "impressao": ["brazilfiscalreport[damdfe]"],
     },
     zip_safe=False,
     python_requires=">=3.8",
