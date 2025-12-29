@@ -775,7 +775,30 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
 
         if self.autorizador == "GINFES":
-            cabecalho = self._cabecalho_ginfes()
+            cabecalho = """
+            <cabecalho xmlns="http://www.ginfes.com.br/cabecalho_v03.xsd" versao="3">
+            <versaoDados>3</versaoDados>
+            </cabecalho>
+            """.strip()
+
+            xml = """
+            <ConsultarNfseEnvio
+            xmlns="http://www.ginfes.com.br/servico_consultar_nfse_envio_v03.xsd"
+            xmlns:tipos="http://www.ginfes.com.br/tipos_v03.xsd">
+
+            <Prestador>
+                <tipos:Cnpj>13743550000819</tipos:Cnpj>
+                <tipos:InscricaoMunicipal>4073347</tipos:InscricaoMunicipal>
+            </Prestador>
+
+            <PeriodoEmissao>
+                <DataInicial>2024-01-01</DataInicial>
+                <DataFinal>2024-01-31</DataFinal>
+            </PeriodoEmissao>
+
+            </ConsultarNfseEnvio>
+            """.strip()
+
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],cabecalho, xml)
             
