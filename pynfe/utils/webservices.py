@@ -511,6 +511,7 @@ NFSE = {
         "CANCELAR": "Cancelar",
         "CANCELAR_LOTE": "CancelarNotaLote",
         "CONSULTA": "Consultar",
+        "CONSULTA_COMPLETA": "ConsultarNotaCompleta",
         "HTTPS": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
         "HOMOLOGACAO": (
             "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl"

@@ -6,26 +6,14 @@ import re
 import requests
 from pynfe.entidades.certificado import CertificadoA1
 from pynfe.utils import etree, so_numeros
-from pynfe.utils.flags import (
-    CODIGOS_ESTADOS,
-    MODELO_MDFE,
-    NAMESPACE_BETHA,
-    NAMESPACE_CTE,
-    NAMESPACE_CTE_METODO,
-    NAMESPACE_MDFE,
-    NAMESPACE_MDFE_METODO,
-    NAMESPACE_METODO,
-    NAMESPACE_NFCOM,
-    NAMESPACE_NFCOM_METODO,
-    NAMESPACE_NFE,
-    NAMESPACE_SOAP,
-    NAMESPACE_XSD,
-    NAMESPACE_XSI,
-    VERSAO_CTE,
-    VERSAO_MDFE,
-    VERSAO_NFCOM,
-    VERSAO_PADRAO,
-)
+from pynfe.utils.flags import (CODIGOS_ESTADOS, MODELO_MDFE, NAMESPACE_BETHA,
+                               NAMESPACE_CTE, NAMESPACE_CTE_METODO,
+                               NAMESPACE_MDFE, NAMESPACE_MDFE_METODO,
+                               NAMESPACE_METODO, NAMESPACE_NFCOM,
+                               NAMESPACE_NFCOM_METODO, NAMESPACE_NFE,
+                               NAMESPACE_SOAP, NAMESPACE_XSD, NAMESPACE_XSI,
+                               VERSAO_CTE, VERSAO_MDFE, VERSAO_NFCOM,
+                               VERSAO_PADRAO)
 from pynfe.utils.webservices import CTE, MDFE, NFCE, NFCOM, NFE, NFSE
 
 from .assinatura import AssinaturaA1
@@ -782,17 +770,19 @@ class ComunicacaoNfse(Comunicacao):
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
 
-    def consultar(self, payload):
+    def consultar(self, xml):
         # url do serviço
         url = self._get_url()
+
         if self.autorizador == "GINFES":
-            # xml
-            payload = '<?xml version="1.0" encoding="UTF-8"?>' + payload
+            cabecalho = self._cabecalho_ginfes()
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
             # comunica via wsdl
-            return self._post_https(url, payload, "consulta")
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],cabecalho, xml)
+            
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._zeep_client(url, payload, "ConsultarNotaCompleta")
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -803,10 +793,12 @@ class ComunicacaoNfse(Comunicacao):
             # comunica via wsdl
             return self._post(url, xml, "consultaRps")
         elif self.autorizador == "GINFES":
-            return self._zeep_client(url, xml, "consultaRps")
+            cabecalho = self._cabecalho_ginfes()
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"],cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._zeep_client(url, xml, "Consultar")
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -818,7 +810,7 @@ class ComunicacaoNfse(Comunicacao):
             return self._post(url, xml, "consultaFaixa")
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._zeep_client(url, xml, "Consultar")
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -953,7 +945,7 @@ class ComunicacaoNfse(Comunicacao):
             certificadoA1 = CertificadoA1(self.certificado)
             chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
 
-            wsdl = url                       # ?wsdl
+            wsdl = url  # ?wsdl
             endpoint = url.replace("?wsdl", "")  # REMOVE ?wsdl
 
             print("WSDL:", wsdl)
@@ -962,10 +954,8 @@ class ComunicacaoNfse(Comunicacao):
             cliente = Client(
                 wsdl,
                 transport=HttpAuthenticated(
-                    key=chave,
-                    cert=cert,
-                    endereco=endpoint  # ✅ endpoint correto
-                )
+                    key=chave, cert=cert, endereco=endpoint  # ✅ endpoint correto
+                ),
             )
 
             # gerar nfse
@@ -1158,32 +1148,66 @@ class ComunicacaoNfse(Comunicacao):
         finally:
             certificadoA1.excluir()
 
-    def _zeep_client(self, wsdl, payload, metodo, wcf_compatibility=True):
-        """Comunicação wsdl utilizando a biblioteca zeep"""
-
-        # comunicacao wsdl
+    def _post_zeep(self, wsdl, metodo, *args, wcf_compatibility=True):
+        """
+        Comunicação wsdl utilizando a biblioteca zeep (GINFES compatível)
+        
+        Ex:
+            _post_zeep(
+                wsdl,
+                "ConsultarNfseV3",
+                cabecalho_xml,
+                xml_consulta
+            )
+        """
         try:
+            import requests
             from zeep import Client
             from zeep.helpers import serialize_object
             from zeep.settings import Settings
             from zeep.transports import Transport
-
+            
             session = requests.Session()
+            session.verify = False
+    
+            # certificado A1
+            if self.certificado:
+                certificadoA1 = CertificadoA1(self.certificado)
+                chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+                session.cert = (cert, chave)
 
-            transport = Transport(session=session, timeout=60)
-
-            settings = Settings(
-                strict=not wcf_compatibility, xml_huge_tree=True  # IMPORTANTÍSSIMO p/ WCF
+            transport = Transport(
+                session=session,
+                timeout=60
             )
 
-            client = Client(wsdl=wsdl, transport=transport, settings=settings)
-            if hasattr(client.service, metodo):
-                service = getattr(client.service, metodo)
-                return serialize_object(service(payload))
-            else:
-                raise Exception("Método não implementado no autorizador.")
-        except Exception as e:
-            raise e
+            settings = Settings(
+                strict=not wcf_compatibility,
+                xml_huge_tree=True
+            )
+
+            client = Client(
+                wsdl=wsdl,
+                transport=transport,
+                settings=settings
+            )
+
+            # DEBUG ÚTIL
+            print("SOAP endpoint:", client.service._binding_options["address"])
+
+            if not hasattr(client.service, metodo):
+                raise Exception(f"Método {metodo} não existe no WSDL")
+
+            service = getattr(client.service, metodo)
+
+            # chama com N parâmetros (GINFES usa 2)
+            response = service(*args)
+
+            # GINFES retorna string XML
+            return serialize_object(response)
+
+        finally:
+            certificadoA1.excluir()
 
 
 class ComunicacaoMDFe(Comunicacao):
