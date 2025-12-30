@@ -354,8 +354,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao = BIND()
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
-        print("ID no objeto:", consulta.Id)
-        
+
         xml = consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio")
         root = etree.fromstring(xml)
         root.attrib["Id"] = f"CNFSE{uuid.uuid4().hex.upper()}"
