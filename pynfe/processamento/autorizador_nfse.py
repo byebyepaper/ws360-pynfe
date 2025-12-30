@@ -108,6 +108,8 @@ class SerializacaoCampinas(InterfaceAutorizador):
             xml_element = xml_input
 
         element_id = xml_element.get("Id")
+        if not element_id:
+            element_id = self._gerar_id("ID")
 
         # =========================
         # Certificado
@@ -263,9 +265,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
             encoding="unicode",
             pretty_print=False,
         )
-
-
-
 
     def soap_envelope(
         self,
