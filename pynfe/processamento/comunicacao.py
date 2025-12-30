@@ -892,6 +892,8 @@ class ComunicacaoNfse(Comunicacao):
         except Exception as e:
             raise e
     def _post_soap_raw(self, url, soap_xml):
+        certificado_a1 = CertificadoA1(self.certificado)
+        key, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
         return requests.post(
             url,
             data=soap_xml.encode("utf-8"),
