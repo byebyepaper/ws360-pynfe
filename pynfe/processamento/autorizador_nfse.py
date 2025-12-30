@@ -338,7 +338,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
 
         return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseRpsEnvio")
 
-    def consultar_nfse_faixa(emitente, numero_inicial, numero_final, pagina=1):
+    def consultar_nfse_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         NS = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
         DS = "http://www.w3.org/2000/09/xmldsig#"
 
