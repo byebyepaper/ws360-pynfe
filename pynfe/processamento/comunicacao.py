@@ -1156,6 +1156,9 @@ class ComunicacaoNfse(Comunicacao):
             
             print("Chamando método:", metodo)
             print("Parâmetros:", xml)
+            print(client.wsdl.services)
+            print(client.wsdl.services[0].ports[0].operations)
+            print(client.service._binding._operations)
     
             service = getattr(client.service, metodo)
 

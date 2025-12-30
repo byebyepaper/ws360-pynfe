@@ -403,11 +403,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         # Signature OBRIGATÓRIA no XSD
         etree.SubElement(root, f"{{{self.DS}}}Signature")
 
-        return etree.tostring(
-            root,
-            encoding="utf-8",
-            xml_declaration=True
-        )
+        return root
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         nsmap = {
             None: self.NS,
@@ -445,11 +441,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(root, f"{{{self.DS}}}Signature")
 
-        return etree.tostring(
-            root,
-            encoding="utf-8",
-            xml_declaration=True
-        )
+        return root
     def cabecalho(self):
         NS = "http://www.abrasf.org.br/nfse.xsd"
         nsmap = {None: NS}
@@ -460,8 +452,4 @@ class SerializacaoCampinas(InterfaceAutorizador):
         versao_dados = etree.SubElement(cabecalho, "versaoDados")
         versao_dados.text = "2.03"
 
-        return etree.tostring(
-            cabecalho,
-            encoding="utf-8",
-            xml_declaration=False
-        )
+        return cabecalho
