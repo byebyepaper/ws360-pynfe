@@ -770,10 +770,7 @@ class ComunicacaoNfse(Comunicacao):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-
-            cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, payload)
+            return self._post_soap_raw(url, payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -784,7 +781,7 @@ class ComunicacaoNfse(Comunicacao):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
+            return self._post_soap_raw(url, payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -795,7 +792,7 @@ class ComunicacaoNfse(Comunicacao):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
+            return self._post_soap_raw(url, payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -894,6 +891,14 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+    def _post_soap_raw(self, url, soap_xml):
+        return requests.post(
+            url,
+            data=soap_xml.encode("utf-8"),
+            cert=(cert, key),
+            verify=False,
+            headers={"Content-Type": "text/xml; charset=utf-8"}
+        )
 
     def _post_https(self, url, metodo, xml):
         """Comunicação wsdl (https) utilizando certificado do usuário"""
