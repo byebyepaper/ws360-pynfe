@@ -1,6 +1,8 @@
-from pyxb import BIND
-from importlib import import_module
 import uuid
+from importlib import import_module
+
+from pyxb import BIND
+
 
 class InterfaceAutorizador:
     # TODO Colocar raise Exception Not Implemented nos metodos
@@ -10,23 +12,36 @@ class InterfaceAutorizador:
     def cancelar(self):
         pass
 
+
 class SerializacaoOsasco:
     def __init__(self, chave_autenticacao):
         self.chave_autenticacao = chave_autenticacao
-        
-    def consultar(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None, numero_rps_unico=None):
+
+    def consultar(
+        self,
+        cnpj_tomador=None,
+        cpf_tomador=None,
+        data_inicial=None,
+        data_final=None,
+        numero_nota_inicial=None,
+        numero_nota_final=None,
+        numero_rps_inicial=None,
+        numero_rps_final=None,
+        numero_rps_unico=None,
+    ):
         return {
-        "ChaveAutenticacao": self.chave_autenticacao,
-        "CNPJTomador": cnpj_tomador,
-        "CPFTomador": cpf_tomador,
-        "DataInicial": data_inicial,
-        "DataFinal": data_final,
-        "NumeroNotaInicial": numero_nota_inicial,
-        "NumeroNotaFinal": numero_nota_final,
-        "NumeroReciboInicial": numero_rps_inicial,
-        "NumeroReciboFinal": numero_rps_final,
-        "NumeroReciboUnico": numero_rps_unico,
-    }
+            "ChaveAutenticacao": self.chave_autenticacao,
+            "CNPJTomador": cnpj_tomador,
+            "CPFTomador": cpf_tomador,
+            "DataInicial": data_inicial,
+            "DataFinal": data_final,
+            "NumeroNotaInicial": numero_nota_inicial,
+            "NumeroNotaFinal": numero_nota_final,
+            "NumeroReciboInicial": numero_rps_inicial,
+            "NumeroReciboFinal": numero_rps_final,
+            "NumeroReciboUnico": numero_rps_unico,
+        }
+
 
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):
@@ -340,8 +355,8 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao = BIND()
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
-
-        return consulta.toxml(encoding="utf-8", element_name="ConsultarNfseEnvio" )
+        print("ID no objeto:", consulta.Id)
+        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio")
 
     def consultar_lote(self, emitente, numero):
         # Prestador
@@ -542,9 +557,9 @@ class SerializacaoGinfes(InterfaceAutorizador):
         raiz = etree.Element("{%s}CancelarNfseEnvio" % ns1, nsmap={"ns1": ns1, "ns2": ns2})
         prestador = etree.SubElement(raiz, "{%s}Prestador" % ns1)
         etree.SubElement(prestador, "{%s}Cnpj" % ns2).text = nfse.emitente.cnpj
-        etree.SubElement(
-            prestador, "{%s}InscricaoMunicipal" % ns2
-        ).text = nfse.emitente.inscricao_municipal
+        etree.SubElement(prestador, "{%s}InscricaoMunicipal" % ns2).text = (
+            nfse.emitente.inscricao_municipal
+        )
         etree.SubElement(raiz, "{%s}NumeroNfse" % ns1).text = nfse.identificador
         return etree.tostring(raiz, encoding="unicode")
 
@@ -553,7 +568,4 @@ class SerializacaoGinfes(InterfaceAutorizador):
         cabecalho = cabecalho_v03.cabecalho()
         cabecalho.versao = "3"
         cabecalho.versaoDados = "3"
-        return cabecalho.toxml(
-                encoding="utf-8",
-                element_name="cabecalho"
-            )
+        return cabecalho.toxml(encoding="utf-8", element_name="cabecalho")
