@@ -155,8 +155,8 @@ class SerializacaoCampinas(InterfaceAutorizador):
         # nfse:Signature
         # =========================
         signature = etree.Element(
-            etree.QName(NFSE_NS, "Signature"),
-            nsmap=NSMAP,
+            etree.QName(DSIG_NS, "Signature"),
+            nsmap={None: DSIG_NS},
         )
 
         # =========================
