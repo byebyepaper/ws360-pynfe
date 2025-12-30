@@ -6,14 +6,25 @@ import re
 import requests
 from pynfe.entidades.certificado import CertificadoA1
 from pynfe.utils import etree, so_numeros
-from pynfe.utils.flags import (CODIGOS_ESTADOS, MODELO_MDFE, NAMESPACE_BETHA,
-                               NAMESPACE_CTE, NAMESPACE_CTE_METODO,
-                               NAMESPACE_MDFE, NAMESPACE_MDFE_METODO,
-                               NAMESPACE_METODO, NAMESPACE_NFCOM,
-                               NAMESPACE_NFCOM_METODO, NAMESPACE_NFE,
-                               NAMESPACE_SOAP, NAMESPACE_XSD, NAMESPACE_XSI,
-                               VERSAO_CTE, VERSAO_MDFE, VERSAO_NFCOM,
-                               VERSAO_PADRAO)
+from pynfe.utils.flags import (
+    CODIGOS_ESTADOS,
+    MODELO_MDFE,
+    NAMESPACE_CTE,
+    NAMESPACE_CTE_METODO,
+    NAMESPACE_MDFE,
+    NAMESPACE_MDFE_METODO,
+    NAMESPACE_METODO,
+    NAMESPACE_NFCOM,
+    NAMESPACE_NFCOM_METODO,
+    NAMESPACE_NFE,
+    NAMESPACE_SOAP,
+    NAMESPACE_XSD,
+    NAMESPACE_XSI,
+    VERSAO_CTE,
+    VERSAO_MDFE,
+    VERSAO_NFCOM,
+    VERSAO_PADRAO,
+)
 from pynfe.utils.webservices import CTE, MDFE, NFCE, NFCOM, NFE, NFSE
 
 from .assinatura import AssinaturaA1
@@ -731,13 +742,7 @@ class ComunicacaoNfse(Comunicacao):
         self.certificado_senha = certificado_senha
         self._ambiente = 2 if homologacao else 1
         self.autorizador = autorizador.upper()
-        if self.autorizador == "GINFES":
-            self._namespace = "http://www.ginfes.com.br/cabecalho_v03.xsd"
-            self._versao = "3"
-        elif self.autorizador == "BETHA":
-            self._namespace = NAMESPACE_BETHA
-            self._versao = "2.02"
-        elif self.autorizador == "SAO_PAULO":
+        if self.autorizador == "SAO_PAULO":
             self._namespace = "http://www.prefeitura.sp.gov.br/nfe"
             self._versao = "2"
         elif self.autorizador == "BARUERI":
@@ -751,62 +756,59 @@ class ComunicacaoNfse(Comunicacao):
         else:
             raise Exception("Autorizador não encontrado!")
 
-    def consultar_nfse(self, xml):
+    def consultar_nfse(self, payload):
         # url do serviço
         url = self._get_url()
 
         if self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], payload)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_rps(self, xml):
+    def consultar_rps(self, payload):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_faixa(self, xml):
+    def consultar_faixa(self, payload):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"],cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_periodo(self, xml):
+    def consultar_periodo(self, payload):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"],cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payloadpayload)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_lote(self, xml):
+    def consultar_lote(self, payload):
         raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_situacao_lote(self, xml):
+    def consultar_situacao_lote(self, payload):
         raise Exception("Este método não esta implementado para o autorizador.")
 
-    def cancelar(self, xml):
+    def cancelar(self, payload):
         raise Exception("Este método não esta implementado para o autorizador.")
 
     def _cabecalho(self, retorna_string=True):
@@ -907,7 +909,6 @@ class ComunicacaoNfse(Comunicacao):
 
             wsdl = url  # ?wsdl
             endpoint = url.replace("?wsdl", "")  # REMOVE ?wsdl
-
 
             cliente = Client(
                 wsdl,
@@ -1103,16 +1104,10 @@ class ComunicacaoNfse(Comunicacao):
         finally:
             certificadoA1.excluir()
 
-    def _post_zeep(self, wsdl, metodo, xml, wcf_compatibility=True):
+    def _post_zeep(self, wsdl, metodo, payload, wcf_compatibility=True):
         """
-        Comunicação wsdl utilizando a biblioteca zeep (GINFES compatível)
-        
-        Ex:
-            _post_zeep(
-                wsdl,
-                "ConsultarNfseV3",
-                xml_consulta ou payload,
-            )
+        Comunicação wsdl utilizando a biblioteca zeep )
+        Recebe o wsdl, o método a ser chamado e o payload (XML ou objeto)
         """
         try:
             import requests
@@ -1120,47 +1115,34 @@ class ComunicacaoNfse(Comunicacao):
             from zeep.helpers import serialize_object
             from zeep.settings import Settings
             from zeep.transports import Transport
-            
+
             session = requests.Session()
             session.verify = False
-    
+
             # certificado A1
             if self.certificado:
                 certificadoA1 = CertificadoA1(self.certificado)
                 chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
                 session.cert = (cert, chave)
 
-            transport = Transport(
-                session=session,
-                timeout=60
-            )
+            transport = Transport(session=session, timeout=60)
 
-            settings = Settings(
-                strict=not wcf_compatibility,
-                xml_huge_tree=True
-            )
+            settings = Settings(strict=not wcf_compatibility, xml_huge_tree=True)
 
-            client = Client(
-                wsdl=wsdl,
-                transport=transport,
-                settings=settings
-            )
+            client = Client(wsdl=wsdl, transport=transport, settings=settings)
 
             # DEBUG ÚTIL
             print("SOAP endpoint:", client.service._binding_options["address"])
-            
-    
+
             if not hasattr(client.service, metodo):
                 raise Exception(f"Método {metodo} não existe no WSDL")
-            
+
             print("Chamando método:", metodo)
-            print("Parâmetros:", xml)
-            print(client.wsdl.services)
-            print(client.service._binding._operations)
-    
+            print("payload:", payload)
+
             service = getattr(client.service, metodo)
 
-            response = service(xml)
+            response = service(payload)
             return serialize_object(response)
 
         finally:
