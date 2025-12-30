@@ -2140,9 +2140,9 @@ class SerializacaoNfse(object):
 
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         if self.autorizador.lower() == "campinas":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
+            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
         
-            return SerializacaoGinfes().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
+            return SerializacaoCampinas().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
         elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
             return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, numero_nota_inicial=numero_inicial, numero_nota_final=numero_final)
