@@ -911,10 +911,11 @@ class ComunicacaoNfse(Comunicacao):
             cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
 
             # gerar nfse
-            if metodo == "ConsultarNfseServicoPrestado":
-                return cliente.service.ConsultarNfseServicoPrestado(cabecalho, xml)
-            else:
-                raise Exception("Método não implementado no autorizador.")
+            try:
+                service = getattr(cliente.service, metodo)
+            except AttributeError:
+                raise ValueError(f"Método '{metodo}' não disponível para {self.autorizador}.")
+            return service(cabecalho, xml)
         except Exception as e:
             raise e
 
