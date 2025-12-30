@@ -777,7 +777,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "GINFES":
             cabecalho = self._cabecalho_ginfes()
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"],cabecalho, xml)
             
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -806,9 +806,12 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "BETHA":
             # comunica via wsdl
             return self._post(url, xml, "consultaFaixa")
+        elif self.autorizador == "GINFES":
+            cabecalho = self._cabecalho_ginfes()
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"],cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 

@@ -3,29 +3,15 @@ import base64
 import hashlib
 import re
 import warnings
-
 from datetime import datetime
 
 import pynfe.utils.xml_writer as xmlw
 from pynfe.entidades import Manifesto, NotaFiscal
-from pynfe.utils import (
-    etree,
-    obter_codigo_por_municipio,
-    obter_municipio_por_codigo,
-    obter_pais_por_codigo,
-    so_numeros,
-)
-from pynfe.utils.flags import (
-    CODIGOS_ESTADOS,
-    NAMESPACE_CTE,
-    NAMESPACE_MDFE,
-    NAMESPACE_NFE,
-    NAMESPACE_SIG,
-    VERSAO_CTE,
-    VERSAO_MDFE,
-    VERSAO_PADRAO,
-    VERSAO_QRCODE,
-)
+from pynfe.utils import (etree, obter_codigo_por_municipio,
+                         obter_municipio_por_codigo, obter_pais_por_codigo,
+                         so_numeros)
+from pynfe.utils.flags import (CODIGOS_ESTADOS, NAMESPACE_CTE, NAMESPACE_MDFE,
+                               NAMESPACE_NFE, NAMESPACE_SIG, VERSAO_MDFE, VERSAO_PADRAO, VERSAO_QRCODE)
 from pynfe.utils.webservices import MDFE, NFCE
 
 
@@ -2160,21 +2146,21 @@ class SerializacaoNfse(object):
         else:
             raise Exception("Este método só esta implementado no autorizador Betha.")
 
-    def gerar_lote(self, nfse):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-            return SerializacaoGinfes().serializar_lote_assincrono(nfse)
-        else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
-    
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         if self.autorizador.lower() == "ginfes":
             from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
         
             return SerializacaoGinfes().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
         else:
-            raise Exception("Este método só esta implementado no autorizador Osasco.")
+            raise Exception("Este método só esta implementado no autorizador ginfes.")
+    
+    def consultar_servico_prestado(self, emitente, data_inicio, data_fim, pagina=1):
+        if self.autorizador.lower() == "ginfes":
+            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
+        
+            return SerializacaoGinfes().consultar_servico_prestado(emitente, data_inicio, data_fim, pagina=1)
+        else:
+            raise Exception("Este método só esta implementado no autorizador ginfes.")
     
     def consultar_nota_emitida(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None):
         if self.autorizador.lower() == "osasco":
@@ -2192,31 +2178,9 @@ class SerializacaoNfse(object):
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
 
-    def consultar_rps(self, emitente, numero, serie, tipo):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-            return SerializacaoGinfes().consultar_rps(emitente, numero, serie, tipo)
-        else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
-
-    def consultar_situacao_lote(self, emitente, numero):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-            return SerializacaoGinfes().consultar_situacao_lote(emitente, numero)
-        else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
 
     def cancelar(self, nfse):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-            # versao 3
-            # return SerializacaoGinfes().cancelar(nfse)
-            # versao 2
-            return SerializacaoGinfes().cancelar_v2(nfse)
-        elif self.autorizador.lower() == "betha":
+        if self.autorizador.lower() == "betha":
             from pynfe.processamento.autorizador_nfse import SerializacaoBetha
 
             return SerializacaoBetha().cancelar(nfse)

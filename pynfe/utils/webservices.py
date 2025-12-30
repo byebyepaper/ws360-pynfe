@@ -500,16 +500,18 @@ NFSE = {
     },
     #
     "GINFES": {
-        "CONSULTA": "ConsultarNfseV3",
-        "CONSULTA_RPS": "ConsultarNfsePorRpsV3",
+        "AUTORIZACAO": "GerarNfse",
+        "CANCELAR": "CancelarNfse",
+        "CONSULTA_RPS": "consultarNfsePorRps",
+        "CONSULTA_FAIXA": "ConsultarNfseFaixa",
+        "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
+        "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
         "HTTPS": "https://producao.ginfes.com.br/ServiceGinfesImpl?wsdl",
         "HOMOLOGACAO": "https://homologacao.ginfes.com.br/ServiceGinfesImpl?wsdl",
     },
     "OSASCO": {
         "AUTORIZACAO": "Emitir",
-        "AUTORIZACAO_LOTE": "EmitirEmLote",
         "CANCELAR": "Cancelar",
-        "CANCELAR_LOTE": "CancelarNotaLote",
         "CONSULTA": "Consultar",
         "CONSULTA_COMPLETA": "ConsultarNotaCompleta",
         "HTTPS": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
