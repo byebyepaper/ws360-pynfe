@@ -211,76 +211,76 @@ class SerializacaoCampinas(InterfaceAutorizador):
             pretty_print=False,
         )
 
-        def soap_envelope(
-            self,
-            metodo,
+    def soap_envelope(
+        self,
+        metodo,
+        xml_envio_element,
+        certificate_path,
+        certificate_password,
+    ):
+        xml_assinado = self._sign_xml(
             xml_envio_element,
             certificate_path,
             certificate_password,
-        ):
-            xml_assinado = self._sign_xml(
-                xml_envio_element,
-                certificate_path,
-                certificate_password,
-            )
+        )
 
-            return f"""<?xml version="1.0" encoding="utf-8"?>
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                        xmlns:nfse="http://nfse.abrasf.org.br">
-        <soapenv:Header/>
-        <soapenv:Body>
-            <nfse:{metodo}>
-            {self._cabecalho()}
-            {xml_assinado}
-            </nfse:{metodo}>
-        </soapenv:Body>
-        </soapenv:Envelope>
-        """.strip()
+        return f"""<?xml version="1.0" encoding="utf-8"?>
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:nfse="http://nfse.abrasf.org.br">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <nfse:{metodo}>
+        {self._cabecalho()}
+        {xml_assinado}
+        </nfse:{metodo}>
+    </soapenv:Body>
+    </soapenv:Envelope>
+    """.strip()
 
 
-        # -------------------------
-        # CONSULTAR POR PERÍODO
-        # -------------------------
-        def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
-            raiz = etree.Element(
-                "ConsultarNfseServicoPrestadoEnvio",
-                xmlns=self.NS_PERIODO,
-                Id=self._gerar_id("CNFSESP")
-            )
+    # -------------------------
+    # CONSULTAR POR PERÍODO
+    # -------------------------
+    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
+        raiz = etree.Element(
+            "ConsultarNfseServicoPrestadoEnvio",
+            xmlns=self.NS_PERIODO,
+            Id=self._gerar_id("CNFSESP")
+        )
 
-            prestador = etree.SubElement(raiz, "Prestador")
-            cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
-            etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-            etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+        prestador = etree.SubElement(raiz, "Prestador")
+        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
 
-            periodo = etree.SubElement(raiz, "PeriodoEmissao")
-            etree.SubElement(periodo, "DataInicial").text = data_inicio
-            etree.SubElement(periodo, "DataFinal").text = data_fim
+        periodo = etree.SubElement(raiz, "PeriodoEmissao")
+        etree.SubElement(periodo, "DataInicial").text = data_inicio
+        etree.SubElement(periodo, "DataFinal").text = data_fim
 
-            etree.SubElement(raiz, "Pagina").text = str(pagina)
+        etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-            return raiz
+        return raiz
 
-        # -------------------------
-        # CONSULTAR POR FAIXA
-        # -------------------------
-        def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-            raiz = etree.Element(
-                "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
-            )
+    # -------------------------
+    # CONSULTAR POR FAIXA
+    # -------------------------
+    def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
+        raiz = etree.Element(
+            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
+        )
 
-            prestador = etree.SubElement(raiz, "Prestador")
-            cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
-            etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-            etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+        prestador = etree.SubElement(raiz, "Prestador")
+        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
 
-            faixa = etree.SubElement(raiz, "Faixa")
-            etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
-            etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
+        faixa = etree.SubElement(raiz, "Faixa")
+        etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
+        etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
 
-            etree.SubElement(raiz, "Pagina").text = str(pagina)
+        etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-            return raiz
+        return raiz
 
 
 class SerializacaoBetha(InterfaceAutorizador):
