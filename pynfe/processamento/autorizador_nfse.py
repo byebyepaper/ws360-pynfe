@@ -65,23 +65,165 @@ class SerializacaoCampinas(InterfaceAutorizador):
         <versaoDados>2.03</versaoDados>
         </nfse:cabecalho>
         """.strip()
+    def _sign_xml(
+        self,
+        xml_element: etree._Element,
+        certificate_path: str,
+        certificate_password: str,
+    ) -> str:
+        DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
 
-    def soap_envelope(self, metodo, xml_envio):
-        """
-        Envolve o XML de envio no SOAP 1.1 correto
-        """
+        C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+        SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+        DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
+        ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+
+        # Garante que existe Id
+        element_id = xml_element.get("Id")
+        if not element_id:
+            raise ValueError("Elemento raiz precisa ter atributo Id para assinatura")
+
+        # Carrega certificado
+        with open(certificate_path, "rb") as f:
+            cert_data = f.read()
+
+        password = certificate_password.encode()
+        private_key, certificate, _ = pkcs12.load_key_and_certificates(
+            cert_data, password
+        )
+
+        if not private_key or not certificate:
+            raise ValueError("Falha ao carregar certificado")
+
+        cert_b64 = base64.b64encode(
+            certificate.public_bytes(Encoding.DER)
+        ).decode()
+
+        # Canonicaliza XML SEM assinatura
+        xml_c14n = etree.tostring(
+            xml_element, method="c14n", exclusive=False, with_comments=False
+        )
+
+        digest_value = base64.b64encode(
+            hashlib.sha1(xml_c14n).digest()
+        ).decode()
+
+        # ---------- SignedInfo ----------
+        signed_info = etree.Element(
+            "SignedInfo",
+            nsmap={None: DSIG_NS}
+        )
+
+        etree.SubElement(
+            signed_info,
+            "CanonicalizationMethod",
+            Algorithm=C14N_ALG
+        )
+
+        etree.SubElement(
+            signed_info,
+            "SignatureMethod",
+            Algorithm=SIGNATURE_ALG
+        )
+
+        reference = etree.SubElement(
+            signed_info,
+            "Reference",
+            URI=f"#{element_id}"
+        )
+
+        transforms = etree.SubElement(reference, "Transforms")
+
+        etree.SubElement(
+            transforms,
+            "Transform",
+            Algorithm=ENVELOPED_ALG
+        )
+
+        etree.SubElement(
+            transforms,
+            "Transform",
+            Algorithm=C14N_ALG
+        )
+
+        etree.SubElement(
+            reference,
+            "DigestMethod",
+            Algorithm=DIGEST_ALG
+        )
+
+        etree.SubElement(
+            reference,
+            "DigestValue"
+        ).text = digest_value
+
+        # Assina SignedInfo
+        signed_info_c14n = etree.tostring(
+            signed_info, method="c14n", exclusive=False, with_comments=False
+        )
+
+        signature_value = base64.b64encode(
+            private_key.sign(
+                signed_info_c14n,
+                padding.PKCS1v15(),
+                hashes.SHA1()
+            )
+        ).decode()
+
+        # ---------- Signature ----------
+        signature = etree.Element(
+            "Signature",
+            nsmap={None: DSIG_NS}
+        )
+
+        signature.append(signed_info)
+
+        etree.SubElement(
+            signature,
+            "SignatureValue"
+        ).text = signature_value
+
+        key_info = etree.SubElement(signature, "KeyInfo")
+        x509_data = etree.SubElement(key_info, "X509Data")
+        etree.SubElement(
+            x509_data,
+            "X509Certificate"
+        ).text = cert_b64
+
+        # Insere assinatura no XML
+        xml_element.append(signature)
+
+        return etree.tostring(
+            xml_element, encoding="unicode", pretty_print=False
+        )
+
+
+    def soap_envelope(
+        self,
+        metodo,
+        xml_envio_element,
+        certificate_path,
+        certificate_password,
+    ):
+        xml_assinado = self._sign_xml(
+            xml_envio_element,
+            certificate_path,
+            certificate_password,
+        )
+
         return f"""<?xml version="1.0" encoding="utf-8"?>
-            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                            xmlns:nfse="http://nfse.abrasf.org.br">
-            <soapenv:Header/>
-            <soapenv:Body>
-                <nfse:{metodo}>
-                {self._cabecalho()}
-                {xml_envio}
-                </nfse:{metodo}>
-            </soapenv:Body>
-            </soapenv:Envelope>
-            """.strip()
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:nfse="http://nfse.abrasf.org.br">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <nfse:{metodo}>
+        {self._cabecalho()}
+        {xml_assinado}
+        </nfse:{metodo}>
+    </soapenv:Body>
+    </soapenv:Envelope>
+    """.strip()
+
 
     # -------------------------
     # CONSULTAR POR PERÍODO
