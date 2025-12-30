@@ -915,7 +915,7 @@ class ComunicacaoNfse(Comunicacao):
                 service = getattr(cliente.service, metodo)
             except AttributeError:
                 raise ValueError(f"Método '{metodo}' não disponível para {self.autorizador}.")
-            return service(cabecalho, xml)
+            return service(xml)
         except Exception as e:
             raise e
 
