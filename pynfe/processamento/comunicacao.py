@@ -773,7 +773,7 @@ class ComunicacaoNfse(Comunicacao):
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
 
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, payload)
+            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -784,7 +784,7 @@ class ComunicacaoNfse(Comunicacao):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
+            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -795,10 +795,10 @@ class ComunicacaoNfse(Comunicacao):
         # url do serviço
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
+            return self._post_https(url, NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payloadpayload)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -895,7 +895,7 @@ class ComunicacaoNfse(Comunicacao):
         except Exception as e:
             raise e
 
-    def _post_https(self, url, xml, metodo):
+    def _post_https(self, url, metodo, xml):
         """Comunicação wsdl (https) utilizando certificado do usuário"""
         # cabecalho
         cabecalho = self._cabecalho()
@@ -904,40 +904,15 @@ class ComunicacaoNfse(Comunicacao):
             from pynfe.utils.https_nfse import HttpAuthenticated
             from suds.client import Client
 
-            certificadoA1 = CertificadoA1(self.certificado)
-            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+            certificado_a1 = CertificadoA1(self.certificado)
 
-            wsdl = url  # ?wsdl
-            endpoint = url.replace("?wsdl", "")  # REMOVE ?wsdl
+            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
 
-            cliente = Client(
-                wsdl,
-                transport=HttpAuthenticated(
-                    key=chave, cert=cert, endereco=endpoint  # ✅ endpoint correto
-                ),
-            )
+            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
 
             # gerar nfse
-            if metodo == "gerar":
-                return cliente.service.GerarNfse(cabecalho, xml)
-            elif metodo == "enviar_lote":
-                return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
-            elif metodo == "consulta":
-                return cliente.service.ConsultarNfseV3(cabecalho, xml)
-            elif metodo == "consulta_lote":
-                return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
-            elif metodo == "consulta_situacao_lote":
-                return cliente.service.ConsultarSituacaoLoteRpsV3(cabecalho, xml)
-            elif metodo == "consultaRps":
-                return cliente.service.ConsultarNfsePorRpsV3(cabecalho, xml)
-            elif metodo == "consultaFaixa":
-                return cliente.service.ConsultarNfseFaixa(cabecalho, xml)
-            elif metodo == "cancelar":
-                # versão 2
-                return cliente.service.CancelarNfse(xml)
-                # versão 3
-                # return cliente.service.CancelarNfseV3(cabecalho, xml)
-            # TODO outros metodos
+            if metodo == "ConsultarNfseServicoPrestado":
+                return cliente.service.ConsultarNfseServicoPrestado(cabecalho, xml)
             else:
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:

@@ -43,35 +43,56 @@ class SerializacaoOsasco:
             "NumeroReciboUnico": numero_rps_unico,
         }
 
+from lxml import etree
+from pynfe.processamento.autorizador_nfse import InterfaceAutorizador
+
+
 class SerializacaoCampinas(InterfaceAutorizador):
+    """
+    Serialização ABRASF v2.03 – Campinas
+    Retorna XML SEM assinatura (assinatura deve ser aplicada depois).
+    """
+
+    NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
+    NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
+
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
-        return {
-            "Prestador": {
-                "CpfCnpj": {
-                    "Cnpj": emitente.cnpj
-                },
-                "InscricaoMunicipal": emitente.inscricao_municipal
-            },
-            "PeriodoEmissao": {
-                "DataInicial": data_inicio,
-                "DataFinal": data_fim
-            },
-            "Pagina": pagina
-        }
+        raiz = etree.Element(
+            "ConsultarNfseServicoPrestadoEnvio",
+            xmlns=self.NS_PERIODO
+        )
+
+        prestador = etree.SubElement(raiz, "Prestador")
+        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+
+        periodo = etree.SubElement(raiz, "PeriodoEmissao")
+        etree.SubElement(periodo, "DataInicial").text = data_inicio
+        etree.SubElement(periodo, "DataFinal").text = data_fim
+
+        etree.SubElement(raiz, "Pagina").text = str(pagina)
+
+        return raiz
+
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-        return {
-            "Prestador": {
-                "CpfCnpj": {
-                    "Cnpj": emitente.cnpj
-                },
-                "InscricaoMunicipal": emitente.inscricao_municipal
-            },
-            "Faixa": {
-                "NumeroNfseInicial": numero_inicial,
-                "NumeroNfseFinal": numero_final
-            },
-            "Pagina": pagina
-        }
+        raiz = etree.Element(
+            "ConsultarNfseFaixaEnvio",
+            xmlns=self.NS_FAIXA
+        )
+
+        prestador = etree.SubElement(raiz, "Prestador")
+        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+
+        faixa = etree.SubElement(raiz, "Faixa")
+        etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
+        etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
+
+        etree.SubElement(raiz, "Pagina").text = str(pagina)
+
+        return raiz
 
 
 class SerializacaoBetha(InterfaceAutorizador):
