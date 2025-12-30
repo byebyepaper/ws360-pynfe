@@ -767,7 +767,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
@@ -780,7 +780,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"],cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
@@ -1103,7 +1103,7 @@ class ComunicacaoNfse(Comunicacao):
         finally:
             certificadoA1.excluir()
 
-    def _post_zeep(self, wsdl, metodo, *args, wcf_compatibility=True):
+    def _post_zeep(self, wsdl, metodo, xml, wcf_compatibility=True):
         """
         Comunicação wsdl utilizando a biblioteca zeep (GINFES compatível)
         
@@ -1155,14 +1155,11 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception(f"Método {metodo} não existe no WSDL")
             
             print("Chamando método:", metodo)
-            print("Parâmetros:", args)
+            print("Parâmetros:", xml)
     
             service = getattr(client.service, metodo)
 
-            # chama com N parâmetros (GINFES usa 2)
-            response = service(*args)
-
-            # GINFES retorna string XML
+            response = service(xml)
             return serialize_object(response)
 
         finally:
