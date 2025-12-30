@@ -136,10 +136,20 @@ class SerializacaoCampinas(InterfaceAutorizador):
         ).decode()
 
         # =========================
-        # Digest do XML (sem assinatura)
+        # Digest SEM a Signature
         # =========================
+        xml_clone = etree.fromstring(
+            etree.tostring(xml_element)
+        )
+
+        # Remove qualquer Signature existente (segurança)
+        for sig in xml_clone.xpath(
+            ".//*[local-name()='Signature']"
+        ):
+            sig.getparent().remove(sig)
+
         xml_c14n = etree.tostring(
-            xml_element,
+            xml_clone,
             method="c14n",
             exclusive=False,
             with_comments=False,
