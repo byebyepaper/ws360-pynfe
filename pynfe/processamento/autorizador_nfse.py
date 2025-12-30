@@ -65,64 +65,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         <versaoDados>2.03</versaoDados>
         </nfse:cabecalho>
         """.strip()
-    
-    def _ajustar_assinatura(self, xml_assinado) -> str:
-        """
-        Converte:
-        <ds:Signature>...</ds:Signature>
 
-        Para:
-        <nfse:Signature>
-            <ds:SignedInfo/>
-            <ds:SignatureValue/>
-            <ds:KeyInfo/>
-        </nfse:Signature>
-        """
-
-        NFSE_NS = "http://nfse.abrasf.org.br"
-        DS_NS = "http://www.w3.org/2000/09/xmldsig#"
-
-        ns = {
-            "ds": DS_NS,
-            "nfse": NFSE_NS,
-        }
-
-        # garante Element
-        if isinstance(xml_assinado, str):
-            root = etree.fromstring(xml_assinado.encode("utf-8"))
-        else:
-            root = xml_assinado
-
-        # acha ds:Signature
-        signature = root.find(".//ds:Signature", namespaces=ns)
-        if signature is None:
-            raise ValueError("ds:Signature não encontrada")
-
-        parent = signature.getparent()
-        parent.remove(signature)
-
-        # cria nfse:Signature EXPLÍCITO
-        nfse_signature = etree.Element(
-            f"{{{NFSE_NS}}}Signature",
-            nsmap={
-                "nfse": NFSE_NS,
-                "ds": DS_NS,
-            }
-        )
-
-        # move filhos ds:* para dentro
-        for child in signature:
-            nfse_signature.append(child)
-
-        # adiciona no MESMO ponto do XML
-        parent.append(nfse_signature)
-
-        return etree.tostring(
-            root,
-            encoding="utf-8",
-            xml_declaration=False
-        ).decode()
-    
     def soap_envelope(self, metodo, xml_envio):
         """
         Envolve o XML de envio no SOAP 1.1 correto
@@ -134,7 +77,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             <soapenv:Body>
                 <nfse:{metodo}>
                 {self._cabecalho()}
-                {self._ajustar_assinatura(xml_envio)}
+                {xml_envio}
                 </nfse:{metodo}>
             </soapenv:Body>
             </soapenv:Envelope>
