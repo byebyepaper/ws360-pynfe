@@ -2168,11 +2168,11 @@ class SerializacaoNfse(object):
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
     
-    def consultar_faixa(self, cnpj_prestador, numero_nfse_inicial, numero_nfse_final):
+    def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         if self.autorizador.lower() == "ginfes":
             from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
         
-            return SerializacaoGinfes().consultar_faixa(cnpj_prestador=cnpj_prestador, numero_nfse_inicial=numero_nfse_inicial, numero_nfse_final=numero_nfse_final)
+            return SerializacaoGinfes().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
         else:
             raise Exception("Este método só esta implementado no autorizador Osasco.")
     
