@@ -331,8 +331,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
 
         consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio()
         consulta.Prestador = id_prestador
-        
-        consulta.Id =  str(uuid.uuid4())
+        consulta.Id = str(uuid.uuid4())
         # Consulta por Numero
         if numero is not None:
             consulta.NumeroNfse = numero
@@ -342,7 +341,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
 
-        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio" )
+        return consulta.toxml(encoding="utf-8", element_name="ConsultarNfseEnvio" )
 
     def consultar_lote(self, emitente, numero):
         # Prestador
