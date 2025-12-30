@@ -3,12 +3,6 @@ from importlib import import_module
 
 from lxml import etree
 from pyxb import BIND
-import base64
-import hashlib
-
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.serialization import Encoding, pkcs12
 
 
 class InterfaceAutorizador:
@@ -97,7 +91,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         }
 
         # =========================
-        # Algoritmos
+        # Algoritmos (GINFES)
         # =========================
         C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
         SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
@@ -115,7 +109,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         element_id = xml_element.get("Id")
         if not element_id:
-            raise ValueError("Elemento raiz precisa ter atributo Id para assinatura")
+            raise ValueError("Elemento raiz precisa ter atributo Id")
 
         # =========================
         # Certificado
@@ -136,16 +130,14 @@ class SerializacaoCampinas(InterfaceAutorizador):
         ).decode()
 
         # =========================
-        # Digest SEM a Signature
+        # Digest (SEM Signature)
         # =========================
         xml_clone = etree.fromstring(
             etree.tostring(xml_element)
         )
 
-        # Remove qualquer Signature existente (segurança)
-        for sig in xml_clone.xpath(
-            ".//*[local-name()='Signature']"
-        ):
+        # remove qualquer Signature existente
+        for sig in xml_clone.xpath(".//*[local-name()='Signature']"):
             sig.getparent().remove(sig)
 
         xml_c14n = etree.tostring(
@@ -240,9 +232,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
             )
         ).decode()
 
-        # =========================
-        # xd:SignatureValue
-        # =========================
         etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignatureValue"),
@@ -268,7 +257,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         ).text = cert_b64
 
         # =========================
-        # Anexa assinatura ao XML
+        # Anexa assinatura
         # =========================
         xml_element.append(signature)
 
@@ -277,6 +266,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             encoding="unicode",
             pretty_print=False,
         )
+
 
 
 
