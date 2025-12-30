@@ -42,6 +42,8 @@ class SerializacaoOsasco:
             "NumeroReciboFinal": numero_rps_final,
             "NumeroReciboUnico": numero_rps_unico,
         }
+
+
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -86,7 +88,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         raiz = etree.Element(
             "ConsultarNfseServicoPrestadoEnvio",
             xmlns=self.NS_PERIODO,
-            Id=self._gerar_id("CNFSEPERIODO")
+            Id=self._gerar_id("CNFSEPERIODO"),
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
@@ -101,19 +103,14 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
         xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
-        return self._soap_envelope(
-            "ConsultarNfseServicoPrestado",
-            xml_envio
-        )
+        return xml_envio
 
     # -------------------------
     # CONSULTAR POR FAIXA
     # -------------------------
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element(
-            "ConsultarNfseFaixaEnvio",
-            xmlns=self.NS_FAIXA,
-            Id=self._gerar_id("CNFSEFAIXA")
+            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
@@ -128,10 +125,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
         xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
-        return self._soap_envelope(
-            "ConsultarNfseFaixa",
-            xml_envio
-        )
+        return xml_envio
+
+
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):
         # importa
@@ -374,11 +370,11 @@ class SerializacaoBetha(InterfaceAutorizador):
 
         return gnfse.toxml(encoding="utf-8", element_name="EnviarLoteRpsSincronoEnvio")
 
-        
+
 class SerializacaoGinfes(InterfaceAutorizador):
     def __init__(self):
         pass
-    
+
     def consultar_servico_prestado(self, emitente, data_inicio, data_fim, pagina=1):
         NS = "http://www.ginfes.com.br/servico_consultar_nfse_servico_prestado_envio_v03.xsd"
         DS = "http://www.w3.org/2000/09/xmldsig#"
@@ -448,5 +444,3 @@ class SerializacaoGinfes(InterfaceAutorizador):
         versao_dados.text = "3"
 
         return etree.tostring(cabecalho, encoding="utf-8", xml_declaration=True)
-
-
