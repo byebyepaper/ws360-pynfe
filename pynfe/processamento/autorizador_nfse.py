@@ -356,7 +356,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
         print("ID no objeto:", consulta.Id)
-        return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio")
+        return consulta.toxml(encoding="utf-8")
 
     def consultar_lote(self, emitente, numero):
         # Prestador
