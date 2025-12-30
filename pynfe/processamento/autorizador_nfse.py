@@ -102,8 +102,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
-        return xml_envio
+        return raiz
 
     # -------------------------
     # CONSULTAR POR FAIXA
@@ -124,8 +123,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
-        return xml_envio
+        return raiz
 
 
 class SerializacaoBetha(InterfaceAutorizador):
