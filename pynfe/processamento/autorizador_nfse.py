@@ -303,7 +303,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         raiz = etree.Element(
             "ConsultarNfseServicoPrestadoEnvio",
             xmlns=self.NS_PERIODO,
-            Id=self._gerar_id("CNFSEPERIODO"),
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
@@ -324,7 +323,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
     # -------------------------
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element(
-            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
+            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
