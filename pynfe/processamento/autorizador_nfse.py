@@ -70,176 +70,10 @@ class SerializacaoCampinas(InterfaceAutorizador):
         <versaoDados>2.03</versaoDados>
         </nfse:cabecalho>
         """.strip()
-    def _sign_xml_2(
-        self,
-        xml_str: str,
-        certificate_path: str,
-        certificate_password: str,
-    ) -> str:
-        """
-        Sign XML document using XML Digital Signature (Enveloped) according to São Paulo NFS-e manual v3.3.4.
-        
-        According to section 3.2.3 of the manual:
-        - Padrão de assinatura: XML Digital Signature, formato Enveloped
-        - Certificado digital: ICP-Brasil (X509Data)
-        - Cadeia de Certificação: EndCertOnly (apenas certificado do usuário final)
-        - Função criptográfica: RSA (rsa-sha1)
-        - Função message digest: SHA-1
-        - Codificação: Base64
-        - Transformações: Enveloped e C14N
-        
-        Args:
-            xml_str: XML string to sign (must have a Signature placeholder element)
-            certificate_path: Path to the PFX/P12 certificate file
-            certificate_password: Certificate password
-        
-        Returns:
-            Signed XML string
-        """
-        from lxml import etree
-        from cryptography.hazmat.primitives.serialization import pkcs12, Encoding
-        from cryptography.hazmat.primitives.asymmetric import padding
-        from cryptography.hazmat.primitives import hashes
-        import base64
-        import hashlib
-        C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-        SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-        DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
-        ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-        DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
-        
-        # Parse the XML
-        parser = etree.XMLParser(remove_blank_text=True)
-        root = etree.fromstring(xml_str.encode('utf-8'), parser)
-        
-        # Find and remove the Signature placeholder
-        ns = {'ds': DSIG_NS}
-        signature_elem = root.find('.//ds:Signature', ns)
-        
-        if signature_elem is None:
-            raise ValueError("XML must contain a ds:Signature placeholder element")
-        
-        signature_parent = signature_elem.getparent()
-        signature_index = list(signature_parent).index(signature_elem)
-        signature_parent.remove(signature_elem)
-        
-        # Load certificate
-        with open(certificate_path, 'rb') as cert_file:
-            cert_data = cert_file.read()
-        
-        password = certificate_password.encode() if isinstance(certificate_password, str) else certificate_password
-        private_key, certificate, _ = pkcs12.load_key_and_certificates(cert_data, password)
-        
-        if private_key is None or certificate is None:
-            raise ValueError("Could not load private key or certificate from file")
-        
-        # Get certificate in DER format for X509Certificate element
-        cert_der = certificate.public_bytes(Encoding.DER)
-        cert_b64 = base64.b64encode(cert_der).decode('ascii')
-        
-        # Step 1: Canonicalize the document (without signature) for DigestValue
-        # Using C14N as per manual: http://www.w3.org/TR/2001/REC-xml-c14n-20010315
-        xml_c14n = etree.tostring(root, method='c14n', exclusive=False, with_comments=False)
-        digest_b64 = base64.b64encode(hashlib.sha1(xml_c14n).digest()).decode('ascii')
-        
-        # Step 2: Build SignedInfo as a standalone element with explicit namespace
-        # CRITICAL: SignedInfo must have the namespace declaration for proper C14N
-        signed_info = etree.Element(
-            'SignedInfo',
-            nsmap={None: DSIG_NS}  # Default namespace, no prefix
-        )
-        
-        canon_method = etree.SubElement(signed_info, 'CanonicalizationMethod')
-        canon_method.set('Algorithm', C14N_ALG)
-        
-        sig_method = etree.SubElement(signed_info, 'SignatureMethod')
-        sig_method.set('Algorithm', SIGNATURE_ALG)
-        
-        reference = etree.SubElement(signed_info, 'Reference')
-        reference.set('URI', '')
-        
-        transforms = etree.SubElement(reference, 'Transforms')
-        
-        transform1 = etree.SubElement(transforms, 'Transform')
-        transform1.set('Algorithm', ENVELOPED_ALG)
-        
-        transform2 = etree.SubElement(transforms, 'Transform')
-        transform2.set('Algorithm', C14N_ALG)
-        
-        digest_method = etree.SubElement(reference, 'DigestMethod')
-        digest_method.set('Algorithm', DIGEST_ALG)
-        
-        digest_value_elem = etree.SubElement(reference, 'DigestValue')
-        digest_value_elem.text = digest_b64
-        
-        # Step 3: Canonicalize SignedInfo for signing
-        # The namespace declaration MUST be included in the canonicalized form
-        signed_info_c14n = etree.tostring(signed_info, method='c14n', exclusive=False, with_comments=False)
-        
-        # Step 4: Sign the canonicalized SignedInfo with RSA-SHA1
-        from cryptography.hazmat.primitives.asymmetric import rsa
-        if not isinstance(private_key, rsa.RSAPrivateKey):
-            raise ValueError("Certificate must contain an RSA private key")
-        
-        signature_value_bytes = private_key.sign(
-            signed_info_c14n,
-            padding.PKCS1v15(),
-            hashes.SHA1()
-        )
-        signature_value_b64 = base64.b64encode(signature_value_bytes).decode('ascii')
-        
-        # Step 5: Build complete Signature element
-        new_signature = etree.Element(
-            'Signature',
-            nsmap={None: DSIG_NS}  # Default namespace, no prefix
-        )
-        
-        # Append SignedInfo (recreate without standalone namespace for proper nesting)
-        new_signed_info = etree.SubElement(new_signature, 'SignedInfo')
-        
-        new_canon = etree.SubElement(new_signed_info, 'CanonicalizationMethod')
-        new_canon.set('Algorithm', C14N_ALG)
-        
-        new_sig_method = etree.SubElement(new_signed_info, 'SignatureMethod')
-        new_sig_method.set('Algorithm', SIGNATURE_ALG)
-        
-        new_ref = etree.SubElement(new_signed_info, 'Reference')
-        new_ref.set('URI', '')
-        
-        new_transforms = etree.SubElement(new_ref, 'Transforms')
-        new_t1 = etree.SubElement(new_transforms, 'Transform')
-        new_t1.set('Algorithm', ENVELOPED_ALG)
-        new_t2 = etree.SubElement(new_transforms, 'Transform')
-        new_t2.set('Algorithm', C14N_ALG)
-        
-        new_digest_method = etree.SubElement(new_ref, 'DigestMethod')
-        new_digest_method.set('Algorithm', DIGEST_ALG)
-        
-        new_digest_value = etree.SubElement(new_ref, 'DigestValue')
-        new_digest_value.text = digest_b64
-        
-        # SignatureValue
-        sig_value = etree.SubElement(new_signature, 'SignatureValue')
-        sig_value.text = signature_value_b64
-        
-        # KeyInfo with only X509Certificate (EndCertOnly as per manual)
-        key_info = etree.SubElement(new_signature, 'KeyInfo')
-        x509_data = etree.SubElement(key_info, 'X509Data')
-        x509_cert = etree.SubElement(x509_data, 'X509Certificate')
-        x509_cert.text = cert_b64
-        
-        # Insert signature into document
-        signature_parent.insert(signature_index, new_signature)
-        
-        # Return signed XML
-        signed_xml = etree.tostring(root, encoding='unicode', pretty_print=False)
-        
-        return signed_xml
-
 
     def _sign_xml(
         self,
-        xml_input,
+        xml_input: str,
         certificate_path: str,
         certificate_password: str,
     ) -> str:
@@ -250,68 +84,42 @@ class SerializacaoCampinas(InterfaceAutorizador):
         import base64
         import hashlib
 
-        # =========================
-        # Namespaces
-        # =========================
-        DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
-
-        # =========================
-        # Algoritmos (GINFES)
-        # =========================
+        # Algoritmos exigidos pelo GINFES Campinas
         C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-        SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+        SIGN_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
         DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
         ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
 
-        # =========================
-        # Parse XML
-        # =========================
-        if isinstance(xml_input, str):
-            parser = etree.XMLParser(remove_blank_text=True)
-            xml_element = etree.fromstring(xml_input.encode("utf-8"), parser)
-        else:
-            xml_element = xml_input
+        parser = etree.XMLParser(remove_blank_text=True)
+        root = etree.fromstring(xml_input.encode("utf-8"), parser)
 
-        # =========================
-        # Id do elemento raiz (OBRIGATÓRIO)
-        # =========================
-        element_id = xml_element.get("Id")
-        if not element_id:
-            raise ValueError(
-                "Elemento raiz não possui atributo Id (obrigatório para assinatura GINFES)"
-            )
+        # === LOCAL CORRETO ===
+        envio = root.xpath("//*[local-name()='ConsultarNfseServicoPrestadoEnvio']")
+        if not envio:
+            raise ValueError("ConsultarNfseServicoPrestadoEnvio não encontrado")
 
-        # =========================
-        # Carrega certificado
-        # =========================
+        envio = envio[0]
+
+        # Remove qualquer assinatura anterior
+        for s in envio.xpath("./*[local-name()='Signature']"):
+            envio.remove(s)
+
+        # === CARREGA CERTIFICADO ===
         with open(certificate_path, "rb") as f:
-            cert_data = f.read()
+            pfx = f.read()
 
-        private_key, certificate, _ = pkcs12.load_key_and_certificates(
-            cert_data,
+        private_key, cert, _ = pkcs12.load_key_and_certificates(
+            pfx,
             certificate_password.encode(),
         )
 
-        if not private_key or not certificate:
-            raise ValueError("Falha ao carregar certificado")
-
         cert_b64 = base64.b64encode(
-            certificate.public_bytes(Encoding.DER)
+            cert.public_bytes(Encoding.DER)
         ).decode()
 
-        # =========================
-        # Digest (remove Signature)
-        # =========================
-        xml_clone = etree.fromstring(etree.tostring(xml_element))
-
-        for sig in xml_clone.xpath(
-            ".//*[local-name()='Signature' and namespace-uri()=$ns]",
-            ns=DSIG_NS,
-        ):
-            sig.getparent().remove(sig)
-
+        # === DIGEST DO XML SEM SIGNATURE ===
         xml_c14n = etree.tostring(
-            xml_clone,
+            envio,
             method="c14n",
             exclusive=False,
             with_comments=False,
@@ -321,71 +129,51 @@ class SerializacaoCampinas(InterfaceAutorizador):
             hashlib.sha1(xml_c14n).digest()
         ).decode()
 
-        # =========================
-        # <Signature>
-        # =========================
-        signature = etree.Element(
-            etree.QName(DSIG_NS, "Signature"),
-            nsmap={None: DSIG_NS},
-        )
+        # === SIGNATURE (SEM NAMESPACE) ===
+        signature = etree.Element("Signature")
 
-        # =========================
-        # <SignedInfo>
-        # =========================
-        signed_info = etree.SubElement(
-            signature,
-            etree.QName(DSIG_NS, "SignedInfo"),
-        )
+        signed_info = etree.SubElement(signature, "SignedInfo")
 
         etree.SubElement(
             signed_info,
-            etree.QName(DSIG_NS, "CanonicalizationMethod"),
+            "CanonicalizationMethod",
             Algorithm=C14N_ALG,
         )
 
         etree.SubElement(
             signed_info,
-            etree.QName(DSIG_NS, "SignatureMethod"),
-            Algorithm=SIGNATURE_ALG,
+            "SignatureMethod",
+            Algorithm=SIGN_ALG,
         )
 
-        reference = etree.SubElement(
-            signed_info,
-            etree.QName(DSIG_NS, "Reference"),
-            URI=f"#{element_id}",
-        )
+        reference = etree.SubElement(signed_info, "Reference")
 
-        transforms = etree.SubElement(
-            reference,
-            etree.QName(DSIG_NS, "Transforms"),
-        )
+        transforms = etree.SubElement(reference, "Transforms")
 
         etree.SubElement(
             transforms,
-            etree.QName(DSIG_NS, "Transform"),
+            "Transform",
             Algorithm=ENVELOPED_ALG,
         )
 
         etree.SubElement(
             transforms,
-            etree.QName(DSIG_NS, "Transform"),
+            "Transform",
             Algorithm=C14N_ALG,
         )
 
         etree.SubElement(
             reference,
-            etree.QName(DSIG_NS, "DigestMethod"),
+            "DigestMethod",
             Algorithm=DIGEST_ALG,
         )
 
         etree.SubElement(
             reference,
-            etree.QName(DSIG_NS, "DigestValue"),
+            "DigestValue",
         ).text = digest_value
 
-        # =========================
-        # Assina SignedInfo
-        # =========================
+        # === ASSINA SIGNEDINFO ===
         signed_info_c14n = etree.tostring(
             signed_info,
             method="c14n",
@@ -403,108 +191,96 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(
             signature,
-            etree.QName(DSIG_NS, "SignatureValue"),
+            "SignatureValue",
         ).text = signature_value
 
-        # =========================
-        # <KeyInfo>
-        # =========================
-        key_info = etree.SubElement(
-            signature,
-            etree.QName(DSIG_NS, "KeyInfo"),
-        )
-
-        x509_data = etree.SubElement(
-            key_info,
-            etree.QName(DSIG_NS, "X509Data"),
-        )
-
+        # === KEYINFO (END CERT ONLY) ===
+        key_info = etree.SubElement(signature, "KeyInfo")
+        x509_data = etree.SubElement(key_info, "X509Data")
         etree.SubElement(
             x509_data,
-            etree.QName(DSIG_NS, "X509Certificate"),
+            "X509Certificate",
         ).text = cert_b64
 
-        # =========================
-        # Anexa Signature
-        # =========================
-        xml_element.append(signature)
+        # === ANEXA NO FINAL DO ENVIO ===
+        envio.append(signature)
 
         return etree.tostring(
-            xml_element,
+            root,
             encoding="unicode",
             pretty_print=False,
         )
 
-    def soap_envelope(
-        self,
-        metodo,
-        xml_envio_element,
-        certificate_path,
-        certificate_password,
-    ):
-        xml_assinado = self._sign_xml_2(
+        def soap_envelope(
+            self,
+            metodo,
             xml_envio_element,
             certificate_path,
             certificate_password,
-        )
+        ):
+            xml_assinado = self._sign_xml(
+                xml_envio_element,
+                certificate_path,
+                certificate_password,
+            )
 
-        return f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                    xmlns:nfse="http://nfse.abrasf.org.br">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <nfse:{metodo}>
-        {self._cabecalho()}
-        {xml_assinado}
-        </nfse:{metodo}>
-    </soapenv:Body>
-    </soapenv:Envelope>
-    """.strip()
+            return f"""<?xml version="1.0" encoding="utf-8"?>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                        xmlns:nfse="http://nfse.abrasf.org.br">
+        <soapenv:Header/>
+        <soapenv:Body>
+            <nfse:{metodo}>
+            {self._cabecalho()}
+            {xml_assinado}
+            </nfse:{metodo}>
+        </soapenv:Body>
+        </soapenv:Envelope>
+        """.strip()
 
 
-    # -------------------------
-    # CONSULTAR POR PERÍODO
-    # -------------------------
-    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
-        raiz = etree.Element(
-            "ConsultarNfseServicoPrestadoEnvio",
-            xmlns=self.NS_PERIODO,
-            Id=self._gerar_id("CNFSESP")
-        )
+        # -------------------------
+        # CONSULTAR POR PERÍODO
+        # -------------------------
+        def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
+            raiz = etree.Element(
+                "ConsultarNfseServicoPrestadoEnvio",
+                xmlns=self.NS_PERIODO,
+                Id=self._gerar_id("CNFSESP")
+            )
 
-        prestador = etree.SubElement(raiz, "Prestador")
-        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
-        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+            prestador = etree.SubElement(raiz, "Prestador")
+            cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+            etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+            etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
 
-        periodo = etree.SubElement(raiz, "PeriodoEmissao")
-        etree.SubElement(periodo, "DataInicial").text = data_inicio
-        etree.SubElement(periodo, "DataFinal").text = data_fim
+            periodo = etree.SubElement(raiz, "PeriodoEmissao")
+            etree.SubElement(periodo, "DataInicial").text = data_inicio
+            etree.SubElement(periodo, "DataFinal").text = data_fim
 
-        etree.SubElement(raiz, "Pagina").text = str(pagina)
+            etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
+            return raiz
 
-    # -------------------------
-    # CONSULTAR POR FAIXA
-    # -------------------------
-    def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-        raiz = etree.Element(
-            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
-        )
+        # -------------------------
+        # CONSULTAR POR FAIXA
+        # -------------------------
+        def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
+            raiz = etree.Element(
+                "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
+            )
 
-        prestador = etree.SubElement(raiz, "Prestador")
-        cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
-        etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+            prestador = etree.SubElement(raiz, "Prestador")
+            cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
+            etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
+            etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
 
-        faixa = etree.SubElement(raiz, "Faixa")
-        etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
-        etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
+            faixa = etree.SubElement(raiz, "Faixa")
+            etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
+            etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
 
-        etree.SubElement(raiz, "Pagina").text = str(pagina)
+            etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
+            return raiz
 
 
 class SerializacaoBetha(InterfaceAutorizador):
