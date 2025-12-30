@@ -338,33 +338,43 @@ class SerializacaoGinfes(InterfaceAutorizador):
 
         return consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseRpsEnvio")
 
-    def consultar_nfse(self, emitente, numero=None, inicio=None, fim=None):
+    def consultar_nfse_faixa(emitente, numero_inicial, numero_final, pagina=1):
+        NS = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
+        DS = "http://www.w3.org/2000/09/xmldsig#"
+
+        nsmap = {
+            None: NS,
+            "ds": DS
+        }
+
+        root = etree.Element(
+            f"{{{NS}}}ConsultarNfseFaixaEnvio",
+            nsmap=nsmap
+        )
+
+        # Id obrigatório (ANTES da assinatura)
+        root.attrib["Id"] = f"CNFSEFAIXA{uuid.uuid4().hex.upper()}"
+
         # Prestador
-        id_prestador = _tipos.tcIdentificacaoPrestador()
-        id_prestador.Cnpj = emitente.cnpj
-        id_prestador.InscricaoMunicipal = emitente.inscricao_municipal
+        prestador = etree.SubElement(root, f"{{{NS}}}Prestador")
+        cpf_cnpj = etree.SubElement(prestador, f"{{{NS}}}CpfCnpj")
+        etree.SubElement(cpf_cnpj, f"{{{NS}}}Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, f"{{{NS}}}InscricaoMunicipal").text = emitente.inscricao_municipal
 
-        consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio()
-        consulta.Prestador = id_prestador
-        # Consulta por Numero
-        if numero is not None:
-            consulta.NumeroNfse = numero
-        else:
-            # consulta por Data
-            consulta.PeriodoEmissao = BIND()
-            consulta.PeriodoEmissao.DataInicial = inicio
-            consulta.PeriodoEmissao.DataFinal = fim
+        # Faixa
+        faixa = etree.SubElement(root, f"{{{NS}}}Faixa")
+        etree.SubElement(faixa, f"{{{NS}}}NumeroNfseInicial").text = str(numero_inicial)
+        etree.SubElement(faixa, f"{{{NS}}}NumeroNfseFinal").text = str(numero_final)
 
-        xml = consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio")
-        root = etree.fromstring(xml)
-        root.attrib["Id"] = f"CNFSE{uuid.uuid4().hex.upper()}"
+        # Página
+        etree.SubElement(root, f"{{{NS}}}Pagina").text = str(pagina)
 
-        xml = etree.tostring(
+        return etree.tostring(
             root,
             encoding="utf-8",
             xml_declaration=True
         )
-        return xml
+
 
     def consultar_lote(self, emitente, numero):
         # Prestador
