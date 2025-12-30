@@ -62,7 +62,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         </nfse:cabecalho>
         """.strip()
 
-    def _soap_envelope(self, metodo, xml_envio):
+    def soap_envelope(self, metodo, xml_envio):
         """
         Envolve o XML de envio no SOAP 1.1 correto
         """
