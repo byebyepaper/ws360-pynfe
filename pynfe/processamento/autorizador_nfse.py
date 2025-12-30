@@ -91,7 +91,12 @@ class SerializacaoCampinas(InterfaceAutorizador):
         ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
 
         parser = etree.XMLParser(remove_blank_text=True)
-        root = etree.fromstring(xml_input.encode("utf-8"), parser)
+        if isinstance(xml_input, etree._Element):
+            root = xml_input
+        elif isinstance(xml_input, (str, bytes)):
+            root = etree.fromstring(xml_input.encode("utf-8"), parser)
+        else:
+            raise TypeError("xml_input deve ser str, bytes ou lxml.etree._Element")
 
         # === LOCAL CORRETO ===
         envio = root.xpath("//*[local-name()='ConsultarNfseServicoPrestadoEnvio']")
