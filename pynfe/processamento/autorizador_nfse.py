@@ -344,9 +344,8 @@ class SerializacaoGinfes(InterfaceAutorizador):
         id_prestador.Cnpj = emitente.cnpj
         id_prestador.InscricaoMunicipal = emitente.inscricao_municipal
 
-        consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio()
+        consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio(Id=str(uuid.uuid4()))
         consulta.Prestador = id_prestador
-        consulta.Id = str(uuid.uuid4())
         # Consulta por Numero
         if numero is not None:
             consulta.NumeroNfse = numero
