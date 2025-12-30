@@ -65,32 +65,31 @@ class SerializacaoCampinas(InterfaceAutorizador):
         </nfse:cabecalho>
         """.strip()
     
-    def _corrigir_prefixo_ds(self, xml_str: str) -> str:
-        parser = etree.XMLParser(remove_blank_text=True)
-        root = etree.fromstring(xml_str.encode(), parser)
+    def _ajustar_assinatura(self, xml_assinado: etree.Element) -> etree.Element:
+        """
+        Move <Signature> para nfse:Signature
+        Mantém SignedInfo / Reference / etc em ds
+        """
+        ns = {"ds": self.DS_NS}
 
-        nsmap = root.nsmap.copy()
-        if "ds" not in nsmap:
-            nsmap["ds"] = self.DS_NS
-
-        signature = root.find(f".//{{{self.DS_NS}}}Signature")
+        signature = xml_assinado.find(".//ds:Signature", namespaces=ns)
         if signature is None:
-            raise ValueError("Signature não encontrada")
+            raise ValueError("Signature não encontrada no XML assinado")
 
-        signature.tag = f"{{{self.DS_NS}}}Signature"
-        for elem in signature.iter():
-            if elem.tag.startswith("{"):
-                ns, local = elem.tag[1:].split("}")
-                elem.tag = f"{{{ns}}}{local}"
+        parent = signature.getparent()
+        parent.remove(signature)
 
-        etree.cleanup_namespaces(root)
+        nfse_signature = etree.Element(
+            f"{{{self.NFSE_NS}}}Signature",
+            nsmap={"ds": self.DS_NS}
+        )
 
-        return etree.tostring(
-            root,
-            encoding="utf-8",
-            xml_declaration=False
-        ).decode()
+        for child in signature:
+            nfse_signature.append(child)
 
+        parent.append(nfse_signature)
+        return etree.tostring(xml_assinado, encoding="unicode", pretty_print=False)
+    
     def soap_envelope(self, metodo, xml_envio):
         """
         Envolve o XML de envio no SOAP 1.1 correto
@@ -102,7 +101,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             <soapenv:Body>
                 <nfse:{metodo}>
                 {self._cabecalho()}
-                {self._corrigir_prefixo_ds(xml_envio)}
+                {self._ajustar_assinatura(xml_envio)}
                 </nfse:{metodo}>
             </soapenv:Body>
             </soapenv:Envelope>
