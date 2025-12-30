@@ -2138,54 +2138,38 @@ class SerializacaoNfse(object):
         self.autorizador = autorizador
         self.chave_autenticacao = chave_autenticacao
 
-    def gerar(self, nfse):
-        if self.autorizador.lower() == "betha":
-            from pynfe.processamento.autorizador_nfse import SerializacaoBetha
-
-            return SerializacaoBetha().gerar(nfse)
-        else:
-            raise Exception("Este método só esta implementado no autorizador Betha.")
-
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-        if self.autorizador.lower() == "ginfes":
+        if self.autorizador.lower() == "campinas":
             from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
         
             return SerializacaoGinfes().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
+        elif self.autorizador.lower() == "osasco":
+            from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, numero_nota_inicial=numero_inicial, numero_nota_final=numero_final)
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
     
-    def consultar_servico_prestado(self, emitente, data_inicio, data_fim, pagina=1):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
+    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
+        if self.autorizador.lower() == "campinas":
+            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
         
-            return SerializacaoGinfes().consultar_servico_prestado(emitente, data_inicio, data_fim, pagina=1)
-        else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
-    
-    def consultar_nota_emitida(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None):
-        if self.autorizador.lower() == "osasco":
+            return SerializacaoCampinas().consultar_periodo(emitente, data_inicio, data_fim, pagina=1)
+        elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
         
-            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=cnpj_tomador, cpf_tomador=cpf_tomador, data_inicial=data_inicial, data_final=data_final, numero_nota_inicial=numero_nota_inicial, numero_nota_final=numero_nota_final, numero_rps_inicial=numero_rps_inicial, numero_rps_final=numero_rps_final)
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, data_inicial=data_inicio, data_final=data_fim)
         else:
-            raise Exception("Este método só esta implementado no autorizador Osasco.")
+            raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
-    def consultar_lote(self, emitente, numero):
-        if self.autorizador.lower() == "ginfes":
-            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
 
-            return SerializacaoGinfes().consultar_lote(emitente, numero)
+    def consultar_nfse(self, emitente, numero_nfse):
+        if self.autorizador.lower() == "osasco":
+            from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, numero_nota_inicial=numero_nfse, numero_nota_final=numero_nfse)
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
 
-    def cancelar(self, nfse):
-        if self.autorizador.lower() == "betha":
-            from pynfe.processamento.autorizador_nfse import SerializacaoBetha
-
-            return SerializacaoBetha().cancelar(nfse)
-        else:
-            raise Exception("Autorizador não suportado para cancelamento!")
 
 
 class SerializacaoQrcodeMDFe(object):

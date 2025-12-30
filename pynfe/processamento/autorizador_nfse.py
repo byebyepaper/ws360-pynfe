@@ -286,7 +286,7 @@ class SerializacaoBetha(InterfaceAutorizador):
 
         return gnfse.toxml(encoding="utf-8", element_name="EnviarLoteRpsSincronoEnvio")
 
-
+        
 class SerializacaoGinfes(InterfaceAutorizador):
     def __init__(self):
         pass
@@ -360,4 +360,108 @@ class SerializacaoGinfes(InterfaceAutorizador):
         versao_dados.text = "3"
 
         return etree.tostring(cabecalho, encoding="utf-8", xml_declaration=True)
-        
+
+
+class SerializacaoCampinas(InterfaceAutorizador):
+
+    NS = "http://www.abrasf.org.br/nfse.xsd"
+    DS = "http://www.w3.org/2000/09/xmldsig#"
+
+    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
+        nsmap = {
+            None: self.NS,
+            "ds": self.DS,
+        }
+
+        root = etree.Element(
+            f"{{{self.NS}}}ConsultarNfseServicoPrestadoEnvio",
+            nsmap=nsmap
+        )
+
+        # ID é OPCIONAL no XSD, mas Campinas aceita
+        root.attrib["Id"] = f"CNFSESP{uuid.uuid4().hex}"
+
+        # Prestador
+        prestador = etree.SubElement(root, f"{{{self.NS}}}Prestador")
+
+        cpf_cnpj = etree.SubElement(prestador, f"{{{self.NS}}}CpfCnpj")
+        etree.SubElement(cpf_cnpj, f"{{{self.NS}}}Cnpj").text = emitente.cnpj
+
+        etree.SubElement(
+            prestador,
+            f"{{{self.NS}}}InscricaoMunicipal"
+        ).text = emitente.inscricao_municipal
+
+        # Período de emissão
+        periodo = etree.SubElement(root, f"{{{self.NS}}}PeriodoEmissao")
+        etree.SubElement(periodo, f"{{{self.NS}}}DataInicial").text = data_inicio
+        etree.SubElement(periodo, f"{{{self.NS}}}DataFinal").text = data_fim
+
+        # Página (mínimo 1)
+        etree.SubElement(root, f"{{{self.NS}}}Pagina").text = str(pagina)
+
+        # Signature OBRIGATÓRIA no XSD
+        etree.SubElement(root, f"{{{self.DS}}}Signature")
+
+        return etree.tostring(
+            root,
+            encoding="utf-8",
+            xml_declaration=True
+        )
+    def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
+        nsmap = {
+            None: self.NS,
+            "ds": self.DS,
+        }
+
+        root = etree.Element(
+            f"{{{self.NS}}}ConsultarNfseFaixaEnvio",
+            nsmap=nsmap
+        )
+
+        root.attrib["Id"] = f"CNFSEFAIXA{uuid.uuid4().hex}"
+
+        prestador = etree.SubElement(root, f"{{{self.NS}}}Prestador")
+        cpf_cnpj = etree.SubElement(prestador, f"{{{self.NS}}}CpfCnpj")
+        etree.SubElement(cpf_cnpj, f"{{{self.NS}}}Cnpj").text = emitente.cnpj
+        etree.SubElement(
+            prestador,
+            f"{{{self.NS}}}InscricaoMunicipal"
+        ).text = emitente.inscricao_municipal
+
+        faixa = etree.SubElement(root, f"{{{self.NS}}}Faixa")
+        etree.SubElement(
+            faixa,
+            f"{{{self.NS}}}NumeroNfseInicial"
+        ).text = str(numero_inicial)
+
+        if numero_final:
+            etree.SubElement(
+                faixa,
+                f"{{{self.NS}}}NumeroNfseFinal"
+            ).text = str(numero_final)
+
+        etree.SubElement(root, f"{{{self.NS}}}Pagina").text = str(pagina)
+
+        etree.SubElement(root, f"{{{self.DS}}}Signature")
+
+        return etree.tostring(
+            root,
+            encoding="utf-8",
+            xml_declaration=True
+        )
+    def cabecalho(self):
+        NS = "http://www.abrasf.org.br/nfse.xsd"
+        nsmap = {None: NS}
+
+        cabecalho = etree.Element("cabecalho", nsmap=nsmap)
+        cabecalho.attrib["versao"] = "2.03"
+
+        versao_dados = etree.SubElement(cabecalho, "versaoDados")
+        versao_dados.text = "2.03"
+
+        return etree.tostring(
+            cabecalho,
+            encoding="utf-8",
+            xml_declaration=False
+        )

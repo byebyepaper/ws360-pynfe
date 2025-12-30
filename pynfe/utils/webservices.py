@@ -519,6 +519,16 @@ NFSE = {
             "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl"
         ),
     },
+    "CAMPINAS": {
+        "AUTORIZACAO": "GerarNfse",
+        "CANCELAR": "CancelarNfse",
+        "CONSULTA_RPS": "consultarNfsePorRps",
+        "CONSULTA_FAIXA": "ConsultarNfseFaixa",
+        "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
+        "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
+        "HTTPS": "https://novanfse.campinas.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
+        "HOMOLOGACAO": "https://homol-rps.ima.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
+    },
 }
 
 # MDF-e

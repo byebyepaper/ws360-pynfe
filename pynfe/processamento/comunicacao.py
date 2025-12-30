@@ -745,41 +745,17 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "OSASCO":
             self._namespace = ""
             self._versao = "1"
+        elif self.autorizador == "CAMPINAS":
+            self._namespace = "http://www.abrasf.org.br/nfse.xsd"
+            self._versao = "2"
         else:
             raise Exception("Autorizador não encontrado!")
 
-    def autorizacao(self, nota):
-        # url do serviço
-        url = self._get_url()
-        if self.autorizador == "BETHA":
-            # xml
-            xml = etree.tostring(nota, encoding="unicode", pretty_print=False)
-            # comunica via wsdl
-            return self._post(url, xml, "gerar")
-        else:
-            raise Exception("Este método só esta implementado no autorizador betha.")
-
-    def enviar_lote(self, xml):
-        # url do serviço
-        url = self._get_url()
-        if self.autorizador == "GINFES":
-            # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
-            # comunica via wsdl
-            return self._post_https(url, xml, "enviar_lote")
-        else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
-
-    def consultar(self, xml):
+    def consultar_nfse(self, xml):
         # url do serviço
         url = self._get_url()
 
-        if self.autorizador == "GINFES":
-            cabecalho = self._cabecalho_ginfes()
-            # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"],cabecalho, xml)
-            
-        elif self.autorizador == "OSASCO":
+        if self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], xml)
         else:
@@ -788,12 +764,10 @@ class ComunicacaoNfse(Comunicacao):
     def consultar_rps(self, xml):
         # url do serviço
         url = self._get_url()
-        if self.autorizador == "BETHA":
-            # comunica via wsdl
-            return self._post(url, xml, "consultaRps")
-        elif self.autorizador == "GINFES":
-            cabecalho = self._cabecalho_ginfes()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"],cabecalho, xml)
+        if self.autorizador == "CAMPINAS":
+            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+            cabecalho = SerializacaoCampinas().cabecalho()
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
@@ -803,11 +777,9 @@ class ComunicacaoNfse(Comunicacao):
     def consultar_faixa(self, xml):
         # url do serviço
         url = self._get_url()
-        if self.autorizador == "BETHA":
-            # comunica via wsdl
-            return self._post(url, xml, "consultaFaixa")
-        elif self.autorizador == "GINFES":
-            cabecalho = self._cabecalho_ginfes()
+        if self.autorizador == "CAMPINAS":
+            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+            cabecalho = SerializacaoCampinas().cabecalho()
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"],cabecalho, xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -815,40 +787,27 @@ class ComunicacaoNfse(Comunicacao):
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
-    def consultar_lote(self, xml):
+    def consultar_periodo(self, xml):
         # url do serviço
         url = self._get_url()
-        if self.autorizador == "GINFES":
-            # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
+        if self.autorizador == "CAMPINAS":
+            from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+            cabecalho = SerializacaoCampinas().cabecalho()
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_SERVICO"],cabecalho, xml)
+        elif self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_https(url, xml, "consulta_lote")
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
+
+    def consultar_lote(self, xml):
+        raise Exception("Este método não esta implementado para o autorizador.")
 
     def consultar_situacao_lote(self, xml):
-        # url do serviço
-        url = self._get_url()
-        if self.autorizador == "GINFES":
-            # comunica via wsdl
-            return self._post_https(url, xml, "consulta_situacao_lote")
-        else:
-            raise Exception("Este método não esta implementado para o autorizador.")
+        raise Exception("Este método não esta implementado para o autorizador.")
 
     def cancelar(self, xml):
-        # url do serviço
-        url = self._get_url()
-        # Betha
-        if self.autorizador == "BETHA":
-            # comunica via wsdl
-            return self._post(url, xml, "cancelar")
-        # Ginfes
-        elif self.autorizador == "GINFES":
-            # comunica via wsdl com certificado
-            return self._post_https(url, xml, "cancelar")
-        # TODO outros autorizadores
-        else:
-            raise Exception("Este método não esta implementado para o autorizador.")
+        raise Exception("Este método não esta implementado para o autorizador.")
 
     def _cabecalho(self, retorna_string=True):
         """Monta o XML do cabeçalho da requisição wsdl
