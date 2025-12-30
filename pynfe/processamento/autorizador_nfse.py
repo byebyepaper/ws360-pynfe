@@ -1,6 +1,6 @@
 import uuid
 from importlib import import_module
-
+from lxml import etree
 from pyxb import BIND
 
 
@@ -344,7 +344,7 @@ class SerializacaoGinfes(InterfaceAutorizador):
         id_prestador.Cnpj = emitente.cnpj
         id_prestador.InscricaoMunicipal = emitente.inscricao_municipal
 
-        consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio(Id=str(uuid.uuid4()))
+        consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio()
         consulta.Prestador = id_prestador
         # Consulta por Numero
         if numero is not None:
@@ -355,7 +355,17 @@ class SerializacaoGinfes(InterfaceAutorizador):
             consulta.PeriodoEmissao.DataInicial = inicio
             consulta.PeriodoEmissao.DataFinal = fim
         print("ID no objeto:", consulta.Id)
-        return consulta.toxml(encoding="utf-8")
+        
+        xml = consulta.toxml(encoding="utf-8", element_name="ns1:ConsultarNfseEnvio")
+        root = etree.fromstring(xml)
+        root.attrib["Id"] = f"CNFSE{uuid.uuid4().hex.upper()}"
+
+        xml = etree.tostring(
+            root,
+            encoding="utf-8",
+            xml_declaration=True
+        )
+        return xml
 
     def consultar_lote(self, emitente, numero):
         # Prestador

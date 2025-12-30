@@ -233,17 +233,7 @@ class CTD_ANON_(pyxb.binding.basis.complexTypeDefinition):
         "/workspaces/PyNFe/pynfe/data/XSDs/NFS-e/Ginfes/servico_consultar_nfse_envio_v03.xsd", 12, 5
     )
     _ElementMap = {}
-    __Id = pyxb.binding.content.AttributeUse(
-        pyxb.namespace.ExpandedName(None, "Id"),
-        "Id",
-        "__httpwww_ginfes_com_brservico_consultar_nfse_envio_v03_xsd_CTD_ANON_Id",
-        pyxb.binding.datatypes.ID,
-        required=False,
-    )
-
-    Id = property(__Id.value, __Id.set, None, None)
     _AttributeMap = {}
-    _AttributeMap.update({__Id.name(): __Id})
     # Base type is pyxb.binding.datatypes.anyType
 
     # Element {http://www.ginfes.com.br/servico_consultar_nfse_envio_v03.xsd}DataInicial uses Python identifier DataInicial
@@ -293,18 +283,7 @@ ConsultarNfseEnvio = pyxb.binding.basis.element(
 Namespace.addCategoryObject(
     "elementBinding", ConsultarNfseEnvio.name().localName(), ConsultarNfseEnvio
 )
-# === Atributo Id no ELEMENTO (obrigatório para XMLDSig) ===
-ConsultarNfseEnvio._AttributeMap = getattr(ConsultarNfseEnvio, "_AttributeMap", {})
 
-__Id = pyxb.binding.content.AttributeUse(
-    pyxb.namespace.ExpandedName(None, "Id"),
-    "Id",
-    "__httpwww_ginfes_com_brservico_consultar_nfse_envio_v03_xsd_ConsultarNfseEnvio_Id",
-    pyxb.binding.datatypes.ID,
-    required=False,
-)
-
-ConsultarNfseEnvio._AttributeMap.update({__Id.name(): __Id})
 
 CTD_ANON._AddElement(
     pyxb.binding.basis.element(
