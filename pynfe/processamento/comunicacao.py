@@ -785,6 +785,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
+            print(soup_xml)
             return self._post_soap_raw(url, soup_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -798,6 +799,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
+            print(soup_xml)
             return self._post_soap_raw(url, soup_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
