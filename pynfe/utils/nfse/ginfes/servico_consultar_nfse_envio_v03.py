@@ -293,7 +293,18 @@ ConsultarNfseEnvio = pyxb.binding.basis.element(
 Namespace.addCategoryObject(
     "elementBinding", ConsultarNfseEnvio.name().localName(), ConsultarNfseEnvio
 )
+# === Atributo Id no ELEMENTO (obrigatório para XMLDSig) ===
+ConsultarNfseEnvio._AttributeMap = getattr(ConsultarNfseEnvio, "_AttributeMap", {})
 
+__Id = pyxb.binding.content.AttributeUse(
+    pyxb.namespace.ExpandedName(None, "Id"),
+    "Id",
+    "__httpwww_ginfes_com_brservico_consultar_nfse_envio_v03_xsd_ConsultarNfseEnvio_Id",
+    pyxb.binding.datatypes.ID,
+    required=False,
+)
+
+ConsultarNfseEnvio._AttributeMap.update({__Id.name(): __Id})
 
 CTD_ANON._AddElement(
     pyxb.binding.basis.element(
