@@ -767,7 +767,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_RPS"], xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"],  xml)
@@ -780,7 +780,7 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
             cabecalho = SerializacaoCampinas().cabecalho()
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"],cabecalho, xml)
+            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_FAIXA"], xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], xml)
