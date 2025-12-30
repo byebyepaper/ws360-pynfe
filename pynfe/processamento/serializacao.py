@@ -2167,14 +2167,14 @@ class SerializacaoNfse(object):
             return SerializacaoGinfes().serializar_lote_assincrono(nfse)
         else:
             raise Exception("Este método só esta implementado no autorizador ginfes.")
-
-    def consultar_nfse(self, emitente, numero=None, inicio=None, fim=None):
+    
+    def consultar_faixa(self, cnpj_prestador, numero_nfse_inicial, numero_nfse_final):
         if self.autorizador.lower() == "ginfes":
             from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-            return SerializacaoGinfes().consultar_nfse(emitente, numero, inicio, fim)
+        
+            return SerializacaoGinfes().consultar_faixa(cnpj_prestador=cnpj_prestador, numero_nfse_inicial=numero_nfse_inicial, numero_nfse_final=numero_nfse_final)
         else:
-            raise Exception("Este método só esta implementado no autorizador ginfes.")
+            raise Exception("Este método só esta implementado no autorizador Osasco.")
     
     def consultar_nota_emitida(self, cnpj_tomador=None, cpf_tomador=None, data_inicial=None, data_final=None, numero_nota_inicial=None, numero_nota_final=None, numero_rps_inicial=None, numero_rps_final=None):
         if self.autorizador.lower() == "osasco":
