@@ -53,6 +53,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
     NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
     NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
+    DS_NS = "http://www.w3.org/2000/09/xmldsig#"
 
     def _gerar_id(self, prefixo):
         return f"{prefixo}{uuid.uuid4().hex.upper()}"
@@ -63,6 +64,32 @@ class SerializacaoCampinas(InterfaceAutorizador):
         <versaoDados>2.03</versaoDados>
         </nfse:cabecalho>
         """.strip()
+    
+    def _corrigir_prefixo_ds(self, xml_str: str) -> str:
+        parser = etree.XMLParser(remove_blank_text=True)
+        root = etree.fromstring(xml_str.encode(), parser)
+
+        nsmap = root.nsmap.copy()
+        if "ds" not in nsmap:
+            nsmap["ds"] = self.DS_NS
+
+        signature = root.find(f".//{{{self.DS_NS}}}Signature")
+        if signature is None:
+            raise ValueError("Signature não encontrada")
+
+        signature.tag = f"{{{self.DS_NS}}}Signature"
+        for elem in signature.iter():
+            if elem.tag.startswith("{"):
+                ns, local = elem.tag[1:].split("}")
+                elem.tag = f"{{{ns}}}{local}"
+
+        etree.cleanup_namespaces(root)
+
+        return etree.tostring(
+            root,
+            encoding="utf-8",
+            xml_declaration=False
+        ).decode()
 
     def soap_envelope(self, metodo, xml_envio):
         """
@@ -75,7 +102,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             <soapenv:Body>
                 <nfse:{metodo}>
                 {self._cabecalho()}
-                {xml_envio}
+                {self._corrigir_prefixo_ds(xml_envio)}
                 </nfse:{metodo}>
             </soapenv:Body>
             </soapenv:Envelope>
