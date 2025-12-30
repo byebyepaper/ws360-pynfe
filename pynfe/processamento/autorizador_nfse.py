@@ -43,7 +43,12 @@ class SerializacaoOsasco:
             "NumeroReciboUnico": numero_rps_unico,
         }
 
-
+def normalize_xml_for_ginfes(elem):
+    for e in elem.iter():
+        if e.text:
+            e.text = e.text.strip()
+        if e.tail:
+            e.tail = None
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -79,37 +84,40 @@ class SerializacaoCampinas(InterfaceAutorizador):
         import base64
         import hashlib
 
-        # =========================
+        # =====================================================
         # Namespaces
-        # =========================
-        NFSE_NS = "http://nfse.abrasf.org.br"
+        # =====================================================
         DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
 
-        NSMAP = {
-            "nfse": NFSE_NS,
-            "xd": DSIG_NS,
-        }
-
-        # =========================
+        # =====================================================
         # Algoritmos (GINFES)
-        # =========================
+        # =====================================================
         C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
         SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
         DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
         ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
 
-        # =========================
+        # =====================================================
+        # Helper: normalização GINFES (OBRIGATÓRIA)
+        # =====================================================
+        def _normalize_xml_ginfes(elem):
+            for e in elem.iter():
+                if e.text is not None:
+                    e.text = e.text.strip()
+                e.tail = None
+
+        # =====================================================
         # Normaliza entrada
-        # =========================
+        # =====================================================
         if isinstance(xml_input, str):
             parser = etree.XMLParser(remove_blank_text=True)
             xml_element = etree.fromstring(xml_input.encode("utf-8"), parser)
         else:
             xml_element = xml_input
 
-        # =========================
+        # =====================================================
         # Certificado
-        # =========================
+        # =====================================================
         with open(certificate_path, "rb") as f:
             cert_data = f.read()
 
@@ -125,9 +133,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
             certificate.public_bytes(Encoding.DER)
         ).decode()
 
-        # =========================
+        # =====================================================
         # Digest (SEM Signature)
-        # =========================
+        # =====================================================
         xml_clone = etree.fromstring(
             etree.tostring(xml_element)
         )
@@ -135,6 +143,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
         # remove qualquer Signature existente
         for sig in xml_clone.xpath(".//*[local-name()='Signature']"):
             sig.getparent().remove(sig)
+
+        # 🔥 PASSO CRÍTICO PARA GINFES
+        _normalize_xml_ginfes(xml_clone)
 
         xml_c14n = etree.tostring(
             xml_clone,
@@ -147,17 +158,17 @@ class SerializacaoCampinas(InterfaceAutorizador):
             hashlib.sha1(xml_c14n).digest()
         ).decode()
 
-        # =========================
-        # nfse:Signature
-        # =========================
+        # =====================================================
+        # <Signature xmlns="dsig">
+        # =====================================================
         signature = etree.Element(
             etree.QName(DSIG_NS, "Signature"),
             nsmap={None: DSIG_NS},
         )
 
-        # =========================
-        # xd:SignedInfo
-        # =========================
+        # =====================================================
+        # <SignedInfo>
+        # =====================================================
         signed_info = etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignedInfo"),
@@ -208,9 +219,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
             etree.QName(DSIG_NS, "DigestValue"),
         ).text = digest_value
 
-        # =========================
-        # Assina SignedInfo
-        # =========================
+        # =====================================================
+        # Assina o SignedInfo
+        # =====================================================
         signed_info_c14n = etree.tostring(
             signed_info,
             method="c14n",
@@ -231,9 +242,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
             etree.QName(DSIG_NS, "SignatureValue"),
         ).text = signature_value
 
-        # =========================
-        # xd:KeyInfo (EndCertOnly)
-        # =========================
+        # =====================================================
+        # <KeyInfo><X509Data><X509Certificate>
+        # =====================================================
         key_info = etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "KeyInfo"),
@@ -249,9 +260,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
             etree.QName(DSIG_NS, "X509Certificate"),
         ).text = cert_b64
 
-        # =========================
-        # Anexa assinatura
-        # =========================
+        # =====================================================
+        # Anexa assinatura AO ELEMENTO RAIZ DO ENVIO
+        # =====================================================
         xml_element.append(signature)
 
         return etree.tostring(
@@ -259,6 +270,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             encoding="unicode",
             pretty_print=False,
         )
+
 
     def soap_envelope(
         self,
