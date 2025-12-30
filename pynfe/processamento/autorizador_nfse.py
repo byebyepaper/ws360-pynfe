@@ -3,6 +3,12 @@ from importlib import import_module
 
 from lxml import etree
 from pyxb import BIND
+import base64
+import hashlib
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.serialization import Encoding, pkcs12
 
 
 class InterfaceAutorizador:
