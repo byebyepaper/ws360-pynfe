@@ -107,8 +107,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         else:
             xml_element = xml_input
 
-        element_id = xml_element.get("Id")
-
         # =========================
         # Certificado
         # =========================
@@ -163,7 +161,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         signed_info = etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignedInfo"),
-            Id=self._gerar_id("SI"),
         )
 
         etree.SubElement(
@@ -232,7 +229,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignatureValue"),
-            Id=self._gerar_id("SV"),
         ).text = signature_value
 
         # =========================
