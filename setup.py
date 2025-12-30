@@ -32,9 +32,9 @@ setuptools.setup(
     install_requires=[
         "pyopenssl>=23.0.0",
         "requests",
-        "lxml",
-        "signxml",
-        "suds-py3",
+        "lxml==6.0.2",
+        "signxml==3.1.0",
+        "suds-py3==1.4.5.0",
         "zeep>=4.3.2",
     ],
     extras_require={
