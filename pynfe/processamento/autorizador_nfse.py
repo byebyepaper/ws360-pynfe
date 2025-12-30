@@ -163,7 +163,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         signed_info = etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignedInfo"),
-            Id=f"SI-{element_id}" if element_id else None,
+            Id=f"SI-{element_id}" if element_id else "",
         )
 
         etree.SubElement(
@@ -232,7 +232,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(
             signature,
             etree.QName(DSIG_NS, "SignatureValue"),
-            Id=f"SV-{element_id}" if element_id else None,
+            Id=f"SV-{element_id}" if element_id else "",
         ).text = signature_value
 
         # =========================
