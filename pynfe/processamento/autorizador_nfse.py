@@ -71,9 +71,10 @@ class SerializacaoCampinas(InterfaceAutorizador):
         <versaoDados>2.03</versaoDados>
         </nfse:cabecalho>
         """.strip()
+
     def _sign_xml(
         self,
-        xml_element: etree._Element,
+        xml_input,
         certificate_path: str,
         certificate_password: str,
     ) -> str:
@@ -84,12 +85,22 @@ class SerializacaoCampinas(InterfaceAutorizador):
         DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
         ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
 
-        # Garante que existe Id
+        # --------------------------------
+        # Normaliza entrada (str → Element)
+        # --------------------------------
+        if isinstance(xml_input, str):
+            parser = etree.XMLParser(remove_blank_text=True)
+            xml_element = etree.fromstring(xml_input.encode("utf-8"), parser)
+        else:
+            xml_element = xml_input
+
         element_id = xml_element.get("Id")
         if not element_id:
             raise ValueError("Elemento raiz precisa ter atributo Id para assinatura")
 
+        # --------------------------------
         # Carrega certificado
+        # --------------------------------
         with open(certificate_path, "rb") as f:
             cert_data = f.read()
 
@@ -105,7 +116,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
             certificate.public_bytes(Encoding.DER)
         ).decode()
 
-        # Canonicaliza XML SEM assinatura
+        # --------------------------------
+        # Digest
+        # --------------------------------
         xml_c14n = etree.tostring(
             xml_element, method="c14n", exclusive=False, with_comments=False
         )
@@ -114,11 +127,10 @@ class SerializacaoCampinas(InterfaceAutorizador):
             hashlib.sha1(xml_c14n).digest()
         ).decode()
 
-        # ---------- SignedInfo ----------
-        signed_info = etree.Element(
-            "SignedInfo",
-            nsmap={None: DSIG_NS}
-        )
+        # --------------------------------
+        # SignedInfo
+        # --------------------------------
+        signed_info = etree.Element("SignedInfo", nsmap={None: DSIG_NS})
 
         etree.SubElement(
             signed_info,
@@ -163,7 +175,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
             "DigestValue"
         ).text = digest_value
 
-        # Assina SignedInfo
         signed_info_c14n = etree.tostring(
             signed_info, method="c14n", exclusive=False, with_comments=False
         )
@@ -176,12 +187,10 @@ class SerializacaoCampinas(InterfaceAutorizador):
             )
         ).decode()
 
-        # ---------- Signature ----------
-        signature = etree.Element(
-            "Signature",
-            nsmap={None: DSIG_NS}
-        )
-
+        # --------------------------------
+        # Signature
+        # --------------------------------
+        signature = etree.Element("Signature", nsmap={None: DSIG_NS})
         signature.append(signed_info)
 
         etree.SubElement(
@@ -196,12 +205,13 @@ class SerializacaoCampinas(InterfaceAutorizador):
             "X509Certificate"
         ).text = cert_b64
 
-        # Insere assinatura no XML
+        # Insere assinatura
         xml_element.append(signature)
 
         return etree.tostring(
             xml_element, encoding="unicode", pretty_print=False
         )
+
 
 
     def soap_envelope(
