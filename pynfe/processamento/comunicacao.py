@@ -1111,8 +1111,7 @@ class ComunicacaoNfse(Comunicacao):
             _post_zeep(
                 wsdl,
                 "ConsultarNfseV3",
-                cabecalho_xml,
-                xml_consulta
+                xml_consulta ou payload,
             )
         """
         try:
@@ -1157,7 +1156,6 @@ class ComunicacaoNfse(Comunicacao):
             print("Chamando método:", metodo)
             print("Parâmetros:", xml)
             print(client.wsdl.services)
-            print(client.wsdl.services[0].ports[0].operations)
             print(client.service._binding._operations)
     
             service = getattr(client.service, metodo)
