@@ -42,20 +42,46 @@ class SerializacaoOsasco:
             "NumeroReciboFinal": numero_rps_final,
             "NumeroReciboUnico": numero_rps_unico,
         }
-
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
-    Retorna XML SEM assinatura (assinatura deve ser aplicada depois).
+    Retorna SOAP XML (SEM assinatura).
+    Assinatura e envio ficam fora.
     """
 
     NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
     NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
 
     def _gerar_id(self, prefixo):
-        # padrão aceito por Campinas / GINFES
         return f"{prefixo}{uuid.uuid4().hex.upper()}"
 
+    def _cabecalho(self):
+        return """
+        <nfse:cabecalho versao="2.03">
+        <versaoDados>2.03</versaoDados>
+        </nfse:cabecalho>
+        """.strip()
+
+    def _soap_envelope(self, metodo, xml_envio):
+        """
+        Envolve o XML de envio no SOAP 1.1 correto
+        """
+        return f"""<?xml version="1.0" encoding="utf-8"?>
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                            xmlns:nfse="http://nfse.abrasf.org.br">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <nfse:{metodo}>
+                {self._cabecalho()}
+                {xml_envio}
+                </nfse:{metodo}>
+            </soapenv:Body>
+            </soapenv:Envelope>
+            """.strip()
+
+    # -------------------------
+    # CONSULTAR POR PERÍODO
+    # -------------------------
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         raiz = etree.Element(
             "ConsultarNfseServicoPrestadoEnvio",
@@ -74,8 +100,15 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
+        xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
+        return self._soap_envelope(
+            "ConsultarNfseServicoPrestado",
+            xml_envio
+        )
 
+    # -------------------------
+    # CONSULTAR POR FAIXA
+    # -------------------------
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element(
             "ConsultarNfseFaixaEnvio",
@@ -94,8 +127,11 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
-
+        xml_envio = etree.tostring(raiz, encoding="utf-8").decode()
+        return self._soap_envelope(
+            "ConsultarNfseFaixa",
+            xml_envio
+        )
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):
         # importa
