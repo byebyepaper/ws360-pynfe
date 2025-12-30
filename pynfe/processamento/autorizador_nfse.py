@@ -71,7 +71,11 @@ class SerializacaoCampinas(InterfaceAutorizador):
         Move <Signature> para nfse:Signature
         Mantém SignedInfo / Reference / etc em ds
         """
-        ns = {"ds": self.DS_NS}
+        ns = {"ds": "http://www.w3.org/2000/09/xmldsig#"}
+
+        # 🔴 GARANTIA: converter string → Element
+        if isinstance(xml_assinado, str):
+            xml_assinado = etree.fromstring(xml_assinado.encode("utf-8"))
 
         signature = xml_assinado.find(".//ds:Signature", ns)
         if signature is None:
@@ -82,14 +86,19 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         nfse_signature = etree.Element(
             f"{{{self.NFSE_NS}}}Signature",
-            nsmap={"ds": self.DS_NS}
+            nsmap={"ds": ns["ds"]}
         )
 
         for child in signature:
             nfse_signature.append(child)
 
         parent.append(nfse_signature)
-        return etree.tostring(xml_assinado, encoding="unicode", pretty_print=False)
+
+        return etree.tostring(
+            xml_assinado,
+            encoding="utf-8",
+            xml_declaration=False
+        ).decode()
     
     def soap_envelope(self, metodo, xml_envio):
         """
