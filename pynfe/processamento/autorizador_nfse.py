@@ -552,4 +552,8 @@ class SerializacaoGinfes(InterfaceAutorizador):
         cabecalho = cabecalho_v03.cabecalho()
         cabecalho.versao = "3"
         cabecalho.versaoDados = "3"
-        return cabecalho.toxml(encoding="utf-8", element_name="ns2:cabecalho")
+        return cabecalho.toxml(
+                encoding="utf-8",
+                element_name="cabecalho",
+                namespace="http://www.ginfes.com.br/tipos_v03.xsd"
+            )
