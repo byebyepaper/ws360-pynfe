@@ -183,7 +183,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         reference = etree.SubElement(
             signed_info,
             etree.QName(DSIG_NS, "Reference"),
-            URI=f"#{element_id}",
         )
 
         transforms = etree.SubElement(
