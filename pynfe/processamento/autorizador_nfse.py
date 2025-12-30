@@ -1,6 +1,6 @@
 from pyxb import BIND
 from importlib import import_module
-
+import uuid
 
 class InterfaceAutorizador:
     # TODO Colocar raise Exception Not Implemented nos metodos
@@ -331,6 +331,8 @@ class SerializacaoGinfes(InterfaceAutorizador):
 
         consulta = servico_consultar_nfse_envio_v03.ConsultarNfseEnvio()
         consulta.Prestador = id_prestador
+        
+        consulta.Id =  str(uuid.uuid4())
         # Consulta por Numero
         if numero is not None:
             consulta.NumeroNfse = numero
