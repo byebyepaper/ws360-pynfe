@@ -54,6 +54,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
     NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
     NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
     DS_NS = "http://www.w3.org/2000/09/xmldsig#"
+    NFSE_NS = "http://nfse.abrasf.org.br"
 
     def _gerar_id(self, prefixo):
         return f"{prefixo}{uuid.uuid4().hex.upper()}"
@@ -72,7 +73,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         """
         ns = {"ds": self.DS_NS}
 
-        signature = xml_assinado.find(".//ds:Signature", namespaces=ns)
+        signature = xml_assinado.find(".//ds:Signature", ns)
         if signature is None:
             raise ValueError("Signature não encontrada no XML assinado")
 
