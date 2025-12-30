@@ -78,16 +78,35 @@ class SerializacaoCampinas(InterfaceAutorizador):
         certificate_path: str,
         certificate_password: str,
     ) -> str:
+        from lxml import etree
+        from cryptography.hazmat.primitives.serialization import pkcs12, Encoding
+        from cryptography.hazmat.primitives.asymmetric import padding
+        from cryptography.hazmat.primitives import hashes
+        import base64
+        import hashlib
+
+        # =========================
+        # Namespaces
+        # =========================
+        NFSE_NS = "http://nfse.abrasf.org.br"
         DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
 
+        NSMAP = {
+            "nfse": NFSE_NS,
+            "xd": DSIG_NS,
+        }
+
+        # =========================
+        # Algoritmos
+        # =========================
         C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
         SIGNATURE_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
         DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
         ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
 
-        # --------------------------------
-        # Normaliza entrada (str → Element)
-        # --------------------------------
+        # =========================
+        # Normaliza entrada
+        # =========================
         if isinstance(xml_input, str):
             parser = etree.XMLParser(remove_blank_text=True)
             xml_element = etree.fromstring(xml_input.encode("utf-8"), parser)
@@ -98,15 +117,15 @@ class SerializacaoCampinas(InterfaceAutorizador):
         if not element_id:
             raise ValueError("Elemento raiz precisa ter atributo Id para assinatura")
 
-        # --------------------------------
-        # Carrega certificado
-        # --------------------------------
+        # =========================
+        # Certificado
+        # =========================
         with open(certificate_path, "rb") as f:
             cert_data = f.read()
 
-        password = certificate_password.encode()
         private_key, certificate, _ = pkcs12.load_key_and_certificates(
-            cert_data, password
+            cert_data,
+            certificate_password.encode(),
         )
 
         if not private_key or not certificate:
@@ -116,100 +135,137 @@ class SerializacaoCampinas(InterfaceAutorizador):
             certificate.public_bytes(Encoding.DER)
         ).decode()
 
-        # --------------------------------
-        # Digest
-        # --------------------------------
+        # =========================
+        # Digest do XML (sem assinatura)
+        # =========================
         xml_c14n = etree.tostring(
-            xml_element, method="c14n", exclusive=False, with_comments=False
+            xml_element,
+            method="c14n",
+            exclusive=False,
+            with_comments=False,
         )
 
         digest_value = base64.b64encode(
             hashlib.sha1(xml_c14n).digest()
         ).decode()
 
-        # --------------------------------
-        # SignedInfo
-        # --------------------------------
-        signed_info = etree.Element("SignedInfo", nsmap={None: DSIG_NS})
+        # =========================
+        # nfse:Signature
+        # =========================
+        signature = etree.Element(
+            etree.QName(NFSE_NS, "Signature"),
+            nsmap=NSMAP,
+        )
 
-        etree.SubElement(
-            signed_info,
-            "CanonicalizationMethod",
-            Algorithm=C14N_ALG
+        # =========================
+        # xd:SignedInfo
+        # =========================
+        signed_info = etree.SubElement(
+            signature,
+            etree.QName(DSIG_NS, "SignedInfo"),
+            Id=f"SI-{element_id}",
         )
 
         etree.SubElement(
             signed_info,
-            "SignatureMethod",
-            Algorithm=SIGNATURE_ALG
+            etree.QName(DSIG_NS, "CanonicalizationMethod"),
+            Algorithm=C14N_ALG,
+        )
+
+        etree.SubElement(
+            signed_info,
+            etree.QName(DSIG_NS, "SignatureMethod"),
+            Algorithm=SIGNATURE_ALG,
         )
 
         reference = etree.SubElement(
             signed_info,
-            "Reference",
-            URI=f"#{element_id}"
+            etree.QName(DSIG_NS, "Reference"),
+            URI=f"#{element_id}",
         )
 
-        transforms = etree.SubElement(reference, "Transforms")
-
-        etree.SubElement(
-            transforms,
-            "Transform",
-            Algorithm=ENVELOPED_ALG
+        transforms = etree.SubElement(
+            reference,
+            etree.QName(DSIG_NS, "Transforms"),
         )
 
         etree.SubElement(
             transforms,
-            "Transform",
-            Algorithm=C14N_ALG
+            etree.QName(DSIG_NS, "Transform"),
+            Algorithm=ENVELOPED_ALG,
+        )
+
+        etree.SubElement(
+            transforms,
+            etree.QName(DSIG_NS, "Transform"),
+            Algorithm=C14N_ALG,
         )
 
         etree.SubElement(
             reference,
-            "DigestMethod",
-            Algorithm=DIGEST_ALG
+            etree.QName(DSIG_NS, "DigestMethod"),
+            Algorithm=DIGEST_ALG,
         )
 
         etree.SubElement(
             reference,
-            "DigestValue"
+            etree.QName(DSIG_NS, "DigestValue"),
         ).text = digest_value
 
+        # =========================
+        # Assina SignedInfo
+        # =========================
         signed_info_c14n = etree.tostring(
-            signed_info, method="c14n", exclusive=False, with_comments=False
+            signed_info,
+            method="c14n",
+            exclusive=False,
+            with_comments=False,
         )
 
         signature_value = base64.b64encode(
             private_key.sign(
                 signed_info_c14n,
                 padding.PKCS1v15(),
-                hashes.SHA1()
+                hashes.SHA1(),
             )
         ).decode()
 
-        # --------------------------------
-        # Signature
-        # --------------------------------
-        signature = etree.Element("Signature", nsmap={None: DSIG_NS})
-        signature.append(signed_info)
-
+        # =========================
+        # xd:SignatureValue
+        # =========================
         etree.SubElement(
             signature,
-            "SignatureValue"
+            etree.QName(DSIG_NS, "SignatureValue"),
+            Id=f"SV-{element_id}",
         ).text = signature_value
 
-        key_info = etree.SubElement(signature, "KeyInfo")
-        x509_data = etree.SubElement(key_info, "X509Data")
+        # =========================
+        # xd:KeyInfo (EndCertOnly)
+        # =========================
+        key_info = etree.SubElement(
+            signature,
+            etree.QName(DSIG_NS, "KeyInfo"),
+        )
+
+        x509_data = etree.SubElement(
+            key_info,
+            etree.QName(DSIG_NS, "X509Data"),
+        )
+
         etree.SubElement(
             x509_data,
-            "X509Certificate"
+            etree.QName(DSIG_NS, "X509Certificate"),
         ).text = cert_b64
 
-        # Insere assinatura
+        # =========================
+        # Anexa assinatura ao XML
+        # =========================
         xml_element.append(signature)
 
         return etree.tostring(
-            xml_element, encoding="unicode", pretty_print=False
+            xml_element,
+            encoding="unicode",
+            pretty_print=False,
         )
 
 
