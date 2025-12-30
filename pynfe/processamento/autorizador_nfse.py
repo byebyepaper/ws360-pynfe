@@ -43,10 +43,6 @@ class SerializacaoOsasco:
             "NumeroReciboUnico": numero_rps_unico,
         }
 
-from lxml import etree
-from pynfe.processamento.autorizador_nfse import InterfaceAutorizador
-
-
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -56,10 +52,15 @@ class SerializacaoCampinas(InterfaceAutorizador):
     NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
     NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
 
+    def _gerar_id(self, prefixo):
+        # padrão aceito por Campinas / GINFES
+        return f"{prefixo}{uuid.uuid4().hex.upper()}"
+
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         raiz = etree.Element(
             "ConsultarNfseServicoPrestadoEnvio",
-            xmlns=self.NS_PERIODO
+            xmlns=self.NS_PERIODO,
+            Id=self._gerar_id("CNFSEPERIODO")
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
@@ -78,7 +79,8 @@ class SerializacaoCampinas(InterfaceAutorizador):
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element(
             "ConsultarNfseFaixaEnvio",
-            xmlns=self.NS_FAIXA
+            xmlns=self.NS_FAIXA,
+            Id=self._gerar_id("CNFSEFAIXA")
         )
 
         prestador = etree.SubElement(raiz, "Prestador")
@@ -93,7 +95,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
         return raiz
-
 
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):
