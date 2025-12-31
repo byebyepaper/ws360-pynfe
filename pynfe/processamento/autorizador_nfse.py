@@ -43,12 +43,15 @@ class SerializacaoOsasco:
             "NumeroReciboUnico": numero_rps_unico,
         }
 
+
 def normalize_xml_for_ginfes(elem):
     for e in elem.iter():
         if e.text:
             e.text = e.text.strip()
         if e.tail:
             e.tail = None
+
+
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -64,25 +67,19 @@ class SerializacaoCampinas(InterfaceAutorizador):
     def _gerar_id(self, prefixo):
         return f"{prefixo}{uuid.uuid4().hex.upper()}"
 
-    def _cabecalho(self):
-        return """
-        <nfse:cabecalho versao="2.03">
-        <versaoDados>2.03</versaoDados>
-        </nfse:cabecalho>
-        """.strip()
-
     def _sign_xml(
         self,
         xml_input: str,
         certificate_path: str,
         certificate_password: str,
     ) -> str:
-        from lxml import etree
-        from cryptography.hazmat.primitives.serialization import pkcs12, Encoding
-        from cryptography.hazmat.primitives.asymmetric import padding
-        from cryptography.hazmat.primitives import hashes
         import base64
         import hashlib
+
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives.asymmetric import padding
+        from cryptography.hazmat.primitives.serialization import Encoding, pkcs12
+        from lxml import etree
 
         # Algoritmos exigidos pelo GINFES Campinas
         C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
@@ -118,9 +115,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             certificate_password.encode(),
         )
 
-        cert_b64 = base64.b64encode(
-            cert.public_bytes(Encoding.DER)
-        ).decode()
+        cert_b64 = base64.b64encode(cert.public_bytes(Encoding.DER)).decode()
 
         # === DIGEST DO XML SEM SIGNATURE ===
         xml_c14n = etree.tostring(
@@ -130,9 +125,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             with_comments=False,
         )
 
-        digest_value = base64.b64encode(
-            hashlib.sha1(xml_c14n).digest()
-        ).decode()
+        digest_value = base64.b64encode(hashlib.sha1(xml_c14n).digest()).decode()
 
         # === SIGNATURE (SEM NAMESPACE) ===
         signature = etree.Element("Signature", Id=f"Signature-{envio.attrib['Id']}")
@@ -236,23 +229,17 @@ class SerializacaoCampinas(InterfaceAutorizador):
     <soapenv:Header/>
     <soapenv:Body>
         <nfse:{metodo}>
-        {self._cabecalho()}
         {xml_assinado}
         </nfse:{metodo}>
     </soapenv:Body>
     </soapenv:Envelope>
     """.strip()
 
-
     # -------------------------
     # CONSULTAR POR PERÍODO
     # -------------------------
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
-        raiz = etree.Element(
-            "ConsultarNfseServicoPrestadoEnvio",
-            xmlns=self.NS_PERIODO,
-            Id=self._gerar_id("CNFSESP")
-        )
+        raiz = etree.Element("ConsultarNfseServicoPrestadoEnvio", xmlns=self.NS_PERIODO)
 
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
@@ -271,9 +258,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
     # CONSULTAR POR FAIXA
     # -------------------------
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-        raiz = etree.Element(
-            "ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA, Id=self._gerar_id("CNFSEFAIXA")
-        )
+        raiz = etree.Element("ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA)
 
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
