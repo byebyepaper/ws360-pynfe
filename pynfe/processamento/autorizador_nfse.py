@@ -102,7 +102,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
+        return etree.tostring(raiz, pretty_print=True).decode()
 
 
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
@@ -119,7 +119,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
 
-        return raiz
+        return etree.tostring(raiz, pretty_print=True).decode()
 
 
 class SerializacaoBetha(InterfaceAutorizador):

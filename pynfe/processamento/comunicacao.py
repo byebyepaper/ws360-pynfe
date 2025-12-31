@@ -771,8 +771,9 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_RPS"], payload)
-            return self._post_soap_raw(url, soup_xml)
+            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_RPS"], xml_assinado)
+            return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -784,9 +785,9 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
-            print(soup_xml)
-            return self._post_soap_raw(url, soup_xml)
+            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], xml_assinado)
+            return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -798,9 +799,9 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
-            print(soup_xml)
-            return self._post_soap_raw(url, soup_xml)
+            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado)
+            return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
@@ -855,12 +856,6 @@ class ComunicacaoNfse(Comunicacao):
             return cabecalho
         else:
             return raiz
-
-    def _cabecalho_ginfes(self):
-        """Retorna o XML do cabeçalho gerado pelo xsd"""
-        from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
-
-        return SerializacaoGinfes().cabecalho()
 
     def _get_url(self):
         """Retorna a url para comunicação com o webservice"""
