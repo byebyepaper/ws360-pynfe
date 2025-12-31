@@ -135,7 +135,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         ).decode()
 
         # === SIGNATURE (SEM NAMESPACE) ===
-        signature = etree.Element("Signature")
+        signature = etree.Element("Signature", Id=f"Signature-{envio.attrib['Id']}")
 
         signed_info = etree.SubElement(signature, "SignedInfo")
 
@@ -171,6 +171,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
             reference,
             "DigestMethod",
             Algorithm=DIGEST_ALG,
+            URI="#" + envio.attrib["Id"],
         )
 
         etree.SubElement(
