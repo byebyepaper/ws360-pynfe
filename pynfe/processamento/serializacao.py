@@ -2145,7 +2145,7 @@ class SerializacaoNfse(object):
             return SerializacaoCampinas().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
         elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
-            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, numero_nota_inicial=numero_inicial, numero_nota_final=numero_final)
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(numero_nota_inicial=numero_inicial, numero_nota_final=numero_final)
         else:
             raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
     
@@ -2157,7 +2157,7 @@ class SerializacaoNfse(object):
         elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
         
-            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, data_inicial=data_inicio, data_final=data_fim)
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(data_inicial=data_inicio, data_final=data_fim)
         else:
             raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
@@ -2165,7 +2165,7 @@ class SerializacaoNfse(object):
     def consultar_nfse(self, emitente, numero_nfse):
         if self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
-            return SerializacaoOsasco(self.chave_autenticacao).consultar(cnpj_tomador=emitente.cnpj, numero_nota_inicial=numero_nfse, numero_nota_final=numero_nfse)
+            return SerializacaoOsasco(self.chave_autenticacao).consultar(numero_nota_inicial=numero_nfse, numero_nota_final=numero_nfse)
         else:
             raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
