@@ -51,7 +51,6 @@ def normalize_xml_for_ginfes(elem):
         if e.tail:
             e.tail = None
 
-
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -59,185 +58,36 @@ class SerializacaoCampinas(InterfaceAutorizador):
     Assinatura e envio ficam fora.
     """
 
-    NS_FAIXA = "http://www.ginfes.com.br/servico_consultar_nfse_faixa_envio_v03.xsd"
-    NS_PERIODO = "http://www.ginfes.com.br/servico_consultar_nfse_servico_envio_v03.xsd"
-    DS_NS = "http://www.w3.org/2000/09/xmldsig#"
-    NFSE_NS = "http://nfse.abrasf.org.br"
-
     def _gerar_id(self, prefixo):
         return f"{prefixo}{uuid.uuid4().hex.upper()}"
-
-    def _sign_xml(
-        self,
-        xml_input: str,
-        certificate_path: str,
-        certificate_password: str,
-    ) -> str:
-        import base64
-        import hashlib
-
-        from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.asymmetric import padding
-        from cryptography.hazmat.primitives.serialization import Encoding, pkcs12
-        from lxml import etree
-
-        # Algoritmos exigidos pelo GINFES Campinas
-        C14N_ALG = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-        SIGN_ALG = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-        DIGEST_ALG = "http://www.w3.org/2000/09/xmldsig#sha1"
-        ENVELOPED_ALG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-
-        parser = etree.XMLParser(remove_blank_text=True)
-        if isinstance(xml_input, etree._Element):
-            root = xml_input
-        elif isinstance(xml_input, (str, bytes)):
-            root = etree.fromstring(xml_input.encode("utf-8"), parser)
-        else:
-            raise TypeError("xml_input deve ser str, bytes ou lxml.etree._Element")
-
-        # === LOCAL CORRETO ===
-        envio = root.xpath("//*[local-name()='ConsultarNfseServicoPrestadoEnvio']")
-        if not envio:
-            raise ValueError("ConsultarNfseServicoPrestadoEnvio não encontrado")
-
-        envio = envio[0]
-
-        # Remove qualquer assinatura anterior
-        for s in envio.xpath("./*[local-name()='Signature']"):
-            envio.remove(s)
-
-        # === CARREGA CERTIFICADO ===
-        with open(certificate_path, "rb") as f:
-            pfx = f.read()
-
-        private_key, cert, _ = pkcs12.load_key_and_certificates(
-            pfx,
-            certificate_password.encode(),
-        )
-
-        cert_b64 = base64.b64encode(cert.public_bytes(Encoding.DER)).decode()
-
-        # === DIGEST DO XML SEM SIGNATURE ===
-        xml_c14n = etree.tostring(
-            envio,
-            method="c14n",
-            exclusive=False,
-            with_comments=False,
-        )
-
-        digest_value = base64.b64encode(hashlib.sha1(xml_c14n).digest()).decode()
-
-        # === SIGNATURE (SEM NAMESPACE) ===
-        signature = etree.Element("Signature", Id=f"Signature-{envio.attrib['Id']}")
-
-        signed_info = etree.SubElement(signature, "SignedInfo")
-
-        etree.SubElement(
-            signed_info,
-            "CanonicalizationMethod",
-            Algorithm=C14N_ALG,
-        )
-
-        etree.SubElement(
-            signed_info,
-            "SignatureMethod",
-            Algorithm=SIGN_ALG,
-        )
-
-        reference = etree.SubElement(signed_info, "Reference")
-
-        transforms = etree.SubElement(reference, "Transforms")
-
-        etree.SubElement(
-            transforms,
-            "Transform",
-            Algorithm=ENVELOPED_ALG,
-        )
-
-        etree.SubElement(
-            transforms,
-            "Transform",
-            Algorithm=C14N_ALG,
-        )
-
-        etree.SubElement(
-            reference,
-            "DigestMethod",
-            Algorithm=DIGEST_ALG,
-            URI="#" + envio.attrib["Id"],
-        )
-
-        etree.SubElement(
-            reference,
-            "DigestValue",
-        ).text = digest_value
-
-        # === ASSINA SIGNEDINFO ===
-        signed_info_c14n = etree.tostring(
-            signed_info,
-            method="c14n",
-            exclusive=False,
-            with_comments=False,
-        )
-
-        signature_value = base64.b64encode(
-            private_key.sign(
-                signed_info_c14n,
-                padding.PKCS1v15(),
-                hashes.SHA1(),
-            )
-        ).decode()
-
-        etree.SubElement(
-            signature,
-            "SignatureValue",
-        ).text = signature_value
-
-        # === KEYINFO (END CERT ONLY) ===
-        key_info = etree.SubElement(signature, "KeyInfo")
-        x509_data = etree.SubElement(key_info, "X509Data")
-        etree.SubElement(
-            x509_data,
-            "X509Certificate",
-        ).text = cert_b64
-
-        # === ANEXA NO FINAL DO ENVIO ===
-        envio.append(signature)
-
-        return etree.tostring(
-            root,
-            encoding="unicode",
-            pretty_print=False,
-        )
 
     def soap_envelope(
         self,
         metodo,
-        xml_envio_element,
-        certificate_path,
-        certificate_password,
+        xml_assinado,
     ):
-        xml_assinado = self._sign_xml(
-            xml_envio_element,
-            certificate_path,
-            certificate_password,
+        NAMESPACE_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
+        NAMESPACE_XSI = "http://www.w3.org/2001/XMLSchema-instance"
+        NAMESPACE_XSD = "http://www.w3.org/2001/XMLSchema"
+        NAMESPACE_ABRASF = "http://nfse.abrasf.org.br"
+    
+        xml_metodo = etree.Element("{%s}" % NAMESPACE_ABRASF + metodo)
+        xml_metodo.append(xml_assinado)
+        raiz = etree.Element(
+            "{%s}Envelope" % NAMESPACE_SOAP,
+            nsmap={
+                "xsi": NAMESPACE_XSI,
+                "xsd": NAMESPACE_XSD,
+                "soap": NAMESPACE_SOAP,
+                "nfse": NAMESPACE_ABRASF,
+            },
         )
+        body = etree.SubElement(raiz, "{%s}Body" % NAMESPACE_SOAP)
+        body.append(xml_metodo)
 
-        return f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                    xmlns:nfse="http://nfse.abrasf.org.br">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <nfse:{metodo}>
-        {xml_assinado}
-        </nfse:{metodo}>
-    </soapenv:Body>
-    </soapenv:Envelope>
-    """.strip()
+        return etree.tostring(raiz, pretty_print=True).decode()
 
-    # -------------------------
-    # CONSULTAR POR PERÍODO
-    # -------------------------
+
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         raiz = etree.Element("ConsultarNfseServicoPrestadoEnvio")
 
@@ -254,9 +104,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         return raiz
 
-    # -------------------------
-    # CONSULTAR POR FAIXA
-    # -------------------------
+
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element("ConsultarNfseFaixaEnvio")
 

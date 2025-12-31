@@ -771,7 +771,7 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_RPS"], payload, self.certificado, self.certificado_senha)
+            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_RPS"], payload)
             return self._post_soap_raw(url, soup_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -784,7 +784,7 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], payload, self.certificado, self.certificado_senha)
+            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], payload)
             print(soup_xml)
             return self._post_soap_raw(url, soup_xml)
         elif self.autorizador == "OSASCO":
@@ -798,7 +798,7 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
-            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload, self.certificado, self.certificado_senha)
+            soup_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
             print(soup_xml)
             return self._post_soap_raw(url, soup_xml)
         elif self.autorizador == "OSASCO":
