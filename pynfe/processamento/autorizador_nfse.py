@@ -239,7 +239,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
     # CONSULTAR POR PERÍODO
     # -------------------------
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
-        raiz = etree.Element("ConsultarNfseServicoPrestadoEnvio", xmlns=self.NS_PERIODO)
+        raiz = etree.Element("ConsultarNfseServicoPrestadoEnvio")
 
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
@@ -258,7 +258,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
     # CONSULTAR POR FAIXA
     # -------------------------
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
-        raiz = etree.Element("ConsultarNfseFaixaEnvio", xmlns=self.NS_FAIXA)
+        raiz = etree.Element("ConsultarNfseFaixaEnvio")
 
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
