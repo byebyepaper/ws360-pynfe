@@ -1132,7 +1132,8 @@ class ComunicacaoNfse(Comunicacao):
             return serialize_object(response)
 
         finally:
-            certificadoA1.excluir()
+            if self.certificado:
+                certificadoA1.excluir()
 
 
 class ComunicacaoMDFe(Comunicacao):
