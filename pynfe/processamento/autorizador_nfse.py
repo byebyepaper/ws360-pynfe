@@ -63,7 +63,7 @@ class SerializacaoCampinas(InterfaceAutorizador):
         NAMESPACE_XSI = "http://www.w3.org/2001/XMLSchema-instance"
         NAMESPACE_XSD = "http://www.w3.org/2001/XMLSchema"
         NAMESPACE_ABRASF = "http://nfse.abrasf.org.br"
-    
+
         xml_metodo = etree.Element("{%s}" % NAMESPACE_ABRASF + metodo)
         xml_metodo.append(xml_assinado)
         raiz = etree.Element(
@@ -79,7 +79,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
         body.append(xml_metodo)
 
         return etree.tostring(raiz, pretty_print=True).decode()
-
 
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         raiz = etree.Element("ConsultarNfseServicoPrestadoEnvio")
@@ -97,7 +96,6 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         return etree.tostring(raiz, pretty_print=True).decode()
 
-
     def consultar_faixa(self, emitente, numero_inicial, numero_final, pagina=1):
         raiz = etree.Element("ConsultarNfseFaixaEnvio")
 
@@ -114,10 +112,12 @@ class SerializacaoCampinas(InterfaceAutorizador):
 
         return etree.tostring(raiz, pretty_print=True).decode()
 
+
 class SerializacaoMaracanau(InterfaceAutorizador):
     """
     Serialização ABRASF v1.00 – Maracanaú
     """
+
     def _cabecalho(self):
         cabecalho_xml = """<cabecalho xmlns="http://ws.speedgov.com.br/cabecalho_v1.xsd" versao="1"><versaoDados xmlns="">1</versaoDados></cabecalho>""".strip()
         return cabecalho_xml
@@ -129,9 +129,9 @@ class SerializacaoMaracanau(InterfaceAutorizador):
     ):
         NAMESPACE_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
         NAMESPACE_ABRASF = "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd"
-        
+
         ns_metodo = {
-            "ConsultarNfse": "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd",
+            "ConsultarNfse": "http://ws.speedgov.com.br/consultar_nfse_envio_v1.xsd",
         }
 
         envelope = etree.Element(
@@ -145,10 +145,7 @@ class SerializacaoMaracanau(InterfaceAutorizador):
         etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Header")
         body = etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Body")
 
-        consultar_nfse = etree.SubElement(
-            body,
-            "{%s}" % ns_metodo[metodo] + metodo
-        )
+        consultar_nfse = etree.SubElement(body, "{%s}" % NAMESPACE_ABRASF + metodo)
 
         header = etree.SubElement(consultar_nfse, "header")
         header.text = etree.CDATA(self._cabecalho())
@@ -158,9 +155,13 @@ class SerializacaoMaracanau(InterfaceAutorizador):
 
         return etree.tostring(envelope, pretty_print=True).decode()
 
-
     def consultar_periodo(self, emitente, data_inicio, data_fim):
-        raiz = etree.Element("ConsultarNfse")
+        NAMESPACE_SPEEDGOV_CONSULTAR_NFSE_ENVIO = (
+            "http://ws.speedgov.com.br/consultar_nfse_envio_v1.xsd"
+        )
+        raiz = etree.Element(
+            "{%s}ConsultarNfseEnvio" % NAMESPACE_SPEEDGOV_CONSULTAR_NFSE_ENVIO,
+        )
 
         prestador = etree.SubElement(raiz, "Prestador")
         etree.SubElement(prestador, "Cnpj").text = emitente.cnpj
