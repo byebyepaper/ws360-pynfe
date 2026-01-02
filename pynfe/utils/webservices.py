@@ -529,6 +529,11 @@ NFSE = {
         "HTTPS": "https://novanfse.campinas.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
         "HOMOLOGACAO": "https://homol-rps.ima.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
     },
+    "MARACANAU": {
+        "CONSULTA_SERVICO": "ConsultarNfse",
+        "HTTPS": "https://speedgov.com.br/wsmar/Nfes?wsdl",
+        "HOMOLOGACAO": "",
+    },
 }
 
 # MDF-e

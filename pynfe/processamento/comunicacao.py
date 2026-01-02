@@ -802,6 +802,10 @@ class ComunicacaoNfse(Comunicacao):
             xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
             envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado)
             return self._post_soap_raw(url, envelope_xml)
+        elif self.autorizador == "MARACANAU":
+            from pynfe.processamento.autorizador_nfse import SerializacaoMaracanau
+            envelope_xml = SerializacaoMaracanau().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
+            return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)

@@ -44,13 +44,6 @@ class SerializacaoOsasco:
         }
 
 
-def normalize_xml_for_ginfes(elem):
-    for e in elem.iter():
-        if e.text:
-            e.text = e.text.strip()
-        if e.tail:
-            e.tail = None
-
 class SerializacaoCampinas(InterfaceAutorizador):
     """
     Serialização ABRASF v2.03 – Campinas
@@ -118,6 +111,64 @@ class SerializacaoCampinas(InterfaceAutorizador):
         etree.SubElement(faixa, "NumeroNfseFinal").text = str(numero_final)
 
         etree.SubElement(raiz, "Pagina").text = str(pagina)
+
+        return etree.tostring(raiz, pretty_print=True).decode()
+
+class SerializacaoMaracanau(InterfaceAutorizador):
+    """
+    Serialização ABRASF v1.00 – Maracanaú
+    """
+    def _cabecalho(self):
+        cabecalho_xml = """<cabecalho xmlns="http://ws.speedgov.com.br/cabecalho_v1.xsd" versao="1"><versaoDados xmlns="">1</versaoDados></cabecalho>""".strip()
+        return cabecalho_xml
+
+    def soap_envelope(
+        self,
+        metodo,
+        xml_envio,
+    ):
+        NAMESPACE_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
+        NAMESPACE_ABRASF = "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd"
+        
+        ns_metodo = {
+            "ConsultarNfse": "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd",
+        }
+
+        envelope = etree.Element(
+            "{http://schemas.xmlsoap.org/soap/envelope/}Envelope",
+            nsmap={
+                "soapenv": NAMESPACE_SOAP,
+                "nfse": NAMESPACE_ABRASF,
+                "consult": ns_metodo[metodo],
+            },
+        )
+        etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Header")
+        body = etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Body")
+
+        consultar_nfse = etree.SubElement(
+            body,
+            "{%s}" % ns_metodo[metodo] + metodo
+        )
+
+        header = etree.SubElement(consultar_nfse, "header")
+        header.text = etree.CDATA(self._cabecalho())
+
+        parameters = etree.SubElement(consultar_nfse, "parameters")
+        parameters.text = etree.CDATA(xml_envio)
+
+        return etree.tostring(envelope, pretty_print=True).decode()
+
+
+    def consultar_periodo(self, emitente, data_inicio, data_fim):
+        raiz = etree.Element("ConsultarNfse")
+
+        prestador = etree.SubElement(raiz, "Prestador")
+        etree.SubElement(prestador, "Cnpj").text = emitente.cnpj
+        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+
+        periodo = etree.SubElement(raiz, "PeriodoEmissao")
+        etree.SubElement(periodo, "DataInicial").text = data_inicio
+        etree.SubElement(periodo, "DataFinal").text = data_fim
 
         return etree.tostring(raiz, pretty_print=True).decode()
 
