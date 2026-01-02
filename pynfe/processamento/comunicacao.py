@@ -753,6 +753,9 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "CAMPINAS":
             self._namespace = "http://www.abrasf.org.br/nfse.xsd"
             self._versao = "2"
+        elif self.autorizador == "MARACANAU":
+            self._namespace = "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd"
+            self._versao = "1.00"
         else:
             raise Exception("Autorizador não encontrado!")
 
