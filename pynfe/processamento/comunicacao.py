@@ -826,7 +826,7 @@ class ComunicacaoNfse(Comunicacao):
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], payload
             )
             return self._post_soap_raw(url, envelope_xml)
-        elif self.autorizador == "MARACANAU":
+        elif self.autorizador == "GISS":
             from pynfe.processamento.autorizador_nfse import SerializacaoGiss
 
             envelope_xml = SerializacaoGiss().soap_envelope(
