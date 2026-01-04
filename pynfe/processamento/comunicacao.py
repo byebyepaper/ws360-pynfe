@@ -5,7 +5,7 @@ import re
 
 import requests
 from pynfe.entidades.certificado import CertificadoA1
-from pynfe.utils import etree, so_numeros
+from pynfe.utils import etree, obter_municipio_por_codigo, so_numeros
 from pynfe.utils.flags import (
     CODIGOS_ESTADOS,
     MODELO_MDFE,
@@ -737,7 +737,9 @@ class ComunicacaoNfse(Comunicacao):
     _versao = ""
     _namespace = ""
 
-    def __init__(self, autorizador, certificado=None, certificado_senha=None, homologacao=False):
+    def __init__(
+        self, autorizador, certificado=None, certificado_senha=None, homologacao=False, **kwargs
+    ):
         self.certificado = certificado
         self.certificado_senha = certificado_senha
         self._ambiente = 2 if homologacao else 1
@@ -748,14 +750,17 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "BARUERI":
             self._namespace = "http://www.barueri.sp.gov.br/nfeservice"
         elif self.autorizador == "OSASCO":
-            self._namespace = ""
-            self._versao = "1"
+            pass
         elif self.autorizador == "CAMPINAS":
-            self._namespace = "http://www.abrasf.org.br/nfse.xsd"
-            self._versao = "2"
+            pass
         elif self.autorizador == "MARACANAU":
-            self._namespace = "http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd"
-            self._versao = "1.00"
+            pass
+        elif self.autorizador == "GISS":
+            if not kwargs.get("municipio_codigo"):
+                raise Exception(
+                    "Para o autorizador GISS é necessário informar o código do município."
+                )
+            self.municipio_codigo = kwargs.get("municipio_codigo")
         else:
             raise Exception("Autorizador não encontrado!")
 
@@ -774,8 +779,11 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+
             xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
-            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_RPS"], xml_assinado)
+            envelope_xml = SerializacaoCampinas().soap_envelope(
+                NFSE[self.autorizador]["CONSULTA_RPS"], xml_assinado
+            )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -788,8 +796,11 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+
             xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
-            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_FAIXA"], xml_assinado)
+            envelope_xml = SerializacaoCampinas().soap_envelope(
+                NFSE[self.autorizador]["CONSULTA_FAIXA"], xml_assinado
+            )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -802,12 +813,25 @@ class ComunicacaoNfse(Comunicacao):
         url = self._get_url()
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
+
             xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
-            envelope_xml = SerializacaoCampinas().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado)
+            envelope_xml = SerializacaoCampinas().soap_envelope(
+                NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
+            )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "MARACANAU":
             from pynfe.processamento.autorizador_nfse import SerializacaoMaracanau
-            envelope_xml = SerializacaoMaracanau().soap_envelope(NFSE[self.autorizador]["CONSULTA_SERVICO"], payload)
+
+            envelope_xml = SerializacaoMaracanau().soap_envelope(
+                NFSE[self.autorizador]["CONSULTA_SERVICO"], payload
+            )
+            return self._post_soap_raw(url, envelope_xml)
+        elif self.autorizador == "MARACANAU":
+            from pynfe.processamento.autorizador_nfse import SerializacaoGiss
+
+            envelope_xml = SerializacaoGiss().soap_envelope(
+                NFSE[self.autorizador]["CONSULTA_SERVICO"], payload
+            )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
@@ -874,6 +898,11 @@ class ComunicacaoNfse(Comunicacao):
             ambiente = "HOMOLOGACAO"
         if self.autorizador in NFSE:
             self.url = NFSE[self.autorizador][ambiente]
+            if self.autorizador == "GISS":
+                municipio = obter_municipio_por_codigo(
+                    self.municipio_codigo, uf=self.municipio_codigo[:2], normalizado=True
+                )
+                self.url = self.url.replace("{municipio}", str(municipio.lower()))
         else:
             raise Exception("Autorizador nao encontrado!")
         return self.url
@@ -901,6 +930,7 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
     def _post_soap_raw(self, url, soap_xml):
         certificado_a1 = CertificadoA1(self.certificado)
         key, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
@@ -909,7 +939,7 @@ class ComunicacaoNfse(Comunicacao):
             data=soap_xml.encode("utf-8"),
             cert=(cert, key),
             verify=False,
-            headers={"Content-Type": "text/xml; charset=utf-8"}
+            headers={"Content-Type": "text/xml; charset=utf-8"},
         )
 
     def _post_https(self, url, metodo, xml):

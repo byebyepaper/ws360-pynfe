@@ -174,6 +174,78 @@ class SerializacaoMaracanau(InterfaceAutorizador):
         return etree.tostring(raiz, pretty_print=True).decode()
 
 
+class SerializacaoGiss(InterfaceAutorizador):
+    """
+    Serialização ABRASF v2.04 – GISS
+    """
+
+    NAMESPACE_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
+    NAMESPACE_XSI = "http://www.w3.org/2001/XMLSchema-instance"
+    NAMESPACE_XSD = "http://www.w3.org/2001/XMLSchema"
+    NAMESPACE_ABRASF = "http://nfse.abrasf.org.br"
+    NAMESPACE_METODO = "http://www.giss.com.br/consultar-nfse-servico-prestado-envio-v2_04.xsd"
+    NAMESPACE_TIPOS = "http://www.giss.com.br/tipos-v2_04.xsd"
+    NAMESPACE_CABECALHO = "http://www.giss.com.br/cabecalho-v2_04.xsd"
+
+    def _cabecalho(self):
+        cabecalho_xml = f"""<cabecalho xmlns="{self.NAMESPACE_CABECALHO}" versao="2.04"><versaoDados>2.04</versaoDados></cabecalho>""".strip()
+        return cabecalho_xml
+
+    def soap_envelope(
+        self,
+        metodo,
+        xml_assinado,
+    ):
+        NAMESPACE_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
+        NAMESPACE_XSI = "http://www.w3.org/2001/XMLSchema-instance"
+        NAMESPACE_XSD = "http://www.w3.org/2001/XMLSchema"
+        NAMESPACE_ABRASF = "http://nfse.abrasf.org.br"
+
+        envelope = etree.Element(
+            f"{{{self.NAMESPACE_SOAP}}}Envelope",
+            nsmap={
+                "xsi": NAMESPACE_XSI,
+                "xsd": NAMESPACE_XSD,
+                "soap": NAMESPACE_SOAP,
+                "nfse": NAMESPACE_ABRASF,
+            },
+        )
+        body = etree.SubElement(envelope, f"{{{self.NAMESPACE_SOAP}}}Body")
+
+        consultar_nfse = etree.SubElement(
+            body, f"{{{self.NAMESPACE_ABRASF}}}{metodo}Request"
+        )
+
+        header = etree.SubElement(consultar_nfse, "nfseCabecMsg")
+        header.text = etree.CDATA(self._cabecalho())
+
+        parameters = etree.SubElement(consultar_nfse, "nfseDadosMsg")
+        parameters.text = etree.CDATA(xml_assinado)
+
+        return (
+            '<?xml version="1.0" encoding="utf-8"?>'
+            + etree.tostring(envelope, pretty_print=True).decode()
+        )
+
+    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
+        return f"""<ConsultarNfseServicoPrestadoEnvio
+            xmlns="{self.NAMESPACE_METODO}"
+            xmlns:tipos="{self.NAMESPACE_TIPOS}">
+
+            <Prestador>
+                <tipos:CpfCnpj>
+                <tipos:Cnpj>{emitente.cnpj}</tipos:Cnpj>
+                </tipos:CpfCnpj>
+                <tipos:InscricaoMunicipal>{emitente.inscricao_municipal}</tipos:InscricaoMunicipal>
+            </Prestador>
+            <PeriodoCompetencia>
+                <DataInicial>{data_inicio}</DataInicial>
+                <DataFinal>{data_fim}</DataFinal>
+            </PeriodoCompetencia>
+            <Pagina>{pagina}</Pagina>
+        </ConsultarNfseServicoPrestadoEnvio>""".strip()
+
+
 class SerializacaoBetha(InterfaceAutorizador):
     def __init__(self):
         # importa

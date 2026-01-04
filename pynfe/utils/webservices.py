@@ -534,6 +534,11 @@ NFSE = {
         "HTTPS": "https://speedgov.com.br/wsmar/Nfes?wsdl",
         "HOMOLOGACAO": "",
     },
+    "GISS": {
+        "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
+        "HTTPS": "https://ws-{municipio}.giss.com.br/service-ws/nf/nfse-ws?wsdl",
+        "HOMOLOGACAO": "",
+    },
 }
 
 # MDF-e
