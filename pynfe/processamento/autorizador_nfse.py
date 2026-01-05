@@ -113,9 +113,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
         return etree.tostring(raiz, pretty_print=True).decode()
 
 
-class SerializacaoMaracanau(InterfaceAutorizador):
+class SerializacaoSpeedgov(InterfaceAutorizador):
     """
-    Serialização ABRASF v1.00 – Maracanaú
+    Serialização ABRASF v1.00 – Speedgov
     """
 
     def _cabecalho(self):

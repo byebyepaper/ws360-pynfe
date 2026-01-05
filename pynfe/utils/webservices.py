@@ -315,7 +315,7 @@ NFE = {
         "HTTPS": "https://",
         "HOMOLOGACAO": "https://hom",
     },
-    "MA": {"CADASTRO": ("https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl")},
+    "MA": {"CADASTRO": "https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl"},
     "PE": {
         "STATUS": "sefaz.pe.gov.br/nfe-service/services/NFeStatusServico4",
         "AUTORIZACAO": "sefaz.pe.gov.br/nfe-service/services/NFeAutorizacao4",
@@ -328,14 +328,12 @@ NFE = {
         "HOMOLOGACAO": "https://nfehomolog.",
     },
     "BA": {
-        "STATUS": ("nfe.sefaz.ba.gov.br/webservices/NFeStatusServico4/NFeStatusServico4.asmx"),
-        "AUTORIZACAO": ("nfe.sefaz.ba.gov.br/webservices/NFeAutorizacao4/NFeAutorizacao4.asmx"),
-        "RECIBO": ("nfe.sefaz.ba.gov.br/webservices/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx"),
-        "CHAVE": (
-            "nfe.sefaz.ba.gov.br/webservices/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx"
-        ),
-        "INUTILIZACAO": ("nfe.sefaz.ba.gov.br/webservices/NFeInutilizacao4/NFeInutilizacao4.asmx"),
-        "EVENTOS": ("nfe.sefaz.ba.gov.br/webservices/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx"),
+        "STATUS": "nfe.sefaz.ba.gov.br/webservices/NFeStatusServico4/NFeStatusServico4.asmx",
+        "AUTORIZACAO": "nfe.sefaz.ba.gov.br/webservices/NFeAutorizacao4/NFeAutorizacao4.asmx",
+        "RECIBO": "nfe.sefaz.ba.gov.br/webservices/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx",
+        "CHAVE": "nfe.sefaz.ba.gov.br/webservices/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
+        "INUTILIZACAO": "nfe.sefaz.ba.gov.br/webservices/NFeInutilizacao4/NFeInutilizacao4.asmx",
+        "EVENTOS": "nfe.sefaz.ba.gov.br/webservices/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
         "CADASTRO": (
             "nfe.sefaz.ba.gov.br/webservices/CadConsultaCadastro4/CadConsultaCadastro4.asmx"
         ),
@@ -365,10 +363,10 @@ NFE = {
         "HOMOLOGACAO": "https://homologacao.",
     },
     "PR": {
-        "STATUS": ("nfe.sefa.pr.gov.br/nfe/NFeStatusServico4"),  # CONSULTA STATUS DO SERVICO
+        "STATUS": "nfe.sefa.pr.gov.br/nfe/NFeStatusServico4",  # CONSULTA STATUS DO SERVICO
         "AUTORIZACAO": "nfe.sefa.pr.gov.br/nfe/NFeAutorizacao4",  # AUTORIZACAO
         "RECIBO": "nfe.sefa.pr.gov.br/nfe/NFeRetAutorizacao4",  # CONSULTA RECIBO
-        "CHAVE": ("nfe.sefa.pr.gov.br/nfe/NFeConsultaProtocolo4"),  # CONSULTA CHAVE DE ACESSO
+        "CHAVE": "nfe.sefa.pr.gov.br/nfe/NFeConsultaProtocolo4",  # CONSULTA CHAVE DE ACESSO
         "INUTILIZACAO": "nfe.sefa.pr.gov.br/nfe/NFeInutilizacao4",  # INUTILIZAÇAO
         "EVENTOS": "nfe.sefa.pr.gov.br/nfe/NFeRecepcaoEvento4",  # REGISTRO DE EVENTOS
         "CADASTRO": "nfe.sefa.pr.gov.br/nfe/CadConsultaCadastro4",  # CONSULTA CADASTRO
@@ -425,12 +423,12 @@ NFE = {
         "HOMOLOGACAO": "https://homolog.",
     },
     "SVAN": {
-        "STATUS": ("sefazvirtual.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx"),
-        "AUTORIZACAO": ("sefazvirtual.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx"),
-        "RECIBO": ("sefazvirtual.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx"),
+        "STATUS": "sefazvirtual.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx",
+        "AUTORIZACAO": "sefazvirtual.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx",
+        "RECIBO": "sefazvirtual.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx",
         "CHAVE": "sefazvirtual.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
-        "INUTILIZACAO": ("sefazvirtual.fazenda.gov.br/NFeInutilizacao4/NFeInutilizacao4.asmx"),
-        "EVENTOS": ("sefazvirtual.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx"),
+        "INUTILIZACAO": "sefazvirtual.fazenda.gov.br/NFeInutilizacao4/NFeInutilizacao4.asmx",
+        "EVENTOS": "sefazvirtual.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
         "DOWNLOAD": "sefazvirtual.fazenda.gov.br/NfeDownloadNF/NfeDownloadNF.asmx",
         "HTTPS": "https://www.",
         "HOMOLOGACAO": "https://hom.",
@@ -478,14 +476,14 @@ NFSE = {
         "CANCELAR_NFSE": "CancelamentoNFe",
         # New URL supports both v1 and v2 (Reforma Tributária 2026)
         # Old URL (v1 only): https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx?wsdl
-        "HTTPS": "https://nfews.prefeitura.sp.gov.br/lotenfe.asmx?WSDL"
+        "HTTPS": "https://nfews.prefeitura.sp.gov.br/lotenfe.asmx?WSDL",
     },
     "BARUERI": {
         "ENVIAR_RPS": "EnviarRPS",
         "CONSULTA_RPS": "ConsultaNFe",
         "CANCELAR_NFSE": "CancelamentoNFe",
         "HTTPS": "https://www.barueri.sp.gov.br/nfeservice/wsrps.asmx?WSDL",
-        "HOMOLOGACAO": "https://testeeiss.barueri.sp.gov.br/nfeservice/wsrps.asmx?WSDL"
+        "HOMOLOGACAO": "https://testeeiss.barueri.sp.gov.br/nfeservice/wsrps.asmx?WSDL",
     },
     "BETHA": {
         "AUTORIZACAO": "GerarNfse",
@@ -496,7 +494,7 @@ NFSE = {
         "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
         "SUBSTITUIR": "SubstituirNfse",
         "HTTPS": "http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl",
-        "HOMOLOGACAO": ("http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl"),
+        "HOMOLOGACAO": "http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl",
     },
     #
     "GINFES": {
@@ -515,9 +513,8 @@ NFSE = {
         "CONSULTA": "Consultar",
         "CONSULTA_COMPLETA": "ConsultarNotaCompleta",
         "HTTPS": "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl",
-        "HOMOLOGACAO": (
-            "https://nfe.osasco.sp.gov.br/EISSNFEWebServices/NotaFiscalEletronica.svc?wsdl"
-        ),
+        "HOMOLOGACAO": "",
+        "DOWNLOAD": "https://nfe.osasco.sp.gov.br/EissnfeWebApp/Sistema/Prestador/VisualizarNFENew.aspx?Id={identificador}",
     },
     "CAMPINAS": {
         "AUTORIZACAO": "GerarNfse",
@@ -527,17 +524,29 @@ NFSE = {
         "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
         "CONSULTA_SERVICO_TOMADO": "ConsultarNfseServicoTomado",
         "HTTPS": "https://novanfse.campinas.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
-        "HOMOLOGACAO": "https://homol-rps.ima.sp.gov.br/notafiscal-abrasfv203-ws/NotaFiscalSoap?wsdl",
-    },
-    "MARACANAU": {
-        "CONSULTA_SERVICO": "ConsultarNfse",
-        "HTTPS": "https://speedgov.com.br/wsmar/Nfes?wsdl",
         "HOMOLOGACAO": "",
+        "DOWNLOAD": (
+            "https://novanfse.campinas.sp.gov.br/notafiscal-ws/servico/notafiscal/autenticacao/cpfCnpj/{cpf_cnpj}/inscricaoMunicipal/{im}/numeroNota/{numero_nfse}/codigoVerificacao/{codigo_verificacao}"
+        ),
+    },
+    "SPEEDGOV": {
+        "CONSULTA_SERVICO": "ConsultarNfse",
+        "HTTPS": "https://speedgov.com.br/ws{suffix_municipio}/Nfes?wsdl",
+        "HOMOLOGACAO": "",
+        "DOWNLOAD": (
+            "https://speedgov.com.br/sat{suffix_municipio}/servlet//com.satweb.aratb177e?1,1,1,1,{im},{numero_nfse},{codigo_verificacao}"
+        ),
+        "SUFFIX_MUNICIPIO": {
+            "2307650":"mar"
+        },
     },
     "GISS": {
         "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
         "HTTPS": "https://ws-{municipio}.giss.com.br/service-ws/nf/nfse-ws?wsdl",
         "HOMOLOGACAO": "",
+        "DOWNLOAD": (
+            "https://gissv2-{codigo_ibge}.eiconbrasil.com.br/service-relatorio/api/relatorio/nota-autenticacao/{tipo_doc}/{codigo_ibge}/{identificador}/codigo-verificacao/{codigo_verificacao}"
+        ),
     },
 }
 

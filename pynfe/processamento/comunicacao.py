@@ -753,8 +753,12 @@ class ComunicacaoNfse(Comunicacao):
             pass
         elif self.autorizador == "CAMPINAS":
             pass
-        elif self.autorizador == "MARACANAU":
-            pass
+        elif self.autorizador == "SPEEDGOV":
+            if not kwargs.get("codigo_municipio"):
+                raise Exception(
+                    "Para o autorizador SPEEDGOV é necessário informar o código do município."
+                )
+            self.codigo_municipio = kwargs.get("codigo_municipio")
         elif self.autorizador == "GISS":
             if not kwargs.get("codigo_municipio"):
                 raise Exception(
@@ -819,17 +823,19 @@ class ComunicacaoNfse(Comunicacao):
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
             )
             return self._post_soap_raw(url, envelope_xml)
-        elif self.autorizador == "MARACANAU":
-            from pynfe.processamento.autorizador_nfse import SerializacaoMaracanau
+        elif self.autorizador == "SPEEDGOV":
+            from pynfe.processamento.autorizador_nfse import SerializacaoSpeedgov
 
-            envelope_xml = SerializacaoMaracanau().soap_envelope(
+            envelope_xml = SerializacaoSpeedgov().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], payload
             )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "GISS":
             from pynfe.processamento.autorizador_nfse import SerializacaoGiss
-            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload, retorna_string=True)
 
+            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(
+                payload, retorna_string=True
+            )
             envelope_xml = SerializacaoGiss().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
             )
@@ -904,6 +910,11 @@ class ComunicacaoNfse(Comunicacao):
                     self.codigo_municipio, uf=self.codigo_municipio[:2], normalizado=True
                 )
                 self.url = self.url.replace("{municipio}", str(municipio.lower()))
+            if self.autorizador == "SPEEDGOV":
+                self.url = self.url.replace(
+                    "{suffix_municipio}",
+                    NFSE[self.autorizador]["SUFFIX_MUNICIPIO"][str(self.codigo_municipio)],
+                )
         else:
             raise Exception("Autorizador nao encontrado!")
         return self.url
