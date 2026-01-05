@@ -756,11 +756,11 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "MARACANAU":
             pass
         elif self.autorizador == "GISS":
-            if not kwargs.get("municipio_codigo"):
+            if not kwargs.get("codigo_municipio"):
                 raise Exception(
                     "Para o autorizador GISS é necessário informar o código do município."
                 )
-            self.municipio_codigo = kwargs.get("municipio_codigo")
+            self.codigo_municipio = kwargs.get("codigo_municipio")
         else:
             raise Exception("Autorizador não encontrado!")
 
@@ -901,7 +901,7 @@ class ComunicacaoNfse(Comunicacao):
             self.url = NFSE[self.autorizador][ambiente]
             if self.autorizador == "GISS":
                 municipio = obter_municipio_por_codigo(
-                    self.municipio_codigo, uf=self.municipio_codigo[:2], normalizado=True
+                    self.codigo_municipio, uf=self.codigo_municipio[:2], normalizado=True
                 )
                 self.url = self.url.replace("{municipio}", str(municipio.lower()))
         else:
