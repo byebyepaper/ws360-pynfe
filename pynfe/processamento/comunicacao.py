@@ -828,9 +828,10 @@ class ComunicacaoNfse(Comunicacao):
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "GISS":
             from pynfe.processamento.autorizador_nfse import SerializacaoGiss
+            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
 
             envelope_xml = SerializacaoGiss().soap_envelope(
-                NFSE[self.autorizador]["CONSULTA_SERVICO"], payload
+                NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
             )
             return self._post_soap_raw(url, envelope_xml)
         elif self.autorizador == "OSASCO":
