@@ -2158,6 +2158,14 @@ class SerializacaoNfse(object):
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
         
             return SerializacaoOsasco(self.chave_autenticacao).consultar(data_inicial=data_inicio, data_final=data_fim)
+        elif self.autorizador.lower() == "giss":
+            from pynfe.processamento.autorizador_nfse import SerializacaoGiss
+        
+            return SerializacaoGiss(self.chave_autenticacao).consultar_periodo(emitente, data_inicio, data_fim, pagina=1)
+        elif self.autorizador.lower() == "speedgov":
+            from pynfe.processamento.autorizador_nfse import SerializacaoSpeedgov
+        
+            return SerializacaoSpeedgov(self.chave_autenticacao).consultar_periodo(emitente, data_inicio, data_fim)
         else:
             raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
