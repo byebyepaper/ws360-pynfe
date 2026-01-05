@@ -907,7 +907,7 @@ class ComunicacaoNfse(Comunicacao):
             self.url = NFSE[self.autorizador][ambiente]
             if self.autorizador == "GISS":
                 municipio = obter_municipio_por_codigo(
-                    self.codigo_municipio, uf=self.codigo_municipio[:2], normalizado=True
+                    str(self.codigo_municipio), uf=str(self.codigo_municipio)[:2], normalizado=True
                 )
                 self.url = self.url.replace("{municipio}", str(municipio.lower()))
             if self.autorizador == "SPEEDGOV":
