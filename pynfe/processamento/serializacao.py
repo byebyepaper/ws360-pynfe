@@ -2142,7 +2142,7 @@ class SerializacaoNfse(object):
         if self.autorizador.lower() == "campinas":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
         
-            return SerializacaoCampinas().consultar_faixa(emitente, numero_inicial, numero_final, pagina=1)
+            return SerializacaoCampinas().consultar_faixa(emitente, numero_inicial, numero_final, pagina=pagina)
         elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
             return SerializacaoOsasco(self.chave_autenticacao).consultar(numero_nota_inicial=numero_inicial, numero_nota_final=numero_final)
@@ -2153,7 +2153,7 @@ class SerializacaoNfse(object):
         if self.autorizador.lower() == "campinas":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
         
-            return SerializacaoCampinas().consultar_periodo(emitente, data_inicio, data_fim, pagina=1)
+            return SerializacaoCampinas().consultar_periodo(emitente, data_inicio, data_fim, pagina=pagina)
         elif self.autorizador.lower() == "osasco":
             from pynfe.processamento.autorizador_nfse import SerializacaoOsasco
         
@@ -2161,7 +2161,7 @@ class SerializacaoNfse(object):
         elif self.autorizador.lower() == "giss":
             from pynfe.processamento.autorizador_nfse import SerializacaoGiss
         
-            return SerializacaoGiss().consultar_periodo(emitente, data_inicio, data_fim, pagina=1)
+            return SerializacaoGiss().consultar_periodo(emitente, data_inicio, data_fim, pagina=pagina)
         elif self.autorizador.lower() == "speedgov":
             from pynfe.processamento.autorizador_nfse import SerializacaoSpeedgov
         
