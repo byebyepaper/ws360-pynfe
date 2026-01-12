@@ -848,7 +848,7 @@ class ComunicacaoNfse(Comunicacao):
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         elif self.autorizador == "GINFES":
             # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' + payload
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' +  payload.decode("utf-8")
             # comunica via wsdl
             return self._post_https(url, xml, "ConsultarNfseV3")
         else:
