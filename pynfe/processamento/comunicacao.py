@@ -850,7 +850,7 @@ class ComunicacaoNfse(Comunicacao):
             # xml
             xml = '<?xml version="1.0" encoding="UTF-8"?>' +  payload.decode("utf-8")
             # comunica via wsdl
-            return self._post_https(url, xml, "ConsultarNfseV3")
+            return self._post_https(url, "ConsultarNfseV3", xml)
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
