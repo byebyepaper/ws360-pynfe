@@ -2166,6 +2166,10 @@ class SerializacaoNfse(object):
             from pynfe.processamento.autorizador_nfse import SerializacaoSpeedgov
         
             return SerializacaoSpeedgov().consultar_periodo(emitente, data_inicio, data_fim)
+        elif self.autorizador.lower() == "ginfes":
+            from pynfe.processamento.autorizador_nfse import SerializacaoGinfes
+        
+            return SerializacaoGinfes().consultar_periodo(emitente, data_inicio, data_fim, pagina=pagina)
         else:
             raise Exception(f"Este método não esta implementado para o autorizador {self.autorizador.upper()}")
 
