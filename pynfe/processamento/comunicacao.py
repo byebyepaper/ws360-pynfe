@@ -850,7 +850,7 @@ class ComunicacaoNfse(Comunicacao):
             # xml
             xml = '<?xml version="1.0" encoding="UTF-8"?>' +  payload.decode("utf-8")
             # comunica via wsdl
-            return self._post_https(url, "ConsultarNfseV3", xml)
+            return self._post_https(url, xml, "consulta")
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -962,7 +962,7 @@ class ComunicacaoNfse(Comunicacao):
             headers={"Content-Type": "text/xml; charset=utf-8"},
         )
 
-    def _post_https(self, url, metodo, xml):
+    def _post_https(self, url, xml, metodo):
         """Comunicação wsdl (https) utilizando certificado do usuário"""
         # cabecalho
         cabecalho = self._cabecalho()
@@ -971,20 +971,37 @@ class ComunicacaoNfse(Comunicacao):
             from pynfe.utils.https_nfse import HttpAuthenticated
             from suds.client import Client
 
-            certificado_a1 = CertificadoA1(self.certificado)
-
-            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+            certificadoA1 = CertificadoA1(self.certificado)
+            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
 
             cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
 
             # gerar nfse
-            try:
-                service = getattr(cliente.service, metodo)
-            except AttributeError:
-                raise ValueError(f"Método '{metodo}' não disponível para {self.autorizador}.")
-            return service(xml)
+            if metodo == "gerar":
+                return cliente.service.GerarNfse(cabecalho, xml)
+            elif metodo == "enviar_lote":
+                return cliente.service.RecepcionarLoteRpsV3(cabecalho, xml)
+            elif metodo == "consulta":
+                return cliente.service.ConsultarNfseV3(cabecalho, xml)
+            elif metodo == "consulta_lote":
+                return cliente.service.ConsultarLoteRpsV3(cabecalho, xml)
+            elif metodo == "consulta_situacao_lote":
+                return cliente.service.ConsultarSituacaoLoteRpsV3(cabecalho, xml)
+            elif metodo == "consultaRps":
+                return cliente.service.ConsultarNfsePorRpsV3(cabecalho, xml)
+            elif metodo == "consultaFaixa":
+                return cliente.service.ConsultarNfseFaixa(cabecalho, xml)
+            elif metodo == "cancelar":
+                # versão 2
+                return cliente.service.CancelarNfse(xml)
+                # versão 3
+                # return cliente.service.CancelarNfseV3(cabecalho, xml)
+            # TODO outros metodos
+            else:
+                raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
+
 
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
