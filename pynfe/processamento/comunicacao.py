@@ -744,7 +744,10 @@ class ComunicacaoNfse(Comunicacao):
         self.certificado_senha = certificado_senha
         self._ambiente = 2 if homologacao else 1
         self.autorizador = autorizador.upper()
-        if self.autorizador == "SAO_PAULO":
+        if self.autorizador == "GINFES":
+            self._namespace = "http://www.ginfes.com.br/cabecalho_v03.xsd"
+            self._versao = "3"
+        elif self.autorizador == "SAO_PAULO":
             self._namespace = "http://www.prefeitura.sp.gov.br/nfe"
             self._versao = "2"
         elif self.autorizador == "BARUERI":
@@ -843,6 +846,11 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "OSASCO":
             # comunica via wsdl
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
+        elif self.autorizador == "GINFES":
+            # xml
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' + xml
+            # comunica via wsdl
+            return self._post_https(url, xml, "ConsultarNfseV3")
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 

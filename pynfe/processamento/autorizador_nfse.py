@@ -492,8 +492,9 @@ class SerializacaoBetha(InterfaceAutorizador):
 class SerializacaoGinfes(InterfaceAutorizador):
     def __init__(self):
         pass
+    
 
-    def consultar_servico_prestado(self, emitente, data_inicio, data_fim, pagina=1):
+    def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         NS = "http://www.ginfes.com.br/servico_consultar_nfse_servico_prestado_envio_v03.xsd"
         DS = "http://www.w3.org/2000/09/xmldsig#"
 
