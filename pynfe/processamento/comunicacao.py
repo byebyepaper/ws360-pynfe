@@ -508,7 +508,7 @@ class ComunicacaoSefaz(Comunicacao):
     def _get_url(self, modelo, consulta, contingencia=False):
         """Retorna a url para comunicação com o webservice"""
         if contingencia:
-            contingencia_svrs = ["AM", "BA", "CE", "GO", "MA", "MS", "MT", "PE", "PR"]
+            contingencia_svrs = ["SP", "AM", "BA", "CE", "GO", "MA", "MS", "MT", "PE", "PR"]
             contingencia_svan = [
                 "AC",
                 "AL",
@@ -526,7 +526,6 @@ class ComunicacaoSefaz(Comunicacao):
                 "RS",
                 "SC",
                 "SE",
-                "SP",
                 "TO",
             ]
 
