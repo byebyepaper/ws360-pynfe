@@ -59,7 +59,13 @@ class ComunicacaoSefaz(Comunicacao):
     _assinatura = AssinaturaA1
 
     def autorizacao(
-        self, modelo, nota_fiscal, id_lote=1, ind_sinc=1, contingencia=False, timeout=None
+        self,
+        modelo,
+        nota_fiscal,
+        id_lote=1,
+        ind_sinc=1,
+        contingencia=False,
+        timeout=None,
     ):
         """
         Método para realizar autorização da nota de acordo com o modelo
@@ -72,11 +78,15 @@ class ComunicacaoSefaz(Comunicacao):
         Caso contrário, envia todo o soap de resposta da Sefaz para decisão do usuário.
         """
         # url do serviço
-        url = self._get_url(modelo=modelo, consulta="AUTORIZACAO", contingencia=contingencia)
+        url = self._get_url(
+            modelo=modelo, consulta="AUTORIZACAO", contingencia=contingencia
+        )
 
         # Monta XML do corpo da requisição
         if modelo == "nfe-abi":
-            raiz = etree.Element("enviNFeABI", xmlns=NAMESPACE_NFEABI, versao=VERSAO_NFEABI)
+            raiz = etree.Element(
+                "enviNFeABI", xmlns=NAMESPACE_NFEABI, versao=VERSAO_NFEABI
+            )
             etree.SubElement(raiz, "idLote").text = str(id_lote)
             etree.SubElement(raiz, "indSinc").text = str(ind_sinc)
             raiz.append(nota_fiscal)
@@ -86,7 +96,9 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "idLote").text = str(
                 id_lote
             )  # numero autoincremental gerado pelo sistema
-            etree.SubElement(raiz, "indSinc").text = str(ind_sinc)  # 0 para assincrono, 1 para sincrono
+            etree.SubElement(raiz, "indSinc").text = str(
+                ind_sinc
+            )  # 0 para assincrono, 1 para sincrono
             raiz.append(nota_fiscal)
             xml = self._construir_xml_soap("NFeAutorizacao4", raiz)
 
@@ -113,11 +125,17 @@ class ComunicacaoSefaz(Comunicacao):
                         # Estados como GO vem com a tag header
                         inf_prot = prot[1][0]
 
-                    lote_status = inf_prot.xpath("ns:retEnviNFe/ns:cStat", namespaces=ns)[0].text
+                    lote_status = inf_prot.xpath(
+                        "ns:retEnviNFe/ns:cStat", namespaces=ns
+                    )[0].text
                     # Lote processado
                     if lote_status == "104":
-                        prot_nfe = inf_prot.xpath("ns:retEnviNFe/ns:protNFe", namespaces=ns)[0]
-                        status = prot_nfe.xpath("ns:infProt/ns:cStat", namespaces=ns)[0].text
+                        prot_nfe = inf_prot.xpath(
+                            "ns:retEnviNFe/ns:protNFe", namespaces=ns
+                        )[0]
+                        status = prot_nfe.xpath("ns:infProt/ns:cStat", namespaces=ns)[
+                            0
+                        ].text
                         # autorizado usa da NF-e
                         # retorna xml final (protNFe+NFe)
                         if status in ["100", "150"]:
@@ -136,7 +154,9 @@ class ComunicacaoSefaz(Comunicacao):
                 status = rec.xpath("ns:retEnviNFe/ns:cStat", namespaces=ns)[0].text
                 # Lote Recebido com Sucesso!
                 if status == "103":
-                    nrec = rec.xpath("ns:retEnviNFe/ns:infRec/ns:nRec", namespaces=ns)[0].text
+                    nrec = rec.xpath("ns:retEnviNFe/ns:infRec/ns:nRec", namespaces=ns)[
+                        0
+                    ].text
                     return 0, nrec, nota_fiscal
         return 1, retorno, nota_fiscal
 
@@ -177,20 +197,26 @@ class ComunicacaoSefaz(Comunicacao):
         # url do serviço
         url = self._get_url(modelo=modelo, consulta="CHAVE", contingencia=contingencia)
         if modelo == "nfcom":
-            raiz = etree.Element("consSitNFCom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM)
+            raiz = etree.Element(
+                "consSitNFCom", versao=VERSAO_NFCOM, xmlns=NAMESPACE_NFCOM
+            )
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
             etree.SubElement(raiz, "chNFCom").text = chave
             xml = self._construir_xml_soap("NFComConsulta", raiz)
         elif modelo == "nfe-abi":
-            raiz = etree.Element("consSitNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI)
+            raiz = etree.Element(
+                "consSitNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI
+            )
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
             etree.SubElement(raiz, "chNFeABI").text = chave
             xml = self._construir_xml_soap("NFeConsultaProtocolo", raiz)
         else:
             # Monta XML do corpo da requisição
-            raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
+            raiz = etree.Element(
+                "consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE
+            )
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
             etree.SubElement(raiz, "chNFe").text = chave
@@ -203,7 +229,9 @@ class ComunicacaoSefaz(Comunicacao):
         Download da NFCom via Portal SVRS (HTML + extração do XML via JS).
         """
 
-        url = self._get_url(modelo=modelo, consulta="DOWNLOAD", contingencia=contingencia)
+        url = self._get_url(
+            modelo=modelo, consulta="DOWNLOAD", contingencia=contingencia
+        )
 
         if modelo != "nfcom":
             raise NotImplementedError("Download not implemented for this model yet.")
@@ -429,13 +457,17 @@ class ComunicacaoSefaz(Comunicacao):
         """
         url = self._get_url(modelo, "STATUS")
         if modelo == "nfe-abi":
-            raiz = etree.Element("consStatServNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI)
+            raiz = etree.Element(
+                "consStatServNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI
+            )
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
             etree.SubElement(raiz, "xServ").text = "STATUS"
             xml = self._construir_xml_soap("NFeStatusServico", raiz)
         else:
-            raiz = etree.Element("consStatServ", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
+            raiz = etree.Element(
+                "consStatServ", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE
+            )
             etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
             etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
             etree.SubElement(raiz, "xServ").text = "STATUS"
@@ -479,15 +511,18 @@ class ComunicacaoSefaz(Comunicacao):
 
         # Identificador da TAG a ser assinada formada com Código da UF + Ano (2 posições) +
         #  CNPJ + modelo + série + nro inicial e nro final precedida do literal “ID”
-        id_unico = "ID%(uf)s%(ano)s%(cnpj)s%(modelo)s%(serie)s%(num_ini)s%(num_fin)s" % {
-            "uf": uf,
-            "ano": ano,
-            "cnpj": cnpjcpf_chaveacesso,
-            "modelo": "55" if modelo == "nfe" else "65",  # 55=NF-e; 65=NFC-e;
-            "serie": str(serie).zfill(3),
-            "num_ini": str(numero_inicial).zfill(9),
-            "num_fin": str(numero_final).zfill(9),
-        }
+        id_unico = (
+            "ID%(uf)s%(ano)s%(cnpj)s%(modelo)s%(serie)s%(num_ini)s%(num_fin)s"
+            % {
+                "uf": uf,
+                "ano": ano,
+                "cnpj": cnpjcpf_chaveacesso,
+                "modelo": "55" if modelo == "nfe" else "65",  # 55=NF-e; 65=NFC-e;
+                "serie": str(serie).zfill(3),
+                "num_ini": str(numero_inicial).zfill(9),
+                "num_fin": str(numero_final).zfill(9),
+            }
+        )
 
         # Monta XML do corpo da requisição # FIXME
         raiz = etree.Element("inutNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
@@ -568,7 +603,9 @@ class ComunicacaoSefaz(Comunicacao):
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
                 else:
-                    raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+                    raise Exception(
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce"'
+                    )
             elif self.uf.upper() in contingencia_svan:
                 if self._ambiente == 1:
                     ambiente = "HTTPS"
@@ -581,7 +618,9 @@ class ComunicacaoSefaz(Comunicacao):
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
                 else:
-                    raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+                    raise Exception(
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce"'
+                    )
             return self.url
 
         # estado que implementam webservices proprios
@@ -597,28 +636,36 @@ class ComunicacaoSefaz(Comunicacao):
                     self.url = NFE["SVRS"][ambiente] + NFE["SVRS"][consulta]
                 else:
                     # nfe Ex: https://nfe.fazenda.pr.gov.br/nfe/NFeStatusServico3
-                    self.url = NFE[self.uf.upper()][ambiente] + NFE[self.uf.upper()][consulta]
+                    self.url = (
+                        NFE[self.uf.upper()][ambiente] + NFE[self.uf.upper()][consulta]
+                    )
             elif modelo == "nfce":
                 # PE e BA são as únicas UF'sque possuem NFE proprio e SVRS para NFCe
                 if self.uf.upper() == "PE" or self.uf.upper() == "BA":
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
                 else:
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
-                    self.url = NFCE[self.uf.upper()][ambiente] + NFCE[self.uf.upper()][consulta]
+                    self.url = (
+                        NFCE[self.uf.upper()][ambiente]
+                        + NFCE[self.uf.upper()][consulta]
+                    )
             elif modelo == "nfcom":
                 if consulta == "DOWNLOAD":
                     self.url = NFCOM["SVRS"][consulta]
                 else:
                     if self.uf.upper() in ["MG", "MT", "MS"]:
                         self.url = (
-                            NFCOM[self.uf.upper()][ambiente] + NFCOM[self.uf.upper()][consulta]
+                            NFCOM[self.uf.upper()][ambiente]
+                            + NFCOM[self.uf.upper()][consulta]
                         )
                     else:
                         self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
             elif modelo == "nfe-abi":
                 self.url = NFEABI["AN"][ambiente] + NFEABI["AN"][consulta]
             else:
-                raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"')
+                raise Exception(
+                    'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"'
+                )
         # Estados que utilizam outros ambientes
         else:
             lista_svrs = [
@@ -679,7 +726,9 @@ class ComunicacaoSefaz(Comunicacao):
                         'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"'
                     )
             else:
-                raise Exception(f"Url não encontrada para {modelo} e {consulta} {self.uf.upper()}")
+                raise Exception(
+                    f"Url não encontrada para {modelo} e {consulta} {self.uf.upper()}"
+                )
         return self.url
 
     def _construir_xml_soap(self, metodo, dados, cabecalho=False):
@@ -697,21 +746,34 @@ class ComunicacaoSefaz(Comunicacao):
 
         # === NFe Distribuição ===
         if metodo == "NFeDistribuicaoDFe":
-            x = etree.SubElement(body, "nfeDistDFeInteresse", xmlns=NAMESPACE_METODO + metodo)
+            x = etree.SubElement(
+                body, "nfeDistDFeInteresse", xmlns=NAMESPACE_METODO + metodo
+            )
             a = etree.SubElement(x, "nfeDadosMsg")
 
         # === Cadastro MT ===
         elif metodo == "CadConsultaCadastro4" and self.uf.upper() == "MT":
-            x = etree.SubElement(body, "consultaCadastro", xmlns=NAMESPACE_METODO + metodo)
+            x = etree.SubElement(
+                body, "consultaCadastro", xmlns=NAMESPACE_METODO + metodo
+            )
             a = etree.SubElement(x, "nfeDadosMsg")
 
         # === NFCOM Consulta ===
         elif metodo == "NFComConsulta":
-            a = etree.SubElement(body, "nfcomDadosMsg", xmlns=NAMESPACE_NFCOM_METODO + metodo)
+            a = etree.SubElement(
+                body, "nfcomDadosMsg", xmlns=NAMESPACE_NFCOM_METODO + metodo
+            )
 
         # === NFe ABI (Modelo 77) ===
-        elif metodo in ("NFeAutorizacao", "NFeConsultaProtocolo", "NFeStatusServico", "NFeRecepcaoEvento"):
-            a = etree.SubElement(body, "nfeabiDadosMsg", xmlns=NAMESPACE_NFEABI_METODO + metodo)
+        elif metodo in (
+            "NFeAutorizacao",
+            "NFeConsultaProtocolo",
+            "NFeStatusServico",
+            "NFeRecepcaoEvento",
+        ):
+            a = etree.SubElement(
+                body, "nfeabiDadosMsg", xmlns=NAMESPACE_NFEABI_METODO + metodo
+            )
 
         # === Default (NFe / NFCe / CTe etc) ===
         else:
@@ -734,7 +796,9 @@ class ComunicacaoSefaz(Comunicacao):
 
     def _post(self, url, xml, timeout=None):
         certificado_a1 = CertificadoA1(self.certificado)
-        chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+        chave, cert = certificado_a1.separar_arquivo(
+            self.certificado_senha, caminho=True
+        )
         chave_cert = (cert, chave)
         # Abre a conexão HTTPS
         try:
@@ -743,7 +807,10 @@ class ComunicacaoSefaz(Comunicacao):
             # limpa xml com caracteres bugados para infNFeSupl em NFC-e
             xml = re.sub(
                 "<qrCode>(.*?)</qrCode>",
-                lambda x: x.group(0).replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", ""),
+                lambda x: x.group(0)
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", ""),
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml
@@ -773,7 +840,12 @@ class ComunicacaoNfse(Comunicacao):
     _namespace = ""
 
     def __init__(
-        self, autorizador, certificado=None, certificado_senha=None, homologacao=False, **kwargs
+        self,
+        autorizador,
+        certificado=None,
+        certificado_senha=None,
+        homologacao=False,
+        **kwargs,
     ):
         self.certificado = certificado
         self.certificado_senha = certificado_senha
@@ -812,7 +884,9 @@ class ComunicacaoNfse(Comunicacao):
 
         if self.autorizador == "OSASCO":
             # comunica via wsdl
-            return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], payload)
+            return self._post_zeep(
+                url, NFSE[self.autorizador]["CONSULTA_COMPLETA"], payload
+            )
         else:
             raise Exception("Este método não esta implementado para o autorizador.")
 
@@ -822,7 +896,9 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
 
-            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            xml_assinado = AssinaturaA1(
+                self.certificado, self.certificado_senha
+            ).assinar(payload)
             envelope_xml = SerializacaoCampinas().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_RPS"], xml_assinado
             )
@@ -839,7 +915,9 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
 
-            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            xml_assinado = AssinaturaA1(
+                self.certificado, self.certificado_senha
+            ).assinar(payload)
             envelope_xml = SerializacaoCampinas().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_FAIXA"], xml_assinado
             )
@@ -856,7 +934,9 @@ class ComunicacaoNfse(Comunicacao):
         if self.autorizador == "CAMPINAS":
             from pynfe.processamento.autorizador_nfse import SerializacaoCampinas
 
-            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(payload)
+            xml_assinado = AssinaturaA1(
+                self.certificado, self.certificado_senha
+            ).assinar(payload)
             envelope_xml = SerializacaoCampinas().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
             )
@@ -871,9 +951,9 @@ class ComunicacaoNfse(Comunicacao):
         elif self.autorizador == "GISS":
             from pynfe.processamento.autorizador_nfse import SerializacaoGiss
 
-            xml_assinado = AssinaturaA1(self.certificado, self.certificado_senha).assinar(
-                payload, retorna_string=True
-            )
+            xml_assinado = AssinaturaA1(
+                self.certificado, self.certificado_senha
+            ).assinar(payload, retorna_string=True)
             envelope_xml = SerializacaoGiss().soap_envelope(
                 NFSE[self.autorizador]["CONSULTA_SERVICO"], xml_assinado
             )
@@ -883,7 +963,7 @@ class ComunicacaoNfse(Comunicacao):
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         elif self.autorizador == "GINFES":
             # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' +  payload.decode("utf-8")
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' + payload.decode("utf-8")
             # comunica via wsdl
             return self._post_https(url, xml, "consulta")
         else:
@@ -911,9 +991,9 @@ class ComunicacaoNfse(Comunicacao):
         etree.SubElement(raiz, "{%s}versaoDados" % self._namespace).text = self._versao
 
         if retorna_string:
-            cabecalho = etree.tostring(raiz, encoding="unicode", pretty_print=False).replace(
-                "\n", ""
-            )
+            cabecalho = etree.tostring(
+                raiz, encoding="unicode", pretty_print=False
+            ).replace("\n", "")
             cabecalho = xml_declaration + cabecalho
             return cabecalho
         else:
@@ -930,9 +1010,9 @@ class ComunicacaoNfse(Comunicacao):
         etree.SubElement(raiz, "versaoDados").text = self._versao
 
         if retorna_string:
-            cabecalho = etree.tostring(raiz, encoding="unicode", pretty_print=False).replace(
-                "\n", ""
-            )
+            cabecalho = etree.tostring(
+                raiz, encoding="unicode", pretty_print=False
+            ).replace("\n", "")
             cabecalho = xml_declaration + cabecalho
             return cabecalho
         else:
@@ -950,13 +1030,17 @@ class ComunicacaoNfse(Comunicacao):
             self.url = NFSE[self.autorizador][ambiente]
             if self.autorizador == "GISS":
                 municipio = obter_municipio_por_codigo(
-                    str(self.codigo_municipio), uf=str(self.codigo_municipio)[:2], normalizado=True
+                    str(self.codigo_municipio),
+                    uf=str(self.codigo_municipio)[:2],
+                    normalizado=True,
                 )
                 self.url = self.url.replace("{municipio}", str(municipio.lower()))
             if self.autorizador == "SPEEDGOV":
                 self.url = self.url.replace(
                     "{suffix_municipio}",
-                    NFSE[self.autorizador]["SUFFIX_MUNICIPIO"][str(self.codigo_municipio)],
+                    NFSE[self.autorizador]["SUFFIX_MUNICIPIO"][
+                        str(self.codigo_municipio)
+                    ],
                 )
         else:
             raise Exception("Autorizador nao encontrado!")
@@ -1007,9 +1091,13 @@ class ComunicacaoNfse(Comunicacao):
             from suds.client import Client
 
             certificadoA1 = CertificadoA1(self.certificado)
-            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave, cert = certificadoA1.separar_arquivo(
+                self.certificado_senha, caminho=True
+            )
 
-            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+            cliente = Client(
+                url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url)
+            )
 
             # gerar nfse
             if metodo == "gerar":
@@ -1036,7 +1124,6 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
-
 
     def enviar_barueri(self, xml, operation):
         url = self._get_url()
@@ -1071,7 +1158,9 @@ class ComunicacaoNfse(Comunicacao):
 
         certificado_a1 = CertificadoA1(self.certificado)
         try:
-            chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave, cert = certificado_a1.separar_arquivo(
+                self.certificado_senha, caminho=True
+            )
             chave_cert = (cert, chave)
 
             if operation == "enviar_rps":
@@ -1085,7 +1174,10 @@ class ComunicacaoNfse(Comunicacao):
             else:
                 raise Exception(f"Operação {operation} não implementada para Barueri.")
 
-            headers = {"Content-Type": "text/xml; charset=utf-8", "SOAPAction": f'"{soap_action}"'}
+            headers = {
+                "Content-Type": "text/xml; charset=utf-8",
+                "SOAPAction": f'"{soap_action}"',
+            }
 
             return requests.post(
                 url,
@@ -1114,25 +1206,39 @@ class ComunicacaoNfse(Comunicacao):
             from pynfe.utils.https_nfse import HttpAuthenticated
             from suds.client import Client
 
-            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave, cert = certificadoA1.separar_arquivo(
+                self.certificado_senha, caminho=True
+            )
 
-            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+            cliente = Client(
+                url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url)
+            )
 
             # gerar nfse
 
             if metodo == "enviar_rps":
-                return cliente.service.NFeLoteEnviarArquivo(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.NFeLoteEnviarArquivo(
+                    VersaoSchema=1, MensagemXML=xml
+                )
             elif metodo == "consultar_rps":
-                return cliente.service.NFeLoteStatusArquivo(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.NFeLoteStatusArquivo(
+                    VersaoSchema=1, MensagemXML=xml
+                )
             elif metodo == "listar_rps":
-                return cliente.service.NFeLoteListarArquivos(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.NFeLoteListarArquivos(
+                    VersaoSchema=1, MensagemXML=xml
+                )
             elif metodo == "baixar_nfse":
-                return cliente.service.NFeLoteBaixarArquivo(VersaoSchema=1, MensagemXML=xml)
+                return cliente.service.NFeLoteBaixarArquivo(
+                    VersaoSchema=1, MensagemXML=xml
+                )
             elif metodo == "cancelar":
                 return cliente.service.CancelamentoNFe(VersaoSchema=1, MensagemXML=xml)
             # TODO outros metodos
             else:
-                raise Exception(f"Método {metodo} não implementado no autorizador Barueri.")
+                raise Exception(
+                    f"Método {metodo} não implementado no autorizador Barueri."
+                )
         except Exception as e:
             raise e
         finally:
@@ -1174,26 +1280,40 @@ class ComunicacaoNfse(Comunicacao):
             from pynfe.utils.https_nfse import HttpAuthenticated
             from suds.client import Client
 
-            chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+            chave, cert = certificadoA1.separar_arquivo(
+                self.certificado_senha, caminho=True
+            )
 
-            cliente = Client(url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url))
+            cliente = Client(
+                url, transport=HttpAuthenticated(key=chave, cert=cert, endereco=url)
+            )
 
             # São Paulo NFS-e WebService methods
             # Manual v3.3.4 section 4.3.1: All methods receive VersaoSchema and MensagemXML
             if metodo == "enviar_rps":
-                return cliente.service.EnvioRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+                return cliente.service.EnvioRPS(
+                    VersaoSchema=versao_schema, MensagemXML=xml
+                )
             elif metodo == "teste_envio_lote_rps":
                 return cliente.service.TesteEnvioLoteRPS(
                     VersaoSchema=versao_schema, MensagemXML=xml
                 )
             elif metodo == "envio_lote_rps":
-                return cliente.service.EnvioLoteRPS(VersaoSchema=versao_schema, MensagemXML=xml)
+                return cliente.service.EnvioLoteRPS(
+                    VersaoSchema=versao_schema, MensagemXML=xml
+                )
             elif metodo == "consultar_rps":
-                return cliente.service.ConsultaNFe(VersaoSchema=versao_schema, MensagemXML=xml)
+                return cliente.service.ConsultaNFe(
+                    VersaoSchema=versao_schema, MensagemXML=xml
+                )
             elif metodo == "cancelar":
-                return cliente.service.CancelamentoNFe(VersaoSchema=versao_schema, MensagemXML=xml)
+                return cliente.service.CancelamentoNFe(
+                    VersaoSchema=versao_schema, MensagemXML=xml
+                )
             else:
-                raise Exception(f"Método {metodo} não implementado no autorizador São Paulo.")
+                raise Exception(
+                    f"Método {metodo} não implementado no autorizador São Paulo."
+                )
         except Exception as e:
             raise e
         finally:
@@ -1217,7 +1337,9 @@ class ComunicacaoNfse(Comunicacao):
             # certificado A1
             if self.certificado:
                 certificadoA1 = CertificadoA1(self.certificado)
-                chave, cert = certificadoA1.separar_arquivo(self.certificado_senha, caminho=True)
+                chave, cert = certificadoA1.separar_arquivo(
+                    self.certificado_senha, caminho=True
+                )
                 session.cert = (cert, chave)
 
             transport = Transport(session=session, timeout=60)
@@ -1323,16 +1445,24 @@ class ComunicacaoMDFe(Comunicacao):
                 try:
                     # Protocolo com envio OK
                     inf_prot = prot[1][0]
-                    lote_status = inf_prot.xpath("ns:retEnviMDFe/ns:cStat", namespaces=ns)[0].text
+                    lote_status = inf_prot.xpath(
+                        "ns:retEnviMDFe/ns:cStat", namespaces=ns
+                    )[0].text
 
                     # Lote processado
                     if lote_status == self._edoc_situacao_lote_processado:
-                        prot_mdfe = inf_prot.xpath("ns:retEnviMDFe/ns:protMDFe", namespaces=ns)[0]
-                        status = prot_mdfe.xpath("ns:infProt/ns:cStat", namespaces=ns)[0].text
+                        prot_mdfe = inf_prot.xpath(
+                            "ns:retEnviMDFe/ns:protMDFe", namespaces=ns
+                        )[0]
+                        status = prot_mdfe.xpath("ns:infProt/ns:cStat", namespaces=ns)[
+                            0
+                        ].text
 
                         # autorizado uso do MDF-e
                         # retorna xml final (protMDFe + MDFe)
-                        if status in self._edoc_situacao_ja_enviado:  # if status == '100':
+                        if (
+                            status in self._edoc_situacao_ja_enviado
+                        ):  # if status == '100':
                             raiz = etree.Element(
                                 "mdfeProc", xmlns=NAMESPACE_MDFE, versao=VERSAO_MDFE
                             )
@@ -1351,14 +1481,18 @@ class ComunicacaoMDFe(Comunicacao):
                     self._edoc_situacao_arquivo_recebido_com_sucesso,
                     self._edoc_situacao_em_processamento,
                 ):
-                    nrec = rec.xpath("ns:retEnviMDFe/ns:infRec/ns:nRec", namespaces=ns)[0].text
+                    nrec = rec.xpath("ns:retEnviMDFe/ns:infRec/ns:nRec", namespaces=ns)[
+                        0
+                    ].text
                     return 0, nrec, manifesto
         return 1, retorno, manifesto
 
     def status_servico(self):
         url = self._get_url("STATUS")
         # Monta XML do corpo da requisição
-        raiz = etree.Element("consStatServMDFe", versao=self._versao, xmlns=NAMESPACE_MDFE)
+        raiz = etree.Element(
+            "consStatServMDFe", versao=self._versao, xmlns=NAMESPACE_MDFE
+        )
         etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
         etree.SubElement(raiz, "xServ").text = "STATUS"
         xml = self._construir_xml_soap("MDFeStatusServico", raiz)
@@ -1378,7 +1512,9 @@ class ComunicacaoMDFe(Comunicacao):
     def consulta_nao_encerrados(self, cpfcnpj):
         url = self._get_url("NAO_ENCERRADOS")
         # Monta XML do corpo da requisição
-        raiz = etree.Element("consMDFeNaoEnc", xmlns=NAMESPACE_MDFE, versao=self._versao)
+        raiz = etree.Element(
+            "consMDFeNaoEnc", xmlns=NAMESPACE_MDFE, versao=self._versao
+        )
         etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
         etree.SubElement(raiz, "xServ").text = "CONSULTAR NÃO ENCERRADOS"
         if len(cpfcnpj) == 11:
@@ -1435,7 +1571,9 @@ class ComunicacaoMDFe(Comunicacao):
 
         body = etree.SubElement(raiz, "{%s}Body" % self._namespace_soap)
 
-        a = etree.SubElement(body, self._envio_mensagem, xmlns=self._namespace_metodo + metodo)
+        a = etree.SubElement(
+            body, self._envio_mensagem, xmlns=self._namespace_metodo + metodo
+        )
 
         # if metodo == 'MDFeRecepcaoSinc':
         #     body_base64 = base64.b16encode(a).decode()
@@ -1451,9 +1589,9 @@ class ComunicacaoMDFe(Comunicacao):
 
         # PE é a únca UF que exige SOAPAction no header
         if soap_webservice_method:
-            header[b"SOAPAction"] = (self._namespace_metodo + soap_webservice_method).encode(
-                "utf-8"
-            )
+            header[b"SOAPAction"] = (
+                self._namespace_metodo + soap_webservice_method
+            ).encode("utf-8")
 
         if self._accept:
             header[b"Accept"] = b"application/soap+xml; charset=utf-8;"
@@ -1462,7 +1600,9 @@ class ComunicacaoMDFe(Comunicacao):
 
     def _post(self, url, xml):
         certificado_a1 = CertificadoA1(self.certificado)
-        chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+        chave, cert = certificado_a1.separar_arquivo(
+            self.certificado_senha, caminho=True
+        )
         chave_cert = (cert, chave)
         # Abre a conexão HTTPS
         try:
@@ -1471,11 +1611,16 @@ class ComunicacaoMDFe(Comunicacao):
             # limpa xml com caracteres bugados para infMDFeSupl em NFC-e
             xml = re.sub(
                 "<qrCodMDFe>(.*?)</qrCodMDFe>",
-                lambda x: x.group(0).replace("&lt;", "<").replace("&gt;", ">").replace("amp;", ""),
+                lambda x: x.group(0)
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("amp;", ""),
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml
-            xml = xml.encode("utf8")  # necessário para o evento "CONSULTAR NÃO ENCERRADOS"
+            xml = xml.encode(
+                "utf8"
+            )  # necessário para o evento "CONSULTAR NÃO ENCERRADOS"
 
             print(xml)
             print("-" * 20)
@@ -1540,7 +1685,9 @@ class ComunicacaoCTe(Comunicacao):
         """
         url = self._get_url("STATUS")
         # Monta XML do corpo da requisição
-        raiz = etree.Element("consStatServCte", versao=self._versao, xmlns=NAMESPACE_CTE)
+        raiz = etree.Element(
+            "consStatServCte", versao=self._versao, xmlns=NAMESPACE_CTE
+        )
         etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
         etree.SubElement(raiz, "xServ").text = "STATUS"
         xml = self._construir_xml_soap("CteStatusServico", raiz)
@@ -1705,10 +1852,14 @@ class ComunicacaoCTe(Comunicacao):
 
         # distribuição tem um corpo de xml diferente
         if metodo == "CTeDistribuicaoDFe":
-            x = etree.SubElement(body, "cteDistDFeInteresse", xmlns=NAMESPACE_CTE_METODO + metodo)
+            x = etree.SubElement(
+                body, "cteDistDFeInteresse", xmlns=NAMESPACE_CTE_METODO + metodo
+            )
             a = etree.SubElement(x, "cteDadosMsg")
         else:
-            a = etree.SubElement(body, "cteDadosMsg", xmlns=NAMESPACE_CTE_METODO + metodo)
+            a = etree.SubElement(
+                body, "cteDadosMsg", xmlns=NAMESPACE_CTE_METODO + metodo
+            )
         a.append(dados)
         return raiz
 
@@ -1723,7 +1874,9 @@ class ComunicacaoCTe(Comunicacao):
 
     def _post(self, url, xml):
         certificado_a1 = CertificadoA1(self.certificado)
-        chave, cert = certificado_a1.separar_arquivo(self.certificado_senha, caminho=True)
+        chave, cert = certificado_a1.separar_arquivo(
+            self.certificado_senha, caminho=True
+        )
         chave_cert = (cert, chave)
         # Abre a conexão HTTPS
         try:
@@ -1732,7 +1885,10 @@ class ComunicacaoCTe(Comunicacao):
             # limpa xml com caracteres bugados para infNFeSupl em NFC-e
             xml = re.sub(
                 "<qrCode>(.*?)</qrCode>",
-                lambda x: x.group(0).replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", ""),
+                lambda x: x.group(0)
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", ""),
                 etree.tostring(xml, encoding="unicode").replace("\n", ""),
             )
             xml = xml_declaration + xml

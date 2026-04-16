@@ -86,7 +86,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
         etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+        etree.SubElement(prestador, "InscricaoMunicipal").text = (
+            emitente.inscricao_municipal
+        )
 
         periodo = etree.SubElement(raiz, "PeriodoEmissao")
         etree.SubElement(periodo, "DataInicial").text = data_inicio
@@ -102,7 +104,9 @@ class SerializacaoCampinas(InterfaceAutorizador):
         prestador = etree.SubElement(raiz, "Prestador")
         cpf_cnpj = etree.SubElement(prestador, "CpfCnpj")
         etree.SubElement(cpf_cnpj, "Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+        etree.SubElement(prestador, "InscricaoMunicipal").text = (
+            emitente.inscricao_municipal
+        )
 
         faixa = etree.SubElement(raiz, "Faixa")
         etree.SubElement(faixa, "NumeroNfseInicial").text = str(numero_inicial)
@@ -143,7 +147,9 @@ class SerializacaoSpeedgov(InterfaceAutorizador):
             },
         )
         etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Header")
-        body = etree.SubElement(envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Body")
+        body = etree.SubElement(
+            envelope, "{http://schemas.xmlsoap.org/soap/envelope/}Body"
+        )
 
         consultar_nfse = etree.SubElement(body, "{%s}" % NAMESPACE_ABRASF + metodo)
 
@@ -165,7 +171,9 @@ class SerializacaoSpeedgov(InterfaceAutorizador):
 
         prestador = etree.SubElement(raiz, "Prestador")
         etree.SubElement(prestador, "Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, "InscricaoMunicipal").text = emitente.inscricao_municipal
+        etree.SubElement(prestador, "InscricaoMunicipal").text = (
+            emitente.inscricao_municipal
+        )
 
         periodo = etree.SubElement(raiz, "PeriodoEmissao")
         etree.SubElement(periodo, "DataInicial").text = data_inicio
@@ -183,7 +191,9 @@ class SerializacaoGiss(InterfaceAutorizador):
     NAMESPACE_XSI = "http://www.w3.org/2001/XMLSchema-instance"
     NAMESPACE_XSD = "http://www.w3.org/2001/XMLSchema"
     NAMESPACE_ABRASF = "http://nfse.abrasf.org.br"
-    NAMESPACE_METODO = "http://www.giss.com.br/consultar-nfse-servico-prestado-envio-v2_04.xsd"
+    NAMESPACE_METODO = (
+        "http://www.giss.com.br/consultar-nfse-servico-prestado-envio-v2_04.xsd"
+    )
     NAMESPACE_TIPOS = "http://www.giss.com.br/tipos-v2_04.xsd"
     NAMESPACE_CABECALHO = "http://www.giss.com.br/cabecalho-v2_04.xsd"
 
@@ -492,7 +502,6 @@ class SerializacaoBetha(InterfaceAutorizador):
 class SerializacaoGinfes(InterfaceAutorizador):
     def __init__(self):
         pass
-    
 
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         NS = "http://www.ginfes.com.br/servico_consultar_nfse_servico_prestado_envio_v03.xsd"

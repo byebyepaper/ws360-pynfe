@@ -315,7 +315,9 @@ NFE = {
         "HTTPS": "https://",
         "HOMOLOGACAO": "https://hom",
     },
-    "MA": {"CADASTRO": "https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl"},
+    "MA": {
+        "CADASTRO": "https://sistemas.sefaz.ma.gov.br/wscadastro/CadConsultaCadastro2?wsdl"
+    },
     "PE": {
         "STATUS": "sefaz.pe.gov.br/nfe-service/services/NFeStatusServico4",
         "AUTORIZACAO": "sefaz.pe.gov.br/nfe-service/services/NFeAutorizacao4",
@@ -536,9 +538,7 @@ NFSE = {
         "DOWNLOAD": (
             "https://speedgov.com.br/sat{suffix_municipio}/servlet//com.satweb.aratb177e?1,1,1,1,{im},{numero_nfse},{codigo_verificacao}"
         ),
-        "SUFFIX_MUNICIPIO": {
-            "2307650":"mar"
-        },
+        "SUFFIX_MUNICIPIO": {"2307650": "mar"},
     },
     "GISS": {
         "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",
