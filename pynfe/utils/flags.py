@@ -26,6 +26,11 @@ NAMESPACE_NFCOM_METODO = "http://www.portalfiscal.inf.br/nfcom/wsdl/"
 VERSAO_NFCOM = "1.00"
 VERSAO_QRCODE = "2"
 
+NAMESPACE_NFEABI = "http://www.portalfiscal.inf.br/nfeabi"
+NAMESPACE_NFEABI_METODO = "http://www.portalfiscal.inf.br/nfeabi/wsdl/"
+MODELO_NFEABI = "77"
+VERSAO_NFEABI = "1.00"
+
 TIPOS_DOCUMENTO = (
     "CNPJ",
     "CPF",

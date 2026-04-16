@@ -16,6 +16,8 @@ from pynfe.utils.flags import (
     NAMESPACE_METODO,
     NAMESPACE_NFCOM,
     NAMESPACE_NFCOM_METODO,
+    NAMESPACE_NFEABI,
+    NAMESPACE_NFEABI_METODO,
     NAMESPACE_NFE,
     NAMESPACE_SOAP,
     NAMESPACE_XSD,
@@ -23,9 +25,10 @@ from pynfe.utils.flags import (
     VERSAO_CTE,
     VERSAO_MDFE,
     VERSAO_NFCOM,
+    VERSAO_NFEABI,
     VERSAO_PADRAO,
 )
-from pynfe.utils.webservices import CTE, MDFE, NFCE, NFCOM, NFE, NFSE
+from pynfe.utils.webservices import CTE, MDFE, NFCE, NFCOM, NFE, NFEABI, NFSE
 
 from .assinatura import AssinaturaA1
 
@@ -72,15 +75,21 @@ class ComunicacaoSefaz(Comunicacao):
         url = self._get_url(modelo=modelo, consulta="AUTORIZACAO", contingencia=contingencia)
 
         # Monta XML do corpo da requisição
-        raiz = etree.Element("enviNFe", xmlns=NAMESPACE_NFE, versao=VERSAO_PADRAO)
-        etree.SubElement(raiz, "idLote").text = str(
-            id_lote
-        )  # numero autoincremental gerado pelo sistema
-        etree.SubElement(raiz, "indSinc").text = str(ind_sinc)  # 0 para assincrono, 1 para sincrono
-        raiz.append(nota_fiscal)
+        if modelo == "nfe-abi":
+            raiz = etree.Element("enviNFeABI", xmlns=NAMESPACE_NFEABI, versao=VERSAO_NFEABI)
+            etree.SubElement(raiz, "idLote").text = str(id_lote)
+            etree.SubElement(raiz, "indSinc").text = str(ind_sinc)
+            raiz.append(nota_fiscal)
+            xml = self._construir_xml_soap("NFeAutorizacao", raiz)
+        else:
+            raiz = etree.Element("enviNFe", xmlns=NAMESPACE_NFE, versao=VERSAO_PADRAO)
+            etree.SubElement(raiz, "idLote").text = str(
+                id_lote
+            )  # numero autoincremental gerado pelo sistema
+            etree.SubElement(raiz, "indSinc").text = str(ind_sinc)  # 0 para assincrono, 1 para sincrono
+            raiz.append(nota_fiscal)
+            xml = self._construir_xml_soap("NFeAutorizacao4", raiz)
 
-        # Monta XML para envio da requisição
-        xml = self._construir_xml_soap("NFeAutorizacao4", raiz)
         # Faz request no Servidor da Sefaz
         retorno = self._post(url, xml, timeout)
 
@@ -88,7 +97,7 @@ class ComunicacaoSefaz(Comunicacao):
         # Caso contrário, envia todo o soap de resposta da Sefaz para decisão do usuário.
         if retorno.status_code == 200:
             # namespace
-            ns = {"ns": NAMESPACE_NFE}
+            ns = {"ns": NAMESPACE_NFEABI if modelo == "nfe-abi" else NAMESPACE_NFE}
             # Procuta status no xml
             try:
                 prot = etree.fromstring(retorno.text)
@@ -173,6 +182,12 @@ class ComunicacaoSefaz(Comunicacao):
             etree.SubElement(raiz, "xServ").text = "CONSULTAR"
             etree.SubElement(raiz, "chNFCom").text = chave
             xml = self._construir_xml_soap("NFComConsulta", raiz)
+        elif modelo == "nfe-abi":
+            raiz = etree.Element("consSitNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI)
+            etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
+            etree.SubElement(raiz, "xServ").text = "CONSULTAR"
+            etree.SubElement(raiz, "chNFeABI").text = chave
+            xml = self._construir_xml_soap("NFeConsultaProtocolo", raiz)
         else:
             # Monta XML do corpo da requisição
             raiz = etree.Element("consSitNFe", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
@@ -392,13 +407,18 @@ class ComunicacaoSefaz(Comunicacao):
         except Exception:
             url = self._get_url(modelo=modelo, consulta="EVENTOS")
 
-        # Monta XML do corpo da requisição
-        raiz = etree.Element("envEvento", versao="1.00", xmlns=NAMESPACE_NFE)
-        etree.SubElement(raiz, "idLote").text = str(
-            id_lote
-        )  # numero autoincremental gerado pelo sistema
-        raiz.append(evento)
-        xml = self._construir_xml_soap("NFeRecepcaoEvento4", raiz)
+        if modelo == "nfe-abi":
+            raiz = etree.Element("envEvento", versao="1.00", xmlns=NAMESPACE_NFEABI)
+            etree.SubElement(raiz, "idLote").text = str(id_lote)
+            raiz.append(evento)
+            xml = self._construir_xml_soap("NFeRecepcaoEvento", raiz)
+        else:
+            raiz = etree.Element("envEvento", versao="1.00", xmlns=NAMESPACE_NFE)
+            etree.SubElement(raiz, "idLote").text = str(
+                id_lote
+            )  # numero autoincremental gerado pelo sistema
+            raiz.append(evento)
+            xml = self._construir_xml_soap("NFeRecepcaoEvento4", raiz)
         return self._post(url, xml)
 
     def status_servico(self, modelo, timeout=None):
@@ -408,12 +428,18 @@ class ComunicacaoSefaz(Comunicacao):
         :return:
         """
         url = self._get_url(modelo, "STATUS")
-        # Monta XML do corpo da requisição
-        raiz = etree.Element("consStatServ", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
-        etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
-        etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
-        etree.SubElement(raiz, "xServ").text = "STATUS"
-        xml = self._construir_xml_soap("NFeStatusServico4", raiz)
+        if modelo == "nfe-abi":
+            raiz = etree.Element("consStatServNFeABI", versao=VERSAO_NFEABI, xmlns=NAMESPACE_NFEABI)
+            etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
+            etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
+            etree.SubElement(raiz, "xServ").text = "STATUS"
+            xml = self._construir_xml_soap("NFeStatusServico", raiz)
+        else:
+            raiz = etree.Element("consStatServ", versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
+            etree.SubElement(raiz, "tpAmb").text = str(self._ambiente)
+            etree.SubElement(raiz, "cUF").text = CODIGOS_ESTADOS[self.uf.upper()]
+            etree.SubElement(raiz, "xServ").text = "STATUS"
+            xml = self._construir_xml_soap("NFeStatusServico4", raiz)
         return self._post(url, xml, timeout)
 
     def inutilizacao(
@@ -589,9 +615,10 @@ class ComunicacaoSefaz(Comunicacao):
                         )
                     else:
                         self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
-
+            elif modelo == "nfe-abi":
+                self.url = NFEABI["AN"][ambiente] + NFEABI["AN"][consulta]
             else:
-                raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"')
+                raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"')
         # Estados que utilizam outros ambientes
         else:
             lista_svrs = [
@@ -624,9 +651,11 @@ class ComunicacaoSefaz(Comunicacao):
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
                 elif modelo == "nfcom":
                     self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
+                elif modelo == "nfe-abi":
+                    self.url = NFEABI["AN"][ambiente] + NFEABI["AN"][consulta]
                 else:
                     raise Exception(
-                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"'
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"'
                     )
             # unico UF que utiliza SVAN ainda para NF-e
             # SVRS para NFC-e
@@ -643,9 +672,11 @@ class ComunicacaoSefaz(Comunicacao):
                     self.url = NFCE["SVRS"][ambiente] + NFCE["SVRS"][consulta]
                 elif modelo == "nfcom":
                     self.url = NFCOM["SVRS"][ambiente] + NFCOM["SVRS"][consulta]
+                elif modelo == "nfe-abi":
+                    self.url = NFEABI["AN"][ambiente] + NFEABI["AN"][consulta]
                 else:
                     raise Exception(
-                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom"'
+                        'Modelo não encontrado! Defina modelo="nfe" ou "nfce" ou "nfcom" ou "nfe-abi"'
                     )
             else:
                 raise Exception(f"Url não encontrada para {modelo} e {consulta} {self.uf.upper()}")
@@ -677,6 +708,10 @@ class ComunicacaoSefaz(Comunicacao):
         # === NFCOM Consulta ===
         elif metodo == "NFComConsulta":
             a = etree.SubElement(body, "nfcomDadosMsg", xmlns=NAMESPACE_NFCOM_METODO + metodo)
+
+        # === NFe ABI (Modelo 77) ===
+        elif metodo in ("NFeAutorizacao", "NFeConsultaProtocolo", "NFeStatusServico", "NFeRecepcaoEvento"):
+            a = etree.SubElement(body, "nfeabiDadosMsg", xmlns=NAMESPACE_NFEABI_METODO + metodo)
 
         # === Default (NFe / NFCe / CTe etc) ===
         else:
