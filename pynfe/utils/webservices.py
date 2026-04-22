@@ -632,16 +632,15 @@ CTE = {
 }
 
 # NFe ABI (Modelo 77) — Nota Fiscal Eletrônica de Alienação de Bens Imóveis (LC 214/2025)
-# Endpoints centralizados nacionalmente via ambiente AN.
-# URLs a serem preenchidas quando SEFAZ publicar os WSDLs oficiais.
+# Utilizando a mesma base do ambiente nacional da NFe até publicação oficial dos endpoints da ABI.
 NFEABI = {
     "AN": {
-        "STATUS": "nfeabi.sefaz.gov.br/ws/NFeStatusServico",
-        "AUTORIZACAO": "nfeabi.sefaz.gov.br/ws/NFeAutorizacao",
-        "CHAVE": "nfeabi.sefaz.gov.br/ws/NFeConsultaProtocolo",
-        "EVENTOS": "nfeabi.sefaz.gov.br/ws/NFeRecepcaoEvento",
-        "HTTPS": "https://",
-        "HOMOLOGACAO": "https://homologacao.",
+        "STATUS": "nfe.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx",
+        "AUTORIZACAO": "nfe.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx",
+        "CHAVE": "nfe.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
+        "EVENTOS": "nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
+        "HTTPS": "https://www",
+        "HOMOLOGACAO": "https://hom1",
     },
 }
 
