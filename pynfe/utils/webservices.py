@@ -639,8 +639,8 @@ NFEABI = {
         "AUTORIZACAO": "nfe.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx",
         "CHAVE": "nfe.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
         "EVENTOS": "nfe.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx",
-        "HTTPS": "https://www",
-        "HOMOLOGACAO": "https://hom1",
+        "HTTPS": "https://www.",
+        "HOMOLOGACAO": "https://hom1.",
     },
 }
 
