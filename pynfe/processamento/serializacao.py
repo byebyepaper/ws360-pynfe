@@ -9,7 +9,7 @@ import pynfe.utils.xml_writer as xmlw
 from pynfe.entidades import Manifesto, NotaFiscal
 from pynfe.utils import (etree, obter_codigo_por_municipio,
                          obter_municipio_por_codigo, obter_pais_por_codigo,
-                         so_numeros)
+                         so_numeros, sanitize_cpf_cnpj)
 from pynfe.utils.flags import (CODIGOS_ESTADOS, NAMESPACE_CTE, NAMESPACE_MDFE,
                                NAMESPACE_NFE, NAMESPACE_SIG, VERSAO_MDFE, VERSAO_PADRAO, VERSAO_QRCODE)
 from pynfe.utils.webservices import MDFE, NFCE
@@ -95,9 +95,9 @@ class SerializacaoXML(Serializacao):
 
         # Dados do emitente
         if len(so_numeros(emitente.cnpj)) == 11:
-            etree.SubElement(raiz, "CPF").text = so_numeros(emitente.cnpj)
+            etree.SubElement(raiz, "CPF").text = sanitize_cpf_cnpj(emitente.cnpj)
         else:
-            etree.SubElement(raiz, "CNPJ").text = so_numeros(emitente.cnpj)
+            etree.SubElement(raiz, "CNPJ").text = sanitize_cpf_cnpj(emitente.cnpj)
         etree.SubElement(raiz, "xNome").text = emitente.razao_social
         etree.SubElement(raiz, "xFant").text = emitente.nome_fantasia
         # Endereço
@@ -137,7 +137,7 @@ class SerializacaoXML(Serializacao):
         raiz = etree.Element(tag_raiz)
 
         # Dados do cliente (destinatário)
-        etree.SubElement(raiz, cliente.tipo_documento).text = so_numeros(cliente.numero_documento)
+        etree.SubElement(raiz, cliente.tipo_documento).text = sanitize_cpf_cnpj(cliente.numero_documento)
         if not self._so_cpf:
             if cliente.razao_social:
                 etree.SubElement(raiz, "xNome").text = cliente.razao_social
@@ -194,7 +194,7 @@ class SerializacaoXML(Serializacao):
 
         # Dados da transportadora
         if transportadora.numero_documento:
-            etree.SubElement(raiz, transportadora.tipo_documento.upper()).text = so_numeros(
+            etree.SubElement(raiz, transportadora.tipo_documento.upper()).text = sanitize_cpf_cnpj(
                 transportadora.numero_documento
             )
         if transportadora.razao_social:
@@ -221,7 +221,7 @@ class SerializacaoXML(Serializacao):
         raiz = etree.Element(tag_raiz)
 
         # Dados da entrega/retirada
-        etree.SubElement(raiz, entrega_retirada.tipo_documento).text = so_numeros(
+        etree.SubElement(raiz, entrega_retirada.tipo_documento).text = sanitize_cpf_cnpj(
             entrega_retirada.numero_documento
         )
 
@@ -248,9 +248,9 @@ class SerializacaoXML(Serializacao):
         raiz = etree.Element(tag_raiz)
 
         if len(so_numeros(autorizados_baixar_xml.CPFCNPJ)) == 11:
-            etree.SubElement(raiz, "CPF").text = so_numeros(autorizados_baixar_xml.CPFCNPJ)
+            etree.SubElement(raiz, "CPF").text = sanitize_cpf_cnpj(autorizados_baixar_xml.CPFCNPJ)
         else:
-            etree.SubElement(raiz, "CNPJ").text = so_numeros(autorizados_baixar_xml.CPFCNPJ)
+            etree.SubElement(raiz, "CNPJ").text = sanitize_cpf_cnpj(autorizados_baixar_xml.CPFCNPJ)
 
         if retorna_string:
             return etree.tostring(raiz, encoding="unicode", pretty_print=True)

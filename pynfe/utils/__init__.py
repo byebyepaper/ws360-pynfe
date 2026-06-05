@@ -29,7 +29,22 @@ def so_numeros(texto) -> str:
     return "".join(filter(str.isdigit, str(texto)))
 
 
-# @memoize
+def sanitize_cpf_cnpj(texto) -> str:
+    """
+    Sanitiza CPF/CNPJ preservando letras quando presente (CNPJ alfanumérico per NTCJ 2025.001).
+    Para entradas 100% numéricas o resultado é idêntico a so_numeros().
+
+    :param texto: String ou Inteiro a ser sanitizada
+    :return: String com números e letras (maiúsculas) se alfanumérico, ou somente números
+    """
+    if not texto:
+        return ""
+    texto_str = str(texto).upper()
+    if any(ch.isalpha() for ch in texto_str):
+        return "".join(ch for ch in texto_str if ch.isalnum())
+    return so_numeros(texto_str)
+
+
 def obter_pais_por_codigo(codigo):
     if codigo == "1058" or codigo == "" or codigo is None:
         return "Brasil"
