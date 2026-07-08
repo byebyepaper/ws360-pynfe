@@ -2,6 +2,7 @@
 
 import codecs
 import os
+import re
 from unicodedata import normalize
 from signxml import XMLSigner
 from typing import Literal
@@ -27,6 +28,25 @@ def so_numeros(texto) -> str:
     :return: String somente com números
     """
     return "".join(filter(str.isdigit, str(texto)))
+
+
+# @memoize
+def normalizar_documento(texto) -> str:
+    """
+    Normaliza um documento CPF/CNPJ preservando letras maiúsculas (CNPJ
+    alfanumérico, IN RFB nº 2.229/2024).
+
+    Mantém apenas caracteres 0-9 e A-Z, convertendo letras minúsculas para
+    maiúsculas. Para documentos 100% numéricos (CPF ou CNPJ numérico) o
+    resultado é idêntico ao de ``so_numeros`` — retrocompatível.
+
+    Não deve ser usada para CEP, telefone, inscrição estadual, etc., que
+    continuam sendo tratados por ``so_numeros``.
+
+    :param texto: String ou Inteiro a ser analisada
+    :return: String somente com dígitos e letras maiúsculas
+    """
+    return re.sub(r"[^0-9A-Z]", "", str(texto or "").upper())
 
 
 # @memoize

@@ -3,7 +3,7 @@ import random
 from decimal import Decimal
 
 from pynfe import get_version
-from pynfe.utils import so_numeros
+from pynfe.utils import normalizar_documento, so_numeros
 from pynfe.utils.flags import CODIGOS_ESTADOS, MDFE_STATUS
 
 from .base import Entidade
@@ -180,7 +180,9 @@ class Manifesto(Entidade):
 
         weights = [2, 3, 4, 5, 6, 7, 8, 9]
         weights_size = len(weights)
-        key_numbers = [int(k) for k in key]
+        # ord(k) - 48: para '0'-'9' equivale a int(k) (retrocompatível);
+        # para letras 'A'-'Z' de CNPJ alfanumérico gera 17..42 (IN RFB 2.229/2024).
+        key_numbers = [ord(k) - 48 for k in key]
         key_numbers.reverse()
 
         key_sum = 0
@@ -205,7 +207,7 @@ class Manifesto(Entidade):
             "uf": CODIGOS_ESTADOS[self.uf],
             "ano": self.data_emissao.strftime("%y"),
             "mes": self.data_emissao.strftime("%m"),
-            "cnpj": so_numeros(self.emitente.cpfcnpj).zfill(14),
+            "cnpj": normalizar_documento(self.emitente.cpfcnpj).zfill(14),
             "mod": self.modelo,
             "serie": str(self.serie).zfill(3),
             "nMDF": str(self.numero_mdfe).zfill(9),
@@ -218,7 +220,7 @@ class Manifesto(Entidade):
                 "uf": CODIGOS_ESTADOS[self.uf],
                 "ano": self.data_emissao.strftime("%y"),
                 "mes": self.data_emissao.strftime("%m"),
-                "cnpj": so_numeros(self.emitente.cpfcnpj).zfill(14),
+                "cnpj": normalizar_documento(self.emitente.cpfcnpj).zfill(14),
                 "mod": self.modelo,
                 "serie": str(self.serie).zfill(3),
                 "nMDF": str(self.numero_mdfe).zfill(9),

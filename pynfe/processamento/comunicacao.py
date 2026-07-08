@@ -5,7 +5,7 @@ import re
 
 import requests
 from pynfe.entidades.certificado import CertificadoA1
-from pynfe.utils import etree, obter_municipio_por_codigo, so_numeros
+from pynfe.utils import etree, normalizar_documento, obter_municipio_por_codigo, so_numeros
 from pynfe.utils.flags import (
     CODIGOS_ESTADOS,
     MODELO_MDFE,
@@ -194,8 +194,10 @@ class ComunicacaoSefaz(Comunicacao):
             raise NotImplementedError("Download not implemented for this model yet.")
 
         # validação da chave
-        if not chave or not chave.isdigit() or len(chave) != 44:
-            raise ValueError("Chave NFCom inválida (esperado 44 dígitos numéricos)")
+        # A chave de acesso pode ser alfanumérica (CNPJ alfanumérico do emitente
+        # embutido nas posições 7-20). Aceita também chaves 100% numéricas.
+        if not chave or not re.fullmatch(r"[0-9A-Z]{44}", str(chave).upper()):
+            raise ValueError("Chave NFCom inválida (esperado 44 caracteres [0-9A-Z])")
 
         certificado_a1 = CertificadoA1(self.certificado)
 
@@ -213,7 +215,7 @@ class ComunicacaoSefaz(Comunicacao):
                     "sistema": (None, "Nfcom"),
                     "OrigemSite": (None, "0"),
                     "Ambiente": (None, str(self._ambiente)),
-                    "ChaveAcessoDfe": (None, chave),
+                    "ChaveAcessoDfe": (None, str(chave).upper()),
                 },
                 headers={
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
@@ -444,12 +446,19 @@ class ComunicacaoSefaz(Comunicacao):
         # Valores default
         ano = str(ano or datetime.date.today().year)[-2:]
         uf = CODIGOS_ESTADOS[self.uf.upper()]
-        cnpj = so_numeros(cnpj)
+        # CNPJ pode ser alfanumérico (IN RFB 2.229/2024): preserva letras A-Z.
+        # Para CNPJ 100% numérico o resultado é idêntico ao comportamento anterior.
+        cnpj = normalizar_documento(cnpj)
 
         if len(cnpj) == 14:
             cnpjcpf_chaveacesso = cnpj
         elif len(cnpj) == 11:
-            cnpjcpf_chaveacesso = str(cnpj).zfill(14)
+            cnpjcpf_chaveacesso = cnpj.zfill(14)
+        else:
+            raise ValueError(
+                "CPF/CNPJ inválido para inutilização (esperado 11 dígitos "
+                f"para CPF ou 14 caracteres para CNPJ): {cnpj}"
+            )
 
         # Identificador da TAG a ser assinada formada com Código da UF + Ano (2 posições) +
         #  CNPJ + modelo + série + nro inicial e nro final precedida do literal “ID”
