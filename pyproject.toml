@@ -19,12 +19,13 @@ exclude = [
 ]
 line-length = 100
 
+# NOTA: build usa setuptools (setup.py e a fonte autoritativa de install_requires).
+# Estes pins existem para tooling poetry-like; mantidos consistentes com o alvo py3.14.
 [tool.poetry.dependencies]
 requests = "^2.32.4"
-signxml = "^4.1.0"
-cryptography = "43.0.3"
-lxml = "5.4.0"
-pyopenssl = "^25.1.0"
+signxml = ">=4"
+cryptography = ">=45"
+lxml = ">=6"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.5"

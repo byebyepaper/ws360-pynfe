@@ -1,3 +1,5 @@
-# Opcional para NFS-e
+# Opcional para NFS-e (path Betha usa bindings gerados por PyXB)
+# ATENCAO: PyXB-X 1.2.6.3 instala e funciona em py3.12/3.13, mas NAO em py3.14
+# (PyXB e legado de Python 2). Remocao -> xsdata mapeada no relatorio da Fase 2.
 suds-community
 PyXB-X==1.2.6.3

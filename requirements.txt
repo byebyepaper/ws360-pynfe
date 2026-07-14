@@ -1,9 +1,10 @@
-# Dependencias basicas
-requests
-lxml
-signxml
-cryptography
-# Opcional para NFS-e
+# Dependencias basicas (alvo py3.12/3.14 — Fase 2 migracao ws360)
+requests>=2.32
+lxml>=6            # <5 impede py3.13/3.14; wheel py3.12 arm64 OK
+signxml>=4         # API de assinatura/verificacao mudou; validado com 5.x
+cryptography>=45   # load_pkcs12 via pkcs12.load_key_and_certificates (parser Rust aceita PFX legado)
+# pyOpenSSL nao e mais importado pelo pynfe (cert A1 usa cryptography.pkcs12).
+# Opcional para NFS-e (PyXB-X NAO instala em py3.14 — ver requirements-nfse.txt)
 #-r requirements-nfse.txt
 # Opcional para Desenvolvimento (Pytest, Ruff, MyPy, etc)
 #-r requirements-dev.txt
