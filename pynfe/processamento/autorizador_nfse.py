@@ -212,9 +212,7 @@ class SerializacaoGiss(InterfaceAutorizador):
         )
         body = etree.SubElement(envelope, f"{{{self.NAMESPACE_SOAP}}}Body")
 
-        consultar_nfse = etree.SubElement(
-            body, f"{{{self.NAMESPACE_ABRASF}}}{metodo}Request"
-        )
+        consultar_nfse = etree.SubElement(body, f"{{{self.NAMESPACE_ABRASF}}}{metodo}Request")
 
         header = etree.SubElement(consultar_nfse, "nfseCabecMsg")
         header.text = etree.CDATA(self._cabecalho())
@@ -492,7 +490,6 @@ class SerializacaoBetha(InterfaceAutorizador):
 class SerializacaoGinfes(InterfaceAutorizador):
     def __init__(self):
         pass
-    
 
     def consultar_periodo(self, emitente, data_inicio, data_fim, pagina=1):
         NS = "http://www.ginfes.com.br/servico_consultar_nfse_servico_prestado_envio_v03.xsd"
@@ -509,9 +506,9 @@ class SerializacaoGinfes(InterfaceAutorizador):
         prestador = etree.SubElement(root, f"{{{NS}}}Prestador")
         cpf_cnpj = etree.SubElement(prestador, f"{{{NS}}}CpfCnpj")
         etree.SubElement(cpf_cnpj, f"{{{NS}}}Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, f"{{{NS}}}InscricaoMunicipal").text = (
-            emitente.inscricao_municipal
-        )
+        etree.SubElement(
+            prestador, f"{{{NS}}}InscricaoMunicipal"
+        ).text = emitente.inscricao_municipal
 
         # Período
         periodo = etree.SubElement(root, f"{{{NS}}}PeriodoEmissao")
@@ -538,9 +535,9 @@ class SerializacaoGinfes(InterfaceAutorizador):
         prestador = etree.SubElement(root, f"{{{NS}}}Prestador")
         cpf_cnpj = etree.SubElement(prestador, f"{{{NS}}}CpfCnpj")
         etree.SubElement(cpf_cnpj, f"{{{NS}}}Cnpj").text = emitente.cnpj
-        etree.SubElement(prestador, f"{{{NS}}}InscricaoMunicipal").text = (
-            emitente.inscricao_municipal
-        )
+        etree.SubElement(
+            prestador, f"{{{NS}}}InscricaoMunicipal"
+        ).text = emitente.inscricao_municipal
 
         # Faixa
         faixa = etree.SubElement(root, f"{{{NS}}}Faixa")

@@ -5,7 +5,7 @@ import re
 
 import requests
 from pynfe.entidades.certificado import CertificadoA1
-from pynfe.utils import etree, normalizar_documento, obter_municipio_por_codigo, so_numeros
+from pynfe.utils import etree, normalizar_documento, obter_municipio_por_codigo
 from pynfe.utils.flags import (
     CODIGOS_ESTADOS,
     MODELO_MDFE,
@@ -857,7 +857,7 @@ class ComunicacaoNfse(Comunicacao):
             return self._post_zeep(url, NFSE[self.autorizador]["CONSULTA"], payload)
         elif self.autorizador == "GINFES":
             # xml
-            xml = '<?xml version="1.0" encoding="UTF-8"?>' +  payload.decode("utf-8")
+            xml = '<?xml version="1.0" encoding="UTF-8"?>' + payload.decode("utf-8")
             # comunica via wsdl
             return self._post_https(url, xml, "consulta")
         else:
@@ -1010,7 +1010,6 @@ class ComunicacaoNfse(Comunicacao):
                 raise Exception("Método não implementado no autorizador.")
         except Exception as e:
             raise e
-
 
     def enviar_barueri(self, xml, operation):
         url = self._get_url()

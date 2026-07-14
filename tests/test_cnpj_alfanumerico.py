@@ -16,7 +16,6 @@ pattern depende do pacote XSD oficial atualizado (ver xsd_pending).
 
 import datetime
 import unittest
-from decimal import Decimal
 
 from pynfe.entidades.cliente import Cliente
 from pynfe.entidades.emitente import Emitente
