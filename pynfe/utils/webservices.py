@@ -536,9 +536,7 @@ NFSE = {
         "DOWNLOAD": (
             "https://speedgov.com.br/sat{suffix_municipio}/servlet//com.satweb.aratb177e?1,1,1,1,{im},{numero_nfse},{codigo_verificacao}"
         ),
-        "SUFFIX_MUNICIPIO": {
-            "2307650":"mar"
-        },
+        "SUFFIX_MUNICIPIO": {"2307650": "mar"},
     },
     "GISS": {
         "CONSULTA_SERVICO": "ConsultarNfseServicoPrestado",

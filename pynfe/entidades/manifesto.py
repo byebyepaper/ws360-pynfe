@@ -3,7 +3,7 @@ import random
 from decimal import Decimal
 
 from pynfe import get_version
-from pynfe.utils import normalizar_documento, so_numeros
+from pynfe.utils import normalizar_documento
 from pynfe.utils.flags import CODIGOS_ESTADOS, MDFE_STATUS
 
 from .base import Entidade

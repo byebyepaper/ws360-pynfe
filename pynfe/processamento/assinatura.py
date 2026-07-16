@@ -29,10 +29,10 @@ class AssinaturaA1(Assinatura):
 
     def assinar(self, xml: etree._Element, retorna_string=False) -> Union[str, etree._Element]:
         if isinstance(xml, str):
-            xml = etree.fromstring(xml.encode('utf-8'))
+            xml = etree.fromstring(xml.encode("utf-8"))
 
         # busca tag que tem id(reference_uri), logo nao importa se tem namespace
-        reference = xml.xpath('//*[@Id]')[0].attrib['Id'] if xml.xpath('//*[@Id]') else None
+        reference = xml.xpath("//*[@Id]")[0].attrib["Id"] if xml.xpath("//*[@Id]") else None
 
         # retira acentos
         xml_str = remover_acentos(etree.tostring(xml, encoding="unicode", pretty_print=False))
@@ -51,6 +51,12 @@ class AssinaturaA1(Assinatura):
 
         ref_uri = ("#%s" % reference) if reference else None
         signed_root = signer.sign(xml, key=self.key, cert=self.cert, reference_uri=ref_uri)
+
+        # signxml >=4: com o namespace default (sem prefixo ds:) exigido pela SEFAZ, a
+        # tag <Signature> fica sem qualificacao no _Element vivo (xpath por namespace
+        # nao acha). Re-serializar e re-parsear normaliza a arvore sem mudar os bytes
+        # de saida (a assinatura ja esta calculada).
+        signed_root = etree.fromstring(etree.tostring(signed_root))
         if retorna_string:
             return etree.tostring(signed_root, encoding="unicode", pretty_print=False)
         else:

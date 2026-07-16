@@ -44,7 +44,7 @@ class Evento(Entidade):
             "n_seq_evento": str(self.n_seq_evento).zfill(2),
         }
         return self.id
-    
+
     @property
     def identificador_cte(self):
         """
@@ -265,7 +265,14 @@ class EventoManifestacaoDestCTe(Evento):
         # 4=Cancelamento do Insucesso de Entrega do CT-e
         # 5=Prestação do Serviço em Desacordo
         # 6=Cancelamento Prestação do Serviço em Desacordo
-        dict_tp_evento = {1: "110180", 2: "110181", 3: "110190", 4: "110191", 5: "610110", 6: "610111"}
+        dict_tp_evento = {
+            1: "110180",
+            2: "110181",
+            3: "110190",
+            4: "110191",
+            5: "610110",
+            6: "610111",
+        }
         """ Código do evento
             110180 – Comprovante de Entrega do CT-e
             110181 – Cancelamento do Comprovante de Entrega do CT-e
@@ -302,4 +309,3 @@ class EventoManifestacaoDestCTe(Evento):
     # este campo deve ser informado somente no evento de Insucesso na Entrega do CT-e.
     # (min 15 max 255 caracteres)
     justificativa = str()
-
