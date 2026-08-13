@@ -1177,6 +1177,9 @@ class ComunicacaoNfse(Comunicacao):
         Comunicação wsdl utilizando a biblioteca zeep )
         Recebe o wsdl, o método a ser chamado e o payload (XML ou objeto)
         """
+        # Fora do try: se o import do zeep falhar, o finally não pode explodir com
+        # UnboundLocalError e mascarar o erro real.
+        certificadoA1 = None
         try:
             import requests
             from zeep import Client
@@ -1214,7 +1217,7 @@ class ComunicacaoNfse(Comunicacao):
             return serialize_object(response)
 
         finally:
-            if self.certificado:
+            if certificadoA1 is not None:
                 certificadoA1.excluir()
 
 
