@@ -131,6 +131,61 @@ class ComunicacaoSefaz(Comunicacao):
                     return 0, nrec, nota_fiscal
         return 1, retorno, nota_fiscal
 
+    def autorizacao_nfcom(self, nota_fiscal, id_lote=1, timeout=None):
+        """
+        Autorização (recepção) de NFCom (modelo 62) via serviço NFComRecepcao.
+
+        Método ISOLADO: não altera `autorizacao()` (NFe/NFC-e) nem os demais
+        modelos — a NFCom tem envelope, namespace e parsing próprios.
+
+        :param nota_fiscal: XML já assinado da NFCom (elemento `NFCom`).
+        :param id_lote: idLote do envio (enviNFCom).
+        :param timeout: timeout do POST.
+        :return: `(0, nfcomProc)` quando autorizada (nfcomProc = NFCom + protNFCom);
+                 `(1, retorno, nota_fiscal)` caso contrário (rejeição/recibo/erro),
+                 mantendo o mesmo contrato de tupla do `autorizacao()` da NF-e.
+        """
+        # URL já resolvida pelo _get_url para nfcom + AUTORIZACAO (SVRS/MG/MT/MS).
+        url = self._get_url(modelo="nfcom", consulta="AUTORIZACAO")
+
+        # Corpo enviNFCom (idLote + NFCom assinada). Recepção síncrona.
+        raiz = etree.Element("enviNFCom", xmlns=NAMESPACE_NFCOM, versao=VERSAO_NFCOM)
+        etree.SubElement(raiz, "idLote").text = str(id_lote)
+        raiz.append(nota_fiscal)
+
+        xml = self._construir_xml_soap("NFComRecepcao", raiz)
+        retorno = self._post(url, xml, timeout)
+
+        if retorno.status_code != 200:
+            return 1, retorno, nota_fiscal
+
+        try:
+            resp = etree.fromstring(retorno.text)
+        except ValueError:
+            resp = etree.fromstring(retorno.content)
+
+        ns = {"ns": NAMESPACE_NFCOM}
+
+        # No processamento síncrono o protNFCom vem embutido na resposta.
+        prot = resp.xpath("//ns:protNFCom", namespaces=ns)
+        if prot:
+            cstat_el = prot[0].xpath("ns:infProt/ns:cStat", namespaces=ns)
+            cstat = cstat_el[0].text if cstat_el else None
+            # 100 = Autorizado o uso da NFCom
+            if cstat in ("100", "150"):
+                nfcom_proc = etree.Element(
+                    "nfcomProc", xmlns=NAMESPACE_NFCOM, versao=VERSAO_NFCOM
+                )
+                nfcom_proc.append(nota_fiscal)
+                nfcom_proc.append(prot[0])
+                return 0, nfcom_proc
+            # Rejeição com protocolo (ex.: cStat de rejeição por regra de validação).
+            return 1, retorno, nota_fiscal
+
+        # Sem protNFCom: rejeição de lote ou eventual recibo assíncrono. Deixa o
+        # chamador decidir (o retorno completo é preservado na tupla).
+        return 1, retorno, nota_fiscal
+
     def consulta_recibo(self, modelo, numero, contingencia=False):
         """
         Este método oferece a consulta do resultado do processamento de um lote de NF-e.
@@ -683,8 +738,8 @@ class ComunicacaoSefaz(Comunicacao):
             x = etree.SubElement(body, "consultaCadastro", xmlns=NAMESPACE_METODO + metodo)
             a = etree.SubElement(x, "nfeDadosMsg")
 
-        # === NFCOM Consulta ===
-        elif metodo == "NFComConsulta":
+        # === NFCOM (Consulta / Recepção / Status) ===
+        elif metodo in ("NFComConsulta", "NFComRecepcao", "NFComStatusServico"):
             a = etree.SubElement(body, "nfcomDadosMsg", xmlns=NAMESPACE_NFCOM_METODO + metodo)
 
         # === Default (NFe / NFCe / CTe etc) ===
