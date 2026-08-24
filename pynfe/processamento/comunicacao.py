@@ -571,6 +571,12 @@ class ComunicacaoSefaz(Comunicacao):
 
     def _get_url(self, modelo, consulta, contingencia=False):
         """Retorna a url para comunicação com o webservice"""
+        # O download de NFCom é feito no portal do SVRS, cuja URL já é absoluta e vale para
+        # qualquer UF. Precisa ser resolvido antes dos ramos por UF: lá a URL é montada como
+        # ambiente + caminho, o que produziria "https://nfcom.https://dfe-portal...".
+        if modelo == "nfcom" and consulta == "DOWNLOAD":
+            self.url = NFCOM["SVRS"][consulta]
+            return self.url
         if contingencia:
             contingencia_svrs = ["AM", "BA", "CE", "GO", "MA", "MS", "MT", "PE", "PR"]
             contingencia_svan = [
