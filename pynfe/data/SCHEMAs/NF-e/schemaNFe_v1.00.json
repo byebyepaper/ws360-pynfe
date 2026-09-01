@@ -463,14 +463,14 @@
                 "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vICMS",
                 "fundoCombatePobreza": {
                     "baseCalculo": {
-                        "aliquota_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/pFCP",
-                        "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vFCP",
                         "valor_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/vBCFCP",
                         "valor_ICMS20": "NFe/infNFe/det/imposto/ICMS/ICMS20/vBCFCP",
                         "valor_ICMS51": "NFe/infNFe/det/imposto/ICMS/ICMS51/vBCFCP",
                         "valor_ICMS70": "NFe/infNFe/det/imposto/ICMS/ICMS70/vBCFCP",
                         "valor_ICMS90": "NFe/infNFe/det/imposto/ICMS/ICMS90/vBCFCP"
                     },
+                    "aliquota_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/pFCP",
+                    "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vFCP",
                     "aliquota_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/pFCP",
                     "valor_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/vFCP",
                     "aliquota_ICMS20": "NFe/infNFe/det/imposto/ICMS/ICMS20/pFCP",
