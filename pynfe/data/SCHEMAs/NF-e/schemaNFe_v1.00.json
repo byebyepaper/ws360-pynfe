@@ -463,14 +463,14 @@
                 "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vICMS",
                 "fundoCombatePobreza": {
                     "baseCalculo": {
-                        "aliquota_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/pFCP",
-                        "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vFCP",
                         "valor_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/vBCFCP",
                         "valor_ICMS20": "NFe/infNFe/det/imposto/ICMS/ICMS20/vBCFCP",
                         "valor_ICMS51": "NFe/infNFe/det/imposto/ICMS/ICMS51/vBCFCP",
                         "valor_ICMS70": "NFe/infNFe/det/imposto/ICMS/ICMS70/vBCFCP",
                         "valor_ICMS90": "NFe/infNFe/det/imposto/ICMS/ICMS90/vBCFCP"
                     },
+                    "aliquota_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/pFCP",
+                    "valor_ICMS00": "NFe/infNFe/det/imposto/ICMS/ICMS00/vFCP",
                     "aliquota_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/pFCP",
                     "valor_ICMS10": "NFe/infNFe/det/imposto/ICMS/ICMS10/vFCP",
                     "aliquota_ICMS20": "NFe/infNFe/det/imposto/ICMS/ICMS20/pFCP",
@@ -840,36 +840,36 @@
                     "valorTotalCbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBSMono/gMonoDif/vTotCBSMonoItem"
                 },
                 "transferenciaCredito": {
-                    "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gTransfCred/vIBS",
-                    "valorCbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gTransfCred/vCBS"
+                    "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gTransfCred/vIBS",
+                    "valorCbs": "NFe/infNFe/det/imposto/IBSCBS/gTransfCred/vCBS"
                 },
                 "ajusteCompetencia": {
-                    "competencia": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gAjusteCompet/competApur",
-                    "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gAjusteCompet/vIBS",
-                    "valorCbs": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gAjusteCompet/vCBS"
+                    "competencia": "NFe/infNFe/det/imposto/IBSCBS/gAjusteCompet/competApur",
+                    "valorIbs": "NFe/infNFe/det/imposto/IBSCBS/gAjusteCompet/vIBS",
+                    "valorCbs": "NFe/infNFe/det/imposto/IBSCBS/gAjusteCompet/vCBS"
                 },
                 "estornoCredito": {
-                    "valorIbsEstornado": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gEstornoCred/vIBSEstCred",
-                    "valorCbsEstornado": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gEstornoCred/vCBSEstCred"
+                    "valorIbsEstornado": "NFe/infNFe/det/imposto/IBSCBS/gEstornoCred/vIBSEstCred",
+                    "valorCbsEstornado": "NFe/infNFe/det/imposto/IBSCBS/gEstornoCred/vCBSEstCred"
                 },
                 "creditoPresumidoOperacao": {
-                    "codigo": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCredPresOper/cCredPres",
-                    "baseCalculo": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCredPresOper/vBCCredPres"
+                    "baseCalculo": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/vBCCredPres",
+                    "codigo": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/cCredPres"
                 },
                 "ibsCreditoPresumido": {
-                    "percentual": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gIBSCredPres/pCredPres",
-                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gIBSCredPres/vCredPres",
-                    "valorSuspensivo": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gIBSCredPres/vCredPresCondSus"
+                    "percentual": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gIBSCredPres/pCredPres",
+                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gIBSCredPres/vCredPres",
+                    "valorSuspensivo": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gIBSCredPres/vCredPresCondSus"
                 },
                 "cbsCreditoPresumido": {
-                    "percentual": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCBSCredPres/pCredPres",
-                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCBSCredPres/vCredPres",
-                    "valorSuspensivo": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCBSCredPres/vCredPresCondSus"
+                    "percentual": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gCBSCredPres/pCredPres",
+                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gCBSCredPres/vCredPres",
+                    "valorSuspensivo": "NFe/infNFe/det/imposto/IBSCBS/gCredPresOper/gCBSCredPres/vCredPresCondSus"
                 },
                  "creditoPresumidoZfm": {
-                    "competencia": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCredPresIBSZFM/competApur",
-                    "tipo": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCredPresIBSZFM/tpCredPresIBSZFM",
-                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gIBSCBS/gCredPresIBSZFM/vCredPresIBSZFM"
+                    "competencia": "NFe/infNFe/det/imposto/IBSCBS/gCredPresIBSZFM/competApur",
+                    "tipo": "NFe/infNFe/det/imposto/IBSCBS/gCredPresIBSZFM/tpCredPresIBSZFM",
+                    "valor": "NFe/infNFe/det/imposto/IBSCBS/gCredPresIBSZFM/vCredPresIBSZFM"
                 }
             },
             "ipi": {
